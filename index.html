@@ -1,228 +1,250 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_5.html -->
+<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_7.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="WordLens">
-<meta name="theme-color" content="#0d0f14">
+<meta name="theme-color" content="#1a1a1a">
 <title>WordLens</title>
 <link href="./index_files/css2" rel="stylesheet">
 <style>
+/* ── Claude 橘白深色主題 ── */
 :root{
-  --bg:#0d0f14; --s1:#13161e; --s2:#191d28; --s3:#1f2435;
-  --border:#272c3d; --border2:#32394f;
-  --accent:#e8a020; --accent2:#3d9fff; --green:#2ecc71; --red:#e74c3c; --purple:#9b59b6;
-  --text:#f0eff4; --muted:#8892a4; --muted2:#b0bac8;
+  --bg:#1a1a1a;
+  --s1:#222222;
+  --s2:#2a2a2a;
+  --s3:#333333;
+  --border:#3a3a3a;
+  --border2:#444444;
+  --accent:#d97706;      /* 琥珀橘 — Claude 主色 */
+  --accent-light:#f59e0b;
+  --accent-bg:rgba(217,119,6,.1);
+  --accent-border:rgba(217,119,6,.3);
+  --green:#22c55e;
+  --red:#ef4444;
+  --blue:#60a5fa;
+  --purple:#a78bfa;
+  --text:#f5f0eb;
+  --muted:#888880;
+  --muted2:#aaa8a0;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden}
 button{cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none}
-input,textarea{font-family:'Noto Sans TC',sans-serif}
+input,textarea{font-family:'Noto Sans TC',sans-serif;color:var(--text)}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
-/* ── Shell ── */
 #app{max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
 /* ── Nav ── */
 nav{display:flex;background:var(--s1);border-top:1px solid var(--border);order:2;flex-shrink:0}
 nav button{flex:1;padding:10px 2px 12px;font-size:10px;font-weight:600;background:none;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
 nav button .ni{font-size:20px}
-nav button.active{color:var(--accent)}
+nav button.active{color:var(--accent-light)}
 
 /* ── Views ── */
 .view{flex:1;overflow-y:auto;display:none;flex-direction:column}
 .view.show{display:flex}
 
 /* ── Home ── */
-.home-hero{padding:48px 24px 20px;background:linear-gradient(160deg,#0d0f14 0%,#13161e 60%,#191520 100%)}
-.app-name{font-family:'Playfair Display',serif;font-size:42px;color:var(--text);letter-spacing:-1px}
-.app-name span{color:var(--accent);font-style:italic}
+.home-hero{padding:48px 24px 18px}
+.app-name{font-family:'Playfair Display',serif;font-size:40px;color:var(--text);letter-spacing:-1px}
+.app-name em{color:var(--accent-light);font-style:italic}
 .app-sub{font-size:13px;color:var(--muted);margin-top:6px}
+.home-divider{height:1px;background:var(--border);margin:0 24px 16px}
 
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 24px}
-.stat{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center}
-.stat-n{font-family:'Playfair Display',serif;font-size:32px;color:var(--accent)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 24px 16px}
+.stat{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:32px;color:var(--accent-light)}
 .stat-l{font-size:11px;color:var(--muted);margin-top:2px}
 
-.home-section{padding:0 24px 8px;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
-.recent-list{padding:0 24px 16px;display:flex;flex-direction:column;gap:8px}
+.sec-head{padding:0 24px 8px;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.recent-list{padding:0 24px 20px;display:flex;flex-direction:column;gap:8px}
 .recent-item{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
 .recent-item:active{border-color:var(--accent)}
 .ri-word{font-family:'Playfair Display',serif;font-size:20px;flex:1}
 .ri-zh{font-size:12px;color:var(--muted);margin-top:2px}
-.ri-badge{font-size:11px;color:var(--accent);background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.25);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.ri-badge{font-size:11px;color:var(--accent-light);background:var(--accent-bg);border:1px solid var(--accent-border);padding:2px 8px;border-radius:20px;white-space:nowrap}
 
-/* ── Camera / Add ── */
+/* ── Add ── */
 .add-wrap{flex:1;display:flex;flex-direction:column;padding:20px 24px;gap:14px;overflow-y:auto}
-.section-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.sec-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
 
-.camera-zone{background:var(--s1);border:2px dashed var(--border2);border-radius:20px;padding:0;overflow:hidden;position:relative;cursor:pointer;min-height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;transition:border-color .2s}
-.camera-zone:active{border-color:var(--accent)}
-.camera-zone img{width:100%;height:auto;display:block;border-radius:18px}
-.camera-zone.has-img{border-style:solid;border-color:var(--border2)}
-#cam-input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.cam-hint{font-size:14px;color:var(--muted);text-align:center}
-.cam-icon{font-size:40px}
-
-.btn-primary{background:var(--accent);color:#0d0f14;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%;transition:opacity .15s}
+.btn-primary{background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%;transition:opacity .15s}
 .btn-primary:active{opacity:.8}
-.btn-primary:disabled{opacity:.4;cursor:not-allowed}
-
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
 .btn-secondary{background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:14px;padding:13px;font-size:15px;font-weight:600;width:100%}
+.btn-green{background:var(--green);color:#fff;border-radius:14px;padding:13px;font-size:15px;font-weight:700;width:100%}
 
-.manual-input{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;font-size:16px;color:var(--text);outline:none;width:100%;transition:border-color .2s}
-.manual-input:focus{border-color:var(--accent)}
+.txt-input{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;font-size:16px;outline:none;width:100%;transition:border-color .2s}
+.txt-input:focus{border-color:var(--accent)}
 
-.loading-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.spinner-wrap{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
 .spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-msg{font-size:14px;color:var(--muted2)}
+.spin-msg{font-size:14px;color:var(--muted2)}
 
-/* ── Word Detail Card ── */
-.word-detail{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:0}
-.wd-tag{display:inline-flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
-.tag-cat{color:var(--accent2);background:rgba(61,159,255,.12);border:1px solid rgba(61,159,255,.25)}
-.tag-src{color:var(--purple);background:rgba(155,89,182,.12);border:1px solid rgba(155,89,182,.25)}
-.wd-word{font-family:'Playfair Display',serif;font-size:40px;line-height:1}
-.wd-ph{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);margin-top:5px}
-.wd-pos{font-size:12px;color:var(--accent);font-weight:700;margin-top:12px;letter-spacing:.5px;text-transform:uppercase}
-.wd-zh{font-size:24px;font-weight:700;margin-top:4px}
-.wd-en{font-size:14px;color:var(--muted2);margin-top:3px;line-height:1.5}
+.mode-tabs{display:flex;gap:6px}
+.mtab{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted);border-radius:10px;padding:9px 4px;font-size:13px;font-weight:600;transition:all .15s}
+.mtab.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-light)}
+.cam-btns{display:flex;gap:8px}
+.cbtn{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:14px;font-size:15px;font-weight:600;transition:all .15s}
+.cbtn:active{border-color:var(--accent);color:var(--accent-light)}
 
-.ex-block{background:var(--s2);border-left:3px solid var(--accent2);border-radius:0 12px 12px 0;padding:12px 14px;margin-top:14px}
-.ex-en{font-size:15px;line-height:1.6;font-style:italic}
+.img-preview{display:none;flex-direction:column;gap:8px}
+.img-preview img{width:100%;border-radius:14px;display:block}
+.img-preview.show{display:flex}
+
+/* ── Word Result Card ── */
+.result-section{display:flex;flex-direction:column;gap:14px}
+
+.word-header{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:20px}
+.wtag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.wtag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.wtag-lvl{color:var(--accent-light);background:var(--accent-bg);border:1px solid var(--accent-border)}
+.wtag-src{color:var(--purple);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25)}
+.wtag-dup{color:var(--red);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
+.w-word{font-family:'Playfair Display',serif;font-size:40px;line-height:1;color:var(--text)}
+.w-ph{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);margin-top:5px}
+.w-pos{font-size:12px;color:var(--accent-light);font-weight:700;margin-top:12px;letter-spacing:.5px;text-transform:uppercase}
+.w-zh{font-size:24px;font-weight:700;margin-top:4px;color:var(--text)}
+.w-en{font-size:14px;color:var(--muted2);margin-top:3px;line-height:1.5}
+.ex-block{background:var(--s2);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 14px;margin-top:14px}
+.ex-en{font-size:15px;line-height:1.6;font-style:italic;color:var(--text)}
 .ex-zh{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.5}
+.speak-row{display:flex;gap:8px;margin-top:12px}
+.btn-speak{flex:1;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--blue);border-radius:11px;padding:10px;font-size:13px;font-weight:600}
 
-/* ── Root Analysis ── */
-.root-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px}
-.root-title{font-size:11px;color:var(--purple);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:14px}
-.root-parts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.root-part{padding:8px 14px;border-radius:10px;text-align:center}
-.root-part .rp-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600}
-.root-part .rp-mean{font-size:11px;margin-top:3px;opacity:.8}
-.root-prefix{background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);color:var(--accent)}
-.root-root{background:rgba(155,89,182,.1);border:1px solid rgba(155,89,182,.3);color:var(--purple)}
-.root-suffix{background:rgba(61,159,255,.1);border:1px solid rgba(61,159,255,.3);color:var(--accent2)}
+/* ── Root Analysis Card ── */
+.root-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.root-card-title{font-size:11px;color:var(--accent-light);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.root-parts-row{display:flex;gap:8px;flex-wrap:wrap}
+.rp{padding:8px 14px;border-radius:10px;text-align:center}
+.rp-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.rp-mean{font-size:11px;margin-top:3px;opacity:.85}
+.rp-prefix{background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.35);color:var(--accent-light)}
+.rp-root{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);color:var(--purple)}
+.rp-suffix{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);color:var(--blue)}
+.root-tip-box{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:12px;padding:12px 14px}
+.root-tip-label{font-size:11px;color:var(--accent-light);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
+.root-tip-text{font-size:14px;color:var(--muted2);line-height:1.6}
+.family-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.family-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.fw{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;color:var(--text);transition:border-color .15s}
+.fw:active{border-color:var(--purple)}
 
-.root-family{margin-top:4px}
-.root-family-title{font-size:12px;color:var(--muted);margin-bottom:8px}
-.root-family-words{display:flex;flex-wrap:wrap;gap:6px}
-.family-word{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;transition:border-color .15s}
-.family-word:active{border-color:var(--purple)}
+/* ── Memory tip ── */
+.mem-card{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:14px;padding:14px 16px}
+.mem-label{font-size:11px;color:var(--accent-light);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
+.mem-text{font-size:14px;color:var(--muted2);line-height:1.6}
 
-.tip-card{background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.2);border-radius:16px;padding:14px 16px}
-.tip-label{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
-.tip-text{font-size:14px;color:var(--muted2);line-height:1.6}
+/* ── Save actions ── */
+.save-row{display:flex;gap:8px;margin-top:2px}
+.btn-save-one{flex:1;background:var(--accent);color:#fff;border-radius:12px;padding:12px;font-size:14px;font-weight:700;transition:opacity .15s}
+.btn-save-one:active{opacity:.8}
+.already-saved{flex:1;text-align:center;color:var(--muted);font-size:13px;padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:12px}
 
-.word-actions{display:flex;gap:10px;margin-top:4px}
-.btn-speak{flex:1;background:rgba(61,159,255,.1);border:1px solid rgba(61,159,255,.25);color:var(--accent2);border-radius:12px;padding:11px;font-size:14px;font-weight:600}
-.btn-star{width:46px;background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.25);color:var(--accent);border-radius:12px;font-size:18px}
-.btn-star.on{background:rgba(232,160,32,.25)}
-.btn-save-word{flex:1;background:var(--green);color:#fff;border-radius:12px;padding:11px;font-size:14px;font-weight:700}
+/* ── Bulk save bar ── */
+.bulk-bar{background:var(--s1);border:1px solid var(--accent-border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.bulk-info{flex:1;font-size:14px;font-weight:600;color:var(--accent-light)}
+.bulk-info span{font-size:12px;color:var(--muted);font-weight:400}
+.btn-bulk{background:var(--accent);color:#fff;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;white-space:nowrap}
+
+/* ── API prompt ── */
+.api-box{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.api-label{font-size:13px;color:var(--muted2);line-height:1.7}
+.api-input{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;width:100%;font-family:'JetBrains Mono',monospace;color:var(--text)}
+.api-input:focus{border-color:var(--accent)}
 
 /* ── Library ── */
-.lib-toolbar{padding:14px 24px 8px;display:flex;gap:10px;align-items:center}
-.search-input{flex:1;background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--text);outline:none}
-.search-input:focus{border-color:var(--accent)}
+.lib-toolbar{padding:16px 24px 8px;display:flex;gap:10px}
+.search-inp{flex:1;background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;outline:none;color:var(--text)}
+.search-inp:focus{border-color:var(--accent)}
 .lib-count{font-size:12px;color:var(--muted);padding:0 24px 10px}
 .lib-list{flex:1;overflow-y:auto;padding:0 24px 24px;display:flex;flex-direction:column;gap:8px}
 .lib-item{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
 .lib-item:active{border-color:var(--accent)}
-.li-word{font-family:'Playfair Display',serif;font-size:22px;flex:1}
+.li-word{font-family:'Playfair Display',serif;font-size:22px;color:var(--text)}
 .li-info{font-size:12px;color:var(--muted);margin-top:2px}
-.li-actions{display:flex;gap:6px}
-.btn-li-speak{background:none;border:none;font-size:20px;padding:4px 6px}
-.btn-li-del{background:none;border:none;font-size:16px;color:var(--red);padding:4px 6px}
-.empty-lib{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);padding:40px;text-align:center}
+.li-acts{display:flex;gap:4px}
+.btn-speak-sm{background:none;border:none;font-size:20px;padding:4px 6px}
+.btn-del{background:none;border:none;font-size:16px;color:var(--red);padding:4px 6px}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);padding:40px;text-align:center}
 
 /* ── Quiz ── */
 .quiz-wrap{flex:1;display:flex;flex-direction:column;padding:20px 24px 32px;gap:12px;overflow-y:auto}
-.quiz-prog-bar{height:3px;background:var(--border);border-radius:99px;overflow:hidden}
-.quiz-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s}
-.quiz-q-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px}
-.quiz-ql{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.quiz-word{font-family:'Playfair Display',serif;font-size:36px;margin-bottom:5px}
-.quiz-ph{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
+.qprog-bar{height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.qprog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:99px;transition:width .4s}
+.q-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px}
+.q-label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.q-word{font-family:'Playfair Display',serif;font-size:36px;color:var(--text);margin-bottom:5px}
+.q-ph{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
 .opts{display:flex;flex-direction:column;gap:9px}
 .opt{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:15px 16px;font-size:15px;color:var(--text);text-align:left;transition:all .12s}
 .opt:active{transform:scale(.98)}
-.opt.ok{background:rgba(46,204,113,.1);border-color:var(--green);color:var(--green)}
-.opt.no{background:rgba(231,76,60,.1);border-color:var(--red);color:var(--red)}
+.opt.ok{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.opt.no{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
 .explain-box{background:var(--s2);border-radius:14px;padding:14px;font-size:14px;color:var(--muted2);line-height:1.6;border-left:3px solid var(--green)}
 .explain-box .exq{font-style:italic;color:var(--text);margin-bottom:5px}
-.btn-nq{background:var(--accent);color:#0d0f14;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%}
+.btn-nq{background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%}
 .score-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
 .score-emoji{font-size:64px}
-.score-n{font-family:'Playfair Display',serif;font-size:56px;color:var(--accent)}
+.score-n{font-family:'Playfair Display',serif;font-size:56px;color:var(--accent-light)}
 .score-sub{font-size:15px;color:var(--muted)}
 .score-msg{font-size:17px;font-weight:700}
-.btn-retry{background:var(--accent);color:#0d0f14;border-radius:14px;padding:14px 40px;font-size:16px;font-weight:700;margin-top:8px}
-.quiz-need-more{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;text-align:center}
+.btn-retry{background:var(--accent);color:#fff;border-radius:14px;padding:14px 40px;font-size:16px;font-weight:700;margin-top:8px}
 
-/* ── Modal overlay ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:flex-end;max-width:480px;margin:0 auto}
-.modal{background:var(--s1);border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:85dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.modal-title{font-family:'Playfair Display',serif;font-size:26px}
+/* ── Modal ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;max-width:480px;margin:0 auto}
+.modal{background:var(--s1);border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:88dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal-word{font-family:'Playfair Display',serif;font-size:32px;color:var(--text)}
 .modal-close{background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:12px;font-size:15px;font-weight:600;width:100%}
 
-/* ── Notify toast ── */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:14px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px;text-align:center}
+/* ── Toast ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:14px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px;text-align:center;white-space:pre-line}
 .toast.show{opacity:1}
-
-/* ── API key prompt ── */
-.api-prompt{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px}
-.api-label{font-size:13px;color:var(--muted2);line-height:1.6}
-.api-input{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text);outline:none;width:100%;font-family:'JetBrains Mono',monospace}
-.api-input:focus{border-color:var(--accent)}
-.mode-tab{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:600;transition:all .15s}
-.mode-tab.active-tab{background:rgba(232,160,32,.12);border-color:var(--accent);color:var(--accent)}
-.cam-btn{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:13px;font-size:15px;font-weight:600;transition:all .15s}
-.cam-btn:active{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- ── HOME ── -->
+  <!-- HOME -->
   <div class="view show" id="v-home">
     <div class="home-hero">
-      <div class="app-name">Word<span>Lens</span></div>
-      <div class="app-sub">拍照・AI 分析・字根字首・個人單字庫</div>
+      <div class="app-name">Word<em>Lens</em></div>
+      <div class="app-sub">拍照・AI 字根字首分析・個人單字庫</div>
     </div>
+    <div class="home-divider"></div>
     <div class="stats-grid">
       <div class="stat"><div class="stat-n" id="h-total">0</div><div class="stat-l">我的單字</div></div>
       <div class="stat"><div class="stat-n" id="h-today">0</div><div class="stat-l">今日新增</div></div>
       <div class="stat"><div class="stat-n" id="h-quiz">0</div><div class="stat-l">測驗次數</div></div>
     </div>
-    <div class="home-section">最近新增</div>
+    <div class="sec-head">最近新增</div>
     <div class="recent-list" id="recent-list"><div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">還沒有單字，去拍照新增吧！📸</div></div>
   </div>
 
-  <!-- ── ADD / CAMERA ── -->
+  <!-- ADD -->
   <div class="view" id="v-add">
-    <div class="add-wrap" id="add-wrap">
-      <!-- API Key check rendered here -->
-    </div>
+    <div class="add-wrap" id="add-wrap"></div>
   </div>
 
-  <!-- ── LIBRARY ── -->
+  <!-- LIBRARY -->
   <div class="view" id="v-lib">
     <div class="lib-toolbar">
-      <input class="search-input" placeholder="🔍 搜尋單字..." oninput="filterLib(this.value)" id="lib-search">
+      <input class="search-inp" id="lib-search" placeholder="🔍 搜尋單字..." oninput="filterLib(this.value)">
     </div>
     <div class="lib-count" id="lib-count"></div>
     <div class="lib-list" id="lib-list"></div>
   </div>
 
-  <!-- ── QUIZ ── -->
+  <!-- QUIZ -->
   <div class="view" id="v-quiz">
-    <div id="quiz-content" class="quiz-wrap"></div>
+    <div class="quiz-wrap" id="quiz-content"></div>
   </div>
 
-  <!-- ── NAV ── -->
   <nav>
     <button class="active" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
     <button onclick="goTab(&#39;add&#39;)"><span class="ni">📸</span>新增</button>
@@ -232,49 +254,44 @@ nav button.active{color:var(--accent)}
 </div>
 
 <!-- Modal -->
-<div class="modal-bg" id="modal" style="display:none" onclick="closeModal(event)">
+<div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modal-body"></div>
 </div>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════
-//  State & Storage
-// ══════════════════════════════
-let library = JSON.parse(localStorage.getItem('wl-lib') || '[]');
-let stats   = JSON.parse(localStorage.getItem('wl-stats') || '{"quiz":0,"today":0,"date":""}');
-let apiKey  = localStorage.getItem('wl-key') || '';
-let currentWord = null; // word being previewed before saving
-let quizState = { words:[], idx:0, score:0, answered:false };
+// ══ State ══
+let library  = JSON.parse(localStorage.getItem('wl-lib')   || '[]');
+let stats    = JSON.parse(localStorage.getItem('wl-stats') || '{"quiz":0,"today":0,"date":""}');
+let apiKey   = localStorage.getItem('wl-key') || '';
+let pending  = [];   // words returned by AI, waiting to be saved
+let quizSt   = {words:[],idx:0,score:0,ans:false};
 
-function saveLib(){ localStorage.setItem('wl-lib', JSON.stringify(library)); }
-function saveSt() { localStorage.setItem('wl-stats', JSON.stringify(stats)); }
-function saveKey(k){ apiKey=k; localStorage.setItem('wl-key', k); }
+const save  = ()=> localStorage.setItem('wl-lib',   JSON.stringify(library));
+const saveSt= ()=> localStorage.setItem('wl-stats', JSON.stringify(stats));
+const saveK = k  =>{ apiKey=k; localStorage.setItem('wl-key',k); };
 
-function todayStr(){ return new Date().toDateString(); }
-function ensureToday(){ if(stats.date !== todayStr()){ stats.today=0; stats.date=todayStr(); saveSt(); } }
-
-function toast(msg, dur=2200){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), dur);
+function ensureToday(){
+  const t = new Date().toDateString();
+  if(stats.date!==t){ stats.today=0; stats.date=t; saveSt(); }
 }
 
-function speak(text){
+function toast(msg, dur=2400){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), dur);
+}
+
+function speak(t){
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = 0.82;
+  const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.82;
   window.speechSynthesis.speak(u);
 }
 
 function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
 
-// ══════════════════════════════
-//  Tab navigation
-// ══════════════════════════════
+// ══ Nav ══
 function goTab(tab){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('show'));
   document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('active',['home','add','lib','quiz'][i]===tab));
@@ -285,537 +302,526 @@ function goTab(tab){
   if(tab==='quiz') renderQuiz();
 }
 
-// ══════════════════════════════
-//  API Call — OpenAI
-// ══════════════════════════════
-async function callOpenAI(messages){
-  const res = await fetch('https://api.openai.com/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-    body: JSON.stringify({
-      model:'gpt-4o-mini',
-      max_tokens:1500,
-      response_format:{type:'json_object'},
-      messages
-    })
-  });
-  if(!res.ok){
-    const err = await res.json().catch(()=>({}));
-    throw new Error((err&&err.error&&err.error.message)||'API error '+res.status);
-  }
-  const d = await res.json();
-  return d.choices[0].message.content;
-}
-
-// ══════════════════════════════
-//  Image → base64
-// ══════════════════════════════
-function fileToBase64(file){
-  return new Promise((res,rej)=>{
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-// ══════════════════════════════
-//  Home
-// ══════════════════════════════
+// ══ Home ══
 function renderHome(){
   ensureToday();
   document.getElementById('h-total').textContent = library.length;
   document.getElementById('h-today').textContent = stats.today;
   document.getElementById('h-quiz').textContent  = stats.quiz;
-  const recent = [...library].reverse().slice(0,6);
   const el = document.getElementById('recent-list');
-  if(!recent.length){
-    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">還沒有單字，去拍照新增吧！📸</div>';
+  const rec = [...library].reverse().slice(0,6);
+  if(!rec.length){
+    el.innerHTML='<div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">還沒有單字，去拍照新增吧！📸</div>';
     return;
   }
-  el.innerHTML = recent.map(w=>`
-    <div class="recent-item" onclick="openWordModal('${w.word}')">
+  el.innerHTML = rec.map(w=>`
+    <div class="recent-item" onclick="openModal('${w.word.replace(/'/g,"\\'")}')">
       <div style="flex:1">
         <div class="ri-word">${w.word}</div>
         <div class="ri-zh">${w.zh}</div>
       </div>
       <span class="ri-badge">${w.source||'手動'}</span>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ══════════════════════════════
-//  Add / Camera  (v2 — fixed)
-// ══════════════════════════════
-let previewImg = null;
-const WORD_PROMPT = '請分析圖片/文字中所有值得學習的英文單字（優先多益800分等級），每個單字輸出完整分析。輸出純JSON，格式：{"words":[{"word":"單字","phonetic":"音標","pos":"詞性","zh":"中文意思(2-5字)","en_def":"英文定義","example_en":"TOEIC例句","example_zh":"例句中譯","roots":[{"part":"字根","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}';
-const TEXT_PROMPT = (word) => `請分析英文單字「${word}」，輸出純JSON：{"words":[{"word":"${word}","phonetic":"音標","pos":"詞性","zh":"中文意思(2-5字)","en_def":"英文定義","example_en":"TOEIC例句","example_zh":"例句中譯","roots":[{"part":"字根","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3","同族4"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}`;
-const PASSAGE_PROMPT = (text) => `以下是一段英文文字，請找出所有值得學習的英文單字（優先多益800分等級，最多10個），每個單字輸出完整分析。文字內容：「${text}」。輸出純JSON：{"words":[{"word":"單字","phonetic":"音標","pos":"詞性","zh":"中文意思(2-5字)","en_def":"英文定義","example_en":"TOEIC例句","example_zh":"例句中譯","roots":[{"part":"字根","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}`;
-
-function resetKey(){
-  if(!confirm('確定要重設 API Key？')) return;
-  localStorage.removeItem('wl-key');
-  apiKey = '';
-  renderAdd();
+// ══ API ══
+async function callAI(messages){
+  const r = await fetch('https://api.openai.com/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body: JSON.stringify({model:'gpt-4o-mini', max_tokens:2000, response_format:{type:'json_object'}, messages})
+  });
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error((e?.error?.message)||'API error '+r.status); }
+  const d=await r.json();
+  return d.choices[0].message.content;
 }
+
+function fileToB64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// JSON prompt templates
+const SYS = 'You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown.';
+
+const IMG_PROMPT = `請辨識圖片中所有值得學習的英文單字（優先多益800分等級，最多8個）。
+每個單字輸出完整分析，回傳JSON：{"words":[{
+  "word":"單字","phonetic":"IPA音標","pos":"詞性(n./v./adj.等)","zh":"中文意思2-5字",
+  "en_def":"英文定義1句","example_en":"TOEIC風格例句","example_zh":"例句中文翻譯",
+  "roots":[{"part":"字根/字首/字尾原文","type":"prefix或root或suffix","meaning":"中文意思"}],
+  "root_tip":"利用字根記憶此單字的方法(繁中1-2句)","family_words":["同族單字1","同族單字2","同族單字3"],
+  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍如650-800"
+}]}`;
+
+const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON：{"words":[{
+  "word":"${w}","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字",
+  "en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯",
+  "roots":[{"part":"字根原文","type":"prefix或root或suffix","meaning":"中文意思"}],
+  "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3","同族4"],
+  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
+}]}`;
+
+const PASSAGE_PROMPT = txt=>`以下英文文字中，找出所有值得學習的單字（優先多益800分，最多10個）。
+文字：「${txt}」
+回傳JSON：{"words":[{
+  "word":"單字","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字",
+  "en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯",
+  "roots":[{"part":"字根原文","type":"prefix或root或suffix","meaning":"中文意思"}],
+  "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3"],
+  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
+}]}`;
+
+// ══ Add Page ══
+let previewFile = null;
+let addMode = 'cam';
 
 function renderAdd(){
   const wrap = document.getElementById('add-wrap');
   if(!apiKey){
-    wrap.innerHTML = `
-      <div class="section-label">設定 API Key</div>
-      <div class="api-prompt">
-        <div class="api-label">
-          輸入你的 <strong>OpenAI API Key</strong> 才能使用 AI 分析功能。<br><br>
-          前往 <strong>platform.openai.com/api-keys</strong> 取得（需儲值 $5，每次分析約 $0.001）。
-        </div>
-        <input class="api-input" id="key-input" placeholder="sk-..." type="password"/>
-        <button class="btn-primary" onclick="submitKey()">儲存並開始使用</button>
-      </div>
-    `;
+    wrap.innerHTML=`
+      <div class="sec-label">設定 API Key</div>
+      <div class="api-box">
+        <div class="api-label">輸入你的 <strong style="color:var(--accent-light)">OpenAI API Key</strong>（格式：sk-...）才能使用 AI 分析功能。<br><br>
+        前往 <strong>platform.openai.com/api-keys</strong> 取得，需儲值 $5，每次分析約 $0.001。</div>
+        <input class="api-input" id="key-inp" placeholder="sk-..." type="password"/>
+        <button class="btn-primary" onclick="submitKey()">儲存並開始</button>
+      </div>`;
     return;
   }
-
-  // 3 input modes: camera, text, passage
-  wrap.innerHTML = `
+  wrap.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div class="section-label" style="margin-bottom:0">新增單字</div>
+      <div class="sec-label">新增單字</div>
       <button onclick="resetKey()" style="background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline">重設 Key</button>
     </div>
 
-    <!-- Mode tabs -->
-    <div style="display:flex;gap:6px">
-      <button id="tab-cam" class="mode-tab active-tab" onclick="switchMode('cam')">📷 拍照/相簿</button>
-      <button id="tab-word" class="mode-tab" onclick="switchMode('word')">✍️ 單字</button>
-      <button id="tab-passage" class="mode-tab" onclick="switchMode('passage')">📝 文章段落</button>
+    <div class="mode-tabs">
+      <button id="mt-cam"     class="mtab on"  onclick="switchMode('cam')">📷 拍照/相簿</button>
+      <button id="mt-word"    class="mtab"     onclick="switchMode('word')">✍️ 單字</button>
+      <button id="mt-passage" class="mtab"     onclick="switchMode('passage')">📝 文章</button>
     </div>
 
-    <!-- Camera mode -->
-    <div id="mode-cam">
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="cam-btn" onclick="triggerCamera()">📷 拍照</button>
-        <button class="cam-btn" onclick="triggerAlbum()">🖼 相簿</button>
+    <!-- Camera -->
+    <div id="m-cam" style="display:flex;flex-direction:column;gap:10px">
+      <div class="cam-btns">
+        <button class="cbtn" onclick="document.getElementById('f-cam').click()">📷 拍照</button>
+        <button class="cbtn" onclick="document.getElementById('f-alb').click()">🖼 相簿</button>
       </div>
-      <div id="img-preview" style="display:none;margin-bottom:10px">
-        <img id="preview-img" style="width:100%;border-radius:14px;display:block"/>
-        <button class="btn-secondary" style="margin-top:8px" onclick="clearImg()">✕ 清除圖片</button>
+      <input type="file" id="f-cam" accept="image/*" capture="environment" style="display:none" onchange="onImg(event)"/>
+      <input type="file" id="f-alb" accept="image/*"                       style="display:none" onchange="onImg(event)"/>
+      <div class="img-preview" id="img-prev">
+        <img id="prev-img" src=""/>
+        <button class="btn-secondary" onclick="clearImg()">✕ 清除圖片</button>
       </div>
-      <input type="file" id="cam-shoot" accept="image/*" capture="environment" style="display:none" onchange="onImgSelect(event)"/>
-      <input type="file" id="cam-album" accept="image/*" style="display:none" onchange="onImgSelect(event)"/>
-      <button class="btn-primary" id="btn-analyze" onclick="analyzeImage()" disabled>🔍 AI 辨識並分析單字</button>
+      <button class="btn-primary" id="btn-img" onclick="doImg()" disabled>🔍 AI 辨識圖片單字</button>
     </div>
 
-    <!-- Word mode -->
-    <div id="mode-word" style="display:none">
-      <input class="manual-input" id="manual-word" placeholder="輸入英文單字，可用逗號分隔多個（negotiate, leverage）" oninput="syncWordBtn()"/>
-      <button class="btn-primary" id="btn-manual" onclick="analyzeManual()" disabled style="margin-top:8px">🤖 AI 分析單字</button>
+    <!-- Word -->
+    <div id="m-word" style="display:none;flex-direction:column;gap:10px">
+      <input class="txt-input" id="word-inp" placeholder="輸入英文單字，多個用逗號隔開 (negotiate, leverage)" oninput="toggleBtn('btn-word','word-inp')"/>
+      <button class="btn-primary" id="btn-word" onclick="doWord()" disabled>🤖 AI 分析單字</button>
     </div>
 
-    <!-- Passage mode -->
-    <div id="mode-passage" style="display:none">
-      <textarea class="manual-input" id="passage-text" placeholder="貼上英文文章、逐字稿、句子... AI 自動擷取重要單字" rows="5" style="resize:vertical" oninput="syncPassageBtn()"></textarea>
-      <button class="btn-primary" id="btn-passage" onclick="analyzePassage()" disabled style="margin-top:8px">🤖 擷取並分析所有單字</button>
+    <!-- Passage -->
+    <div id="m-passage" style="display:none;flex-direction:column;gap:10px">
+      <textarea class="txt-input" id="pass-inp" placeholder="貼上英文文章、逐字稿或句子... AI 自動擷取重要單字" rows="5" style="resize:vertical" oninput="toggleBtn('btn-pass','pass-inp')"></textarea>
+      <button class="btn-primary" id="btn-pass" onclick="doPassage()" disabled>🤖 擷取所有重要單字</button>
     </div>
 
     <div id="result-area"></div>
   `;
-  previewImg = null;
+  previewFile=null; addMode='cam';
 }
 
-function switchMode(mode){
-  ['cam','word','passage'].forEach(m=>{
-    document.getElementById('mode-'+m).style.display = m===mode?'flex':'none';
-    document.getElementById('mode-'+m).style.flexDirection = 'column';
-    document.getElementById('mode-'+m).style.gap = '0';
-    document.getElementById('tab-'+m).classList.toggle('active-tab', m===mode);
+function switchMode(m){
+  addMode=m;
+  ['cam','word','passage'].forEach(x=>{
+    document.getElementById('m-'+x).style.display = x===m?'flex':'none';
+    document.getElementById('mt-'+x).classList.toggle('on', x===m);
   });
-  document.getElementById('mode-'+mode).style.display='flex';
 }
 
-function triggerCamera(){ document.getElementById('cam-shoot').click(); }
-function triggerAlbum(){  document.getElementById('cam-album').click(); }
-function clearImg(){
-  previewImg=null;
-  document.getElementById('img-preview').style.display='none';
-  document.getElementById('btn-analyze').disabled=true;
-}
-function syncWordBtn(){
-  const v=document.getElementById('manual-word').value.trim();
-  document.getElementById('btn-manual').disabled=!v;
-}
-function syncPassageBtn(){
-  const v=document.getElementById('passage-text').value.trim();
-  document.getElementById('btn-passage').disabled=!v;
+function toggleBtn(btnId, inputId){
+  const v=document.getElementById(inputId).value.trim();
+  document.getElementById(btnId).disabled=!v;
 }
 
 function submitKey(){
-  const k = document.getElementById('key-input').value.trim();
+  const k=document.getElementById('key-inp').value.trim();
   if(!k.startsWith('sk-')) return toast('⚠️ Key 格式不正確，應以 sk- 開頭');
-  saveKey(k);
-  toast('✅ API Key 已儲存！');
-  renderAdd();
+  saveK(k); toast('✅ API Key 已儲存！'); renderAdd();
 }
 
-function onImgSelect(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  previewImg = file;
-  const url = URL.createObjectURL(file);
-  document.getElementById('preview-img').src = url;
-  document.getElementById('img-preview').style.display = 'block';
-  document.getElementById('btn-analyze').disabled = false;
-  // reset input so same file can be re-selected
-  e.target.value = '';
+function resetKey(){
+  if(!confirm('確定重設 API Key？')) return;
+  localStorage.removeItem('wl-key'); apiKey=''; renderAdd();
 }
 
-async function analyzeImage(){
-  if(!previewImg) return;
-  const btn = document.getElementById('btn-analyze');
+function onImg(e){
+  const f=e.target.files[0]; if(!f) return;
+  previewFile=f;
+  const url=URL.createObjectURL(f);
+  document.getElementById('prev-img').src=url;
+  document.getElementById('img-prev').classList.add('show');
+  document.getElementById('btn-img').disabled=false;
+  e.target.value='';
+}
+function clearImg(){
+  previewFile=null;
+  document.getElementById('img-prev').classList.remove('show');
+  document.getElementById('btn-img').disabled=true;
+}
+
+function loading(msg){
+  document.getElementById('result-area').innerHTML=`<div class="spinner-wrap"><div class="spinner"></div><div class="spin-msg">${msg}</div></div>`;
+}
+
+async function doImg(){
+  if(!previewFile) return;
+  const btn=document.getElementById('btn-img');
   btn.disabled=true; btn.textContent='⏳ 分析中...';
-  document.getElementById('result-area').innerHTML = renderLoading('AI 正在辨識圖片中的英文單字...');
-  try {
-    const b64 = await fileToBase64(previewImg);
-    const mime = previewImg.type || 'image/jpeg';
-    const raw = await callOpenAI([
-      {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
+  loading('AI 正在辨識圖片中的英文單字...');
+  try{
+    const b64=await fileToB64(previewFile);
+    const mime=previewFile.type||'image/jpeg';
+    const raw=await callAI([
+      {role:'system', content:SYS},
       {role:'user', content:[
         {type:'image_url', image_url:{url:`data:${mime};base64,${b64}`}},
-        {type:'text', text: WORD_PROMPT}
+        {type:'text', text:IMG_PROMPT}
       ]}
     ]);
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    renderWordResults(parsed.words||parsed, '拍照');
-  } catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-prompt"><div class="api-label">❌ ${e.message}</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
+    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    showResults(d.words||d, '拍照');
+  }catch(e){
+    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
   }
-  btn.disabled=false; btn.textContent='🔍 AI 辨識並分析單字';
+  btn.disabled=false; btn.textContent='🔍 AI 辨識圖片單字';
 }
 
-async function analyzeManual(){
-  const input = document.getElementById('manual-word').value.trim();
-  if(!input) return;
-  const words = input.split(/[,，、\s]+/).filter(w=>w.trim());
-  const btn = document.getElementById('btn-manual');
+async function doWord(){
+  const raw_input=document.getElementById('word-inp').value.trim();
+  if(!raw_input) return;
+  const words=raw_input.split(/[,，、\s]+/).map(w=>w.trim()).filter(Boolean);
+  const btn=document.getElementById('btn-word');
   btn.disabled=true; btn.textContent='⏳ 分析中...';
-  document.getElementById('result-area').innerHTML = renderLoading(`AI 正在分析 ${words.length} 個單字...`);
-  try {
-    // analyse each word, or batch if multiple
-    const prompt = words.length===1 ? TEXT_PROMPT(words[0]) : PASSAGE_PROMPT(words.join(', '));
-    const raw = await callOpenAI([
-      {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
-      {role:'user', content: prompt}
-    ]);
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    renderWordResults(parsed.words||parsed, '手動');
-  } catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-prompt"><div class="api-label">❌ ${e.message}</div></div>`;
+  loading(`AI 正在分析 ${words.length} 個單字的字根字首...`);
+  try{
+    const prompt = words.length===1 ? WORD_PROMPT(words[0]) : PASSAGE_PROMPT(words.join(', '));
+    const raw=await callAI([{role:'system',content:SYS},{role:'user',content:prompt}]);
+    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    showResults(d.words||d, '手動');
+  }catch(e){
+    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}</div></div>`;
   }
   btn.disabled=false; btn.textContent='🤖 AI 分析單字';
 }
 
-async function analyzePassage(){
-  const text = document.getElementById('passage-text').value.trim();
-  if(!text) return;
-  const btn = document.getElementById('btn-passage');
+async function doPassage(){
+  const txt=document.getElementById('pass-inp').value.trim();
+  if(!txt) return;
+  const btn=document.getElementById('btn-pass');
   btn.disabled=true; btn.textContent='⏳ 分析中...';
-  document.getElementById('result-area').innerHTML = renderLoading('AI 正在從文章中擷取重要單字...');
-  try {
-    const raw = await callOpenAI([
-      {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
-      {role:'user', content: PASSAGE_PROMPT(text)}
-    ]);
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-    renderWordResults(parsed.words||parsed, '文章');
-  } catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-prompt"><div class="api-label">❌ ${e.message}</div></div>`;
+  loading('AI 正在從文章中擷取重要單字...');
+  try{
+    const raw=await callAI([{role:'system',content:SYS},{role:'user',content:PASSAGE_PROMPT(txt)}]);
+    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    showResults(d.words||d, '文章');
+  }catch(e){
+    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}</div></div>`;
   }
-  btn.disabled=false; btn.textContent='🤖 擷取並分析所有單字';
+  btn.disabled=false; btn.textContent='🤖 擷取所有重要單字';
 }
 
-function renderLoading(msg){
-  return `<div class="loading-card"><div class="spinner"></div><div class="loading-msg">${msg}</div></div>`;
+// ══ Results ══
+function showResults(words, source){
+  pending = words.map(w=>({...w, source}));
+  const newCount = pending.filter(w=>!library.some(l=>l.word.toLowerCase()===w.word.toLowerCase())).length;
+  const dupCount = pending.length - newCount;
+
+  const bulkBar = pending.length > 1 ? `
+    <div class="bulk-bar">
+      <div class="bulk-info">
+        找到 ${pending.length} 個單字
+        <span>（${newCount} 個新・${dupCount} 個重複）</span>
+      </div>
+      <button class="btn-bulk" onclick="saveAll()">全部加入 ＋</button>
+    </div>` : '';
+
+  document.getElementById('result-area').innerHTML =
+    `<div class="result-section">${bulkBar}${pending.map((w,i)=>wordCard(w,i)).join('')}</div>`;
 }
 
-function renderWordResults(words, source){
-  const ra = document.getElementById('result-area');
-  ra.innerHTML = words.map((w,i) => renderWordCard(w, source, i)).join('');
-}
+function wordCard(w, idx){
+  const dup = library.some(l=>l.word.toLowerCase()===w.word.toLowerCase());
 
-function renderWordCard(w, source, idx){
-  const isSaved = library.some(x=>x.word.toLowerCase()===w.word.toLowerCase());
-  const roots = (w.roots||[]).map(r=>`
-    <div class="root-part root-${r.type}">
-      <div class="rp-val">${r.part}</div>
-      <div class="rp-mean">${r.meaning}</div>
-    </div>
-  `).join('');
-  const family = (w.family_words||[]).map(fw=>`
-    <span class="family-word" onclick="lookupFamily('${fw}')">${fw}</span>
-  `).join('');
+  // ── Root parts ──
+  const rootParts = (w.roots||[]).map(r=>{
+    const cls = r.type==='prefix'?'rp-prefix': r.type==='suffix'?'rp-suffix':'rp-root';
+    return `<div class="rp ${cls}"><div class="rp-val">${r.part}</div><div class="rp-mean">${r.meaning}</div></div>`;
+  }).join('');
+
+  const familyWords = (w.family_words||[]).map(fw=>
+    `<span class="fw" onclick="lookupWord('${fw.replace(/'/g,"\\'")}')">🔗 ${fw}</span>`
+  ).join('');
+
+  const hasRoots = rootParts || w.root_tip || familyWords;
 
   return `
-    <div style="display:flex;flex-direction:column;gap:10px" id="wc-${idx}">
-      <div class="word-detail">
-        <div class="wd-tag">
-          <span class="tag tag-cat">${w.level||'TOEIC'}</span>
-          <span class="tag tag-src">${source}</span>
-        </div>
-        <div class="wd-word">${w.word}</div>
-        <div class="wd-ph">${w.phonetic||''}</div>
-        <div class="wd-pos">${w.pos}</div>
-        <div class="wd-zh">${w.zh}</div>
-        <div class="wd-en">${w.en_def}</div>
-        <div class="ex-block">
-          <div class="ex-en">${w.example_en}</div>
-          <div class="ex-zh">${w.example_zh}</div>
-        </div>
-        <div class="word-actions">
-          <button class="btn-speak" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 單字</button>
-          <button class="btn-speak" onclick="speak('${(w.example_en||'').replace(/'/g,"\\'")}')">🔊 例句</button>
-        </div>
-        <div class="word-actions">
-          ${isSaved
-            ? `<div style="flex:1;text-align:center;color:var(--muted);font-size:14px;padding:11px">✅ 已在單字庫</div>`
-            : `<button class="btn-save-word" onclick="saveWord(${idx})">＋ 加入我的單字庫</button>`
-          }
-        </div>
+  <div id="wc-${idx}" style="display:flex;flex-direction:column;gap:10px">
+
+    <!-- Word header -->
+    <div class="word-header">
+      <div class="wtag-row">
+        <span class="wtag wtag-lvl">${w.level||'TOEIC'}</span>
+        <span class="wtag wtag-src">${w.source}</span>
+        ${dup ? '<span class="wtag wtag-dup">⚠️ 已有此單字</span>' : ''}
       </div>
-
-      ${roots ? `
-      <div class="root-card">
-        <div class="root-title">🔤 字根字首分析</div>
-        <div class="root-parts">${roots}</div>
-        ${w.root_tip ? `<div class="tip-card"><div class="tip-label">字根記憶法</div><div class="tip-text">${w.root_tip}</div></div>` : ''}
-        ${family ? `<div class="root-family"><div class="root-family-title" style="font-size:12px;color:var(--muted);margin-bottom:8px">🔗 同族單字（點擊查詢）</div><div class="root-family-words">${family}</div></div>` : ''}
-      </div>` : ''}
-
-      ${w.memory_tip ? `
-      <div class="tip-card">
-        <div class="tip-label">💡 記憶技巧</div>
-        <div class="tip-text">${w.memory_tip}</div>
-      </div>` : ''}
+      <div class="w-word">${w.word}</div>
+      <div class="w-ph">${w.phonetic||''}</div>
+      <div class="w-pos">${w.pos||''}</div>
+      <div class="w-zh">${w.zh}</div>
+      <div class="w-en">${w.en_def}</div>
+      <div class="ex-block">
+        <div class="ex-en">${w.example_en}</div>
+        <div class="ex-zh">${w.example_zh}</div>
+      </div>
+      <div class="speak-row">
+        <button class="btn-speak" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 單字</button>
+        <button class="btn-speak" onclick="speak('${(w.example_en||'').replace(/'/g,"\\'")}')">🔊 例句</button>
+      </div>
+      <div class="save-row" id="save-row-${idx}">
+        ${dup
+          ? `<div class="already-saved">✅ 已在單字庫中${dup?'（重複）':''}</div>`
+          : `<button class="btn-save-one" onclick="saveOne(${idx})">＋ 加入單字庫</button>`
+        }
+      </div>
     </div>
-  `;
+
+    <!-- Root card -->
+    ${hasRoots ? `
+    <div class="root-card">
+      <div class="root-card-title">🔤 字根字首分析</div>
+      ${rootParts ? `<div class="root-parts-row">${rootParts}</div>` : ''}
+      ${w.root_tip ? `
+      <div class="root-tip-box">
+        <div class="root-tip-label">字根記憶法</div>
+        <div class="root-tip-text">${w.root_tip}</div>
+      </div>` : ''}
+      ${familyWords ? `
+      <div>
+        <div class="family-label">同族單字（點擊查詢）</div>
+        <div class="family-row">${familyWords}</div>
+      </div>` : ''}
+    </div>` : ''}
+
+    <!-- Memory tip -->
+    ${w.memory_tip ? `
+    <div class="mem-card">
+      <div class="mem-label">💡 記憶技巧</div>
+      <div class="mem-text">${w.memory_tip}</div>
+    </div>` : ''}
+
+  </div>`;
 }
 
-// store words pending save indexed by position
-let pendingWords = [];
-function renderWordResults(words, source){
-  pendingWords = words.map(w=>({...w, source}));
-  const ra = document.getElementById('result-area');
-  ra.innerHTML = '<div style="display:flex;flex-direction:column;gap:14px">' +
-    words.map((w,i)=>renderWordCard(w,source,i)).join('') +
-    '</div>';
-}
-
-function saveWord(idx){
-  const w = pendingWords[idx];
-  if(!w) return;
-  if(library.some(x=>x.word.toLowerCase()===w.word.toLowerCase())){
-    toast('這個單字已在單字庫'); return;
+function saveOne(idx){
+  const w=pending[idx]; if(!w) return;
+  if(library.some(l=>l.word.toLowerCase()===w.word.toLowerCase())){
+    toast(`⚠️「${w.word}」已在單字庫`); return;
   }
+  pushToLib(w);
+  const row=document.getElementById('save-row-'+idx);
+  if(row) row.innerHTML=`<div class="already-saved">✅ 已儲存</div>`;
+  toast(`✅「${w.word}」已加入！`);
+}
+
+function saveAll(){
+  ensureToday();
+  let added=0, skipped=[];
+  pending.forEach(w=>{
+    if(library.some(l=>l.word.toLowerCase()===w.word.toLowerCase())){
+      skipped.push(w.word);
+    } else {
+      pushToLib(w); added++;
+    }
+  });
+  // update all save rows
+  pending.forEach((w,i)=>{
+    const row=document.getElementById('save-row-'+i);
+    if(row) row.innerHTML=`<div class="already-saved">✅ 已儲存</div>`;
+  });
+  let msg = `✅ 已加入 ${added} 個單字！`;
+  if(skipped.length) msg += `\n⚠️ 跳過重複：${skipped.join('、')}`;
+  toast(msg, 3500);
+  renderHome();
+}
+
+function pushToLib(w){
   ensureToday();
   library.push({
-    word: w.word, phonetic: w.phonetic, pos: w.pos,
-    zh: w.zh, en_def: w.en_def,
-    example_en: w.example_en, example_zh: w.example_zh,
-    roots: w.roots||[], root_tip: w.root_tip||'',
-    family_words: w.family_words||[],
-    memory_tip: w.memory_tip||'',
-    level: w.level||'', source: w.source,
-    addedAt: Date.now()
+    word:w.word, phonetic:w.phonetic||'', pos:w.pos||'',
+    zh:w.zh, en_def:w.en_def,
+    example_en:w.example_en, example_zh:w.example_zh,
+    roots:w.roots||[], root_tip:w.root_tip||'',
+    family_words:w.family_words||[], memory_tip:w.memory_tip||'',
+    level:w.level||'', source:w.source, addedAt:Date.now()
   });
-  stats.today++; saveLib(); saveSt();
-  toast(`✅「${w.word}」已加入單字庫！`);
-  // disable the save button
-  const btn = document.querySelector(`#wc-${idx} .btn-save-word`);
-  if(btn) btn.outerHTML = `<div style="flex:1;text-align:center;color:var(--muted);font-size:14px;padding:11px">✅ 已儲存</div>`;
+  stats.today++; save(); saveSt();
 }
 
-async function lookupFamily(word){
-  document.getElementById('manual-word').value = word;
-  document.getElementById('result-area').innerHTML = renderLoading(`查詢「${word}」中...`);
-  try {
-    const raw = await callOpenAI([
-      {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
-      {role:'user', content: TEXT_PROMPT(word)}
-    ]);
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); const words = parsed.words || parsed;
-    renderWordResults(words, '同族查詢');
-    document.getElementById('add-wrap').scrollTo({top:99999, behavior:'smooth'});
-  } catch(e){ toast('查詢失敗：'+e.message); }
+async function lookupWord(word){
+  document.getElementById('result-area').innerHTML=`<div class="spinner-wrap"><div class="spinner"></div><div class="spin-msg">查詢「${word}」的字根字首...</div></div>`;
+  try{
+    const raw=await callAI([{role:'system',content:SYS},{role:'user',content:WORD_PROMPT(word)}]);
+    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    showResults(d.words||d, '同族查詢');
+    document.getElementById('add-wrap').scrollTo({top:99999,behavior:'smooth'});
+  }catch(e){ toast('查詢失敗：'+e.message); }
 }
 
-// ══════════════════════════════
-//  Library
-// ══════════════════════════════
+// ══ Library ══
 function renderLib(){
-  const q = (document.getElementById('lib-search')||{}).value || '';
-  filterLib(q);
+  filterLib((document.getElementById('lib-search')||{}).value||'');
 }
 
 function filterLib(q){
-  const filtered = q
-    ? library.filter(w=>w.word.toLowerCase().includes(q.toLowerCase())||w.zh.includes(q))
-    : library;
-  const el = document.getElementById('lib-list');
-  document.getElementById('lib-count').textContent = `共 ${library.length} 個單字${q?' · 顯示 '+filtered.length+' 個':''}`;
-
-  if(!filtered.length){
-    el.innerHTML = `<div class="empty-lib"><div style="font-size:48px">${library.length?'🔍':'📚'}</div><div>${library.length?'找不到符合的單字':'單字庫是空的'}</div><div style="font-size:13px;color:var(--muted)">${library.length?'試試其他關鍵字':'去新增頁面拍照或輸入單字'}</div></div>`;
+  const list=q ? library.filter(w=>w.word.toLowerCase().includes(q.toLowerCase())||w.zh.includes(q)) : library;
+  document.getElementById('lib-count').textContent=`共 ${library.length} 個單字${q?` · 顯示 ${list.length} 個`:''}`;
+  const el=document.getElementById('lib-list');
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state"><div style="font-size:48px">${library.length?'🔍':'📚'}</div><div>${library.length?'找不到符合的單字':'單字庫是空的'}</div></div>`;
     return;
   }
-  el.innerHTML = [...filtered].reverse().map(w=>`
-    <div class="lib-item" onclick="openWordModal('${w.word}')">
+  el.innerHTML=[...list].reverse().map(w=>`
+    <div class="lib-item" onclick="openModal('${w.word.replace(/'/g,"\\'")}')">
       <div style="flex:1">
         <div class="li-word">${w.word}</div>
-        <div class="li-info">${w.phonetic||''} · ${w.zh} · ${w.source||''}</div>
+        <div class="li-info">${w.phonetic||''} · ${w.zh} · <span style="color:var(--accent-light)">${w.source||''}</span></div>
       </div>
-      <div class="li-actions" onclick="event.stopPropagation()">
-        <button class="btn-li-speak" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊</button>
-        <button class="btn-li-del" onclick="delWord('${w.word}')">🗑</button>
+      <div class="li-acts" onclick="event.stopPropagation()">
+        <button class="btn-speak-sm" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊</button>
+        <button class="btn-del" onclick="delWord('${w.word.replace(/'/g,"\\'")}')">🗑</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function delWord(word){
   if(!confirm(`確定刪除「${word}」？`)) return;
-  library = library.filter(w=>w.word!==word);
-  saveLib(); renderLib(); renderHome();
+  library=library.filter(w=>w.word!==word);
+  save(); renderLib(); renderHome();
   toast(`🗑 已刪除「${word}」`);
 }
 
-// ══════════════════════════════
-//  Word Modal
-// ══════════════════════════════
-function openWordModal(wordStr){
-  const w = library.find(x=>x.word===wordStr);
-  if(!w) return;
-  const roots = (w.roots||[]).map(r=>`
-    <div class="root-part root-${r.type}">
-      <div class="rp-val">${r.part}</div>
-      <div class="rp-mean">${r.meaning}</div>
-    </div>
-  `).join('');
-  const family = (w.family_words||[]).map(fw=>`<span class="family-word">${fw}</span>`).join('');
+// ══ Modal ══
+function openModal(word){
+  const w=library.find(x=>x.word===word); if(!w) return;
 
-  document.getElementById('modal-body').innerHTML = `
-    <div class="modal-title">${w.word}</div>
-    <div class="wd-ph">${w.phonetic||''}</div>
-    <div class="wd-pos" style="margin-top:10px">${w.pos}</div>
-    <div class="wd-zh">${w.zh}</div>
-    <div class="wd-en">${w.en_def}</div>
+  const rootParts=(w.roots||[]).map(r=>{
+    const cls=r.type==='prefix'?'rp-prefix':r.type==='suffix'?'rp-suffix':'rp-root';
+    return `<div class="rp ${cls}"><div class="rp-val">${r.part}</div><div class="rp-mean">${r.meaning}</div></div>`;
+  }).join('');
+
+  const familyWords=(w.family_words||[]).map(fw=>`<span class="fw">${fw}</span>`).join('');
+  const hasRoots=rootParts||w.root_tip||familyWords;
+
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-word">${w.word}</div>
+    <div class="w-ph">${w.phonetic||''}</div>
+    <div class="w-pos" style="margin-top:10px">${w.pos||''}</div>
+    <div class="w-zh">${w.zh}</div>
+    <div class="w-en">${w.en_def}</div>
     <div class="ex-block">
       <div class="ex-en">${w.example_en}</div>
       <div class="ex-zh">${w.example_zh}</div>
     </div>
-    <div class="word-actions">
+    <div class="speak-row">
       <button class="btn-speak" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 朗讀單字</button>
       <button class="btn-speak" onclick="speak('${(w.example_en||'').replace(/'/g,"\\'")}')">🔊 朗讀例句</button>
     </div>
-    ${roots?`
+    ${hasRoots?`
     <div class="root-card">
-      <div class="root-title">🔤 字根字首</div>
-      <div class="root-parts">${roots}</div>
-      ${w.root_tip?`<div class="tip-card"><div class="tip-label">字根記憶法</div><div class="tip-text">${w.root_tip}</div></div>`:''}
-      ${family?`<div class="root-family"><div class="root-family-title" style="margin-bottom:8px;font-size:12px;color:var(--muted)">同族單字</div><div class="root-family-words">${family}</div></div>`:''}
+      <div class="root-card-title">🔤 字根字首分析</div>
+      ${rootParts?`<div class="root-parts-row">${rootParts}</div>`:''}
+      ${w.root_tip?`<div class="root-tip-box"><div class="root-tip-label">字根記憶法</div><div class="root-tip-text">${w.root_tip}</div></div>`:''}
+      ${familyWords?`<div><div class="family-label" style="margin-bottom:6px">同族單字</div><div class="family-row">${familyWords}</div></div>`:''}
     </div>`:''}
-    ${w.memory_tip?`<div class="tip-card"><div class="tip-label">💡 記憶技巧</div><div class="tip-text">${w.memory_tip}</div></div>`:''}
+    ${w.memory_tip?`<div class="mem-card"><div class="mem-label">💡 記憶技巧</div><div class="mem-text">${w.memory_tip}</div></div>`:''}
     <button class="modal-close" onclick="closeModal()">關閉</button>
   `;
   document.getElementById('modal').style.display='flex';
 }
+function closeModal(){ document.getElementById('modal').style.display='none'; }
 
-function closeModal(e){
-  if(!e || e.target===document.getElementById('modal'))
-    document.getElementById('modal').style.display='none';
-}
-
-// ══════════════════════════════
-//  Quiz
-// ══════════════════════════════
+// ══ Quiz ══
 function renderQuiz(){
-  const el = document.getElementById('quiz-content');
-  if(library.length < 4){
-    el.innerHTML = `<div class="quiz-need-more"><div style="font-size:48px">📚</div><div style="font-size:18px;font-weight:700">單字不夠</div><div style="font-size:14px;color:var(--muted)">至少需要 4 個單字才能測驗<br>目前有 ${library.length} 個</div><button class="btn-primary" style="margin-top:8px" onclick="goTab('add')">去新增單字</button></div>`;
+  const el=document.getElementById('quiz-content');
+  if(library.length<4){
+    el.innerHTML=`<div class="empty-state"><div style="font-size:48px">📚</div><div style="font-size:18px;font-weight:700">單字不夠</div><div style="font-size:14px;color:var(--muted)">至少需要 4 個單字<br>目前有 ${library.length} 個</div><button class="btn-primary" style="margin-top:12px" onclick="goTab('add')">去新增單字</button></div>`;
     return;
   }
-  quizState.words = shuffle(library).slice(0, Math.min(10, library.length));
-  quizState.idx = 0; quizState.score = 0; quizState.answered = false;
+  quizSt.words=shuffle(library).slice(0,Math.min(10,library.length));
+  quizSt.idx=0; quizSt.score=0; quizSt.ans=false;
   renderQ();
 }
 
 function renderQ(){
-  const q = quizState.words[quizState.idx];
-  if(!q){ renderScore(); return; }
-
-  const wrongs = shuffle(library.filter(w=>w.zh!==q.zh)).slice(0,3).map(w=>w.zh);
-  const opts = shuffle([q.zh, ...wrongs]);
-  const pct = (quizState.idx / quizState.words.length) * 100;
-
-  document.getElementById('quiz-content').innerHTML = `
-    <div class="quiz-prog-bar"><div class="quiz-prog-fill" style="width:${pct}%"></div></div>
-    <div style="font-size:12px;color:var(--muted);text-align:right">題目 ${quizState.idx+1} / ${quizState.words.length}</div>
-    <div class="quiz-q-card">
-      <div class="quiz-ql">這個單字的中文意思是？</div>
-      <div class="quiz-word">${q.word}</div>
-      <div class="quiz-ph">${q.phonetic||''}</div>
+  const q=quizSt.words[quizSt.idx]; if(!q){ renderScore(); return; }
+  const wrongs=shuffle(library.filter(w=>w.zh!==q.zh)).slice(0,3).map(w=>w.zh);
+  const opts=shuffle([q.zh,...wrongs]);
+  const pct=(quizSt.idx/quizSt.words.length)*100;
+  document.getElementById('quiz-content').innerHTML=`
+    <div class="qprog-bar"><div class="qprog-fill" style="width:${pct}%"></div></div>
+    <div style="font-size:12px;color:var(--muted);text-align:right">題目 ${quizSt.idx+1} / ${quizSt.words.length}</div>
+    <div class="q-card">
+      <div class="q-label">這個單字的中文意思是？</div>
+      <div class="q-word">${q.word}</div>
+      <div class="q-ph">${q.phonetic||''}</div>
     </div>
     <div class="opts">
-      ${opts.map(o=>`
-        <button class="opt" onclick="ansQ(this,'${o.replace(/'/g,"\\'")}','${q.zh.replace(/'/g,"\\'")}','${q.word.replace(/'/g,"\\'")}','${(q.example_en||'').replace(/'/g,"\\'")}','${(q.example_zh||'').replace(/'/g,"\\'")}')">
-          ${o}
-        </button>
-      `).join('')}
+      ${opts.map(o=>`<button class="opt" onclick="ansQ(this,'${o.replace(/'/g,"\\'")}','${q.zh.replace(/'/g,"\\'")}','${q.word.replace(/'/g,"\\'")}','${(q.example_en||'').replace(/'/g,"\\'")}','${(q.example_zh||'').replace(/'/g,"\\'")}')">
+        ${o}</button>`).join('')}
     </div>
     <div id="qfb" style="display:none"></div>
     <div id="qnxt" style="display:none">
-      <button class="btn-nq" onclick="nextQ()">
-        ${quizState.idx+1 < quizState.words.length ? '下一題 →' : '查看結果 🎯'}
-      </button>
-    </div>
-  `;
+      <button class="btn-nq" onclick="nextQ()">${quizSt.idx+1<quizSt.words.length?'下一題 →':'查看結果 🎯'}</button>
+    </div>`;
 }
 
-function ansQ(btn, chosen, correct, word, ex, exzh){
-  if(quizState.answered) return;
-  quizState.answered = true;
+function ansQ(btn,chosen,correct,word,ex,exzh){
+  if(quizSt.ans) return; quizSt.ans=true;
   document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  if(chosen===correct){ btn.classList.add('ok'); quizState.score++; }
-  else { btn.classList.add('no'); document.querySelectorAll('.opt').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('ok'); }); }
+  if(chosen===correct){ btn.classList.add('ok'); quizSt.score++; }
+  else{ btn.classList.add('no'); document.querySelectorAll('.opt').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('ok'); }); }
   speak(word);
-  const fb = document.getElementById('qfb');
-  fb.style.display = 'block';
-  fb.innerHTML = `<div class="explain-box"><div class="exq">${ex}</div><div>${exzh}</div></div>`;
-  document.getElementById('qnxt').style.display = 'block';
+  const fb=document.getElementById('qfb');
+  fb.style.display='block';
+  fb.innerHTML=`<div class="explain-box"><div class="exq">${ex}</div><div>${exzh}</div></div>`;
+  document.getElementById('qnxt').style.display='block';
 }
 
-function nextQ(){
-  quizState.idx++; quizState.answered = false;
-  renderQ();
-}
+function nextQ(){ quizSt.idx++; quizSt.ans=false; renderQ(); }
 
 function renderScore(){
   stats.quiz++; saveSt();
-  const pct = Math.round((quizState.score/quizState.words.length)*100);
-  const e = pct>=80?'🏆':pct>=60?'💪':'📚';
-  const m = pct>=80?'太棒了！繼續拍照新增單字！':pct>=60?'不錯！繼續加油！':'多複習收藏的單字！';
-  document.getElementById('quiz-content').innerHTML = `
+  const pct=Math.round((quizSt.score/quizSt.words.length)*100);
+  const e=pct>=80?'🏆':pct>=60?'💪':'📚';
+  const m=pct>=80?'太棒了！繼續拍照新增單字！':pct>=60?'不錯！繼續加油！':'多複習收藏的單字！';
+  document.getElementById('quiz-content').innerHTML=`
     <div class="score-screen">
       <div class="score-emoji">${e}</div>
       <div class="score-n">${pct}%</div>
-      <div class="score-sub">${quizState.score} / ${quizState.words.length} 答對</div>
+      <div class="score-sub">${quizSt.score} / ${quizSt.words.length} 答對</div>
       <div class="score-msg">${m}</div>
       <button class="btn-retry" onclick="renderQuiz()">再測一次</button>
-    </div>
-  `;
+    </div>`;
   renderHome();
 }
 
-// ══════════════════════════════
-//  Init
-// ══════════════════════════════
+// ══ Init ══
 renderHome();
 </script>
 
