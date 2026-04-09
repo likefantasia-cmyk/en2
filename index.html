@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_4.html -->
+<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_5.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -177,6 +177,10 @@ nav button.active{color:var(--accent)}
 .api-label{font-size:13px;color:var(--muted2);line-height:1.6}
 .api-input{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--text);outline:none;width:100%;font-family:'JetBrains Mono',monospace}
 .api-input:focus{border-color:var(--accent)}
+.mode-tab{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:600;transition:all .15s}
+.mode-tab.active-tab{background:rgba(232,160,32,.12);border-color:var(--accent);color:var(--accent)}
+.cam-btn{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:13px;font-size:15px;font-weight:600;transition:all .15s}
+.cam-btn:active{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -341,9 +345,19 @@ function renderHome(){
 }
 
 // ══════════════════════════════
-//  Add / Camera
+//  Add / Camera  (v2 — fixed)
 // ══════════════════════════════
 let previewImg = null;
+const WORD_PROMPT = '請分析圖片/文字中所有值得學習的英文單字（優先多益800分等級），每個單字輸出完整分析。輸出純JSON，格式：{"words":[{"word":"單字","phonetic":"音標","pos":"詞性","zh":"中文意思(2-5字)","en_def":"英文定義","example_en":"TOEIC例句","example_zh":"例句中譯","roots":[{"part":"字根","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}';
+const TEXT_PROMPT = (word) => `請分析英文單字「${word}」，輸出純JSON：{"words":[{"word":"${word}","phonetic":"音標","pos":"詞性","zh":"中文意思(2-5字)","en_def":"英文定義","example_en":"TOEIC例句","example_zh":"例句中譯","roots":[{"part":"字根","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3","同族4"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}`;
+const PASSAGE_PROMPT = (text) => `以下是一段英文文字，請找出所有值得學習的英文單字（優先多益800分等級，最多10個），每個單字輸出完整分析。文字內容：「${text}」。輸出純JSON：{"words":[{"word":"單字","phonetic":"音標","pos":"詞性","zh":"中文意思(2-5字)","en_def":"英文定義","example_en":"TOEIC例句","example_zh":"例句中譯","roots":[{"part":"字根","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}`;
+
+function resetKey(){
+  if(!confirm('確定要重設 API Key？')) return;
+  localStorage.removeItem('wl-key');
+  apiKey = '';
+  renderAdd();
+}
 
 function renderAdd(){
   const wrap = document.getElementById('add-wrap');
@@ -352,8 +366,8 @@ function renderAdd(){
       <div class="section-label">設定 API Key</div>
       <div class="api-prompt">
         <div class="api-label">
-          📍 輸入你的 <strong>OpenAI API Key</strong> 才能使用拍照辨識和 AI 分析功能。<br><br>
-          前往 <strong>aistudio.google.com</strong> 取得 Key（免費試用額度充足）。
+          輸入你的 <strong>OpenAI API Key</strong> 才能使用 AI 分析功能。<br><br>
+          前往 <strong>platform.openai.com/api-keys</strong> 取得（需儲值 $5，每次分析約 $0.001）。
         </div>
         <input class="api-input" id="key-input" placeholder="sk-..." type="password"/>
         <button class="btn-primary" onclick="submitKey()">儲存並開始使用</button>
@@ -361,30 +375,77 @@ function renderAdd(){
     `;
     return;
   }
+
+  // 3 input modes: camera, text, passage
   wrap.innerHTML = `
-    <div class="section-label">📸 拍照辨識</div>
-    <div class="camera-zone" id="cam-zone" onclick="document.getElementById('cam-input').click()">
-      <div id="cam-preview-wrap">
-        <div class="cam-icon">📷</div>
-        <div class="cam-hint">點擊拍照或選擇圖片<br><span style="font-size:12px;color:var(--muted)">課本・文章・路牌・菜單 都可以</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="section-label" style="margin-bottom:0">新增單字</div>
+      <button onclick="resetKey()" style="background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline">重設 Key</button>
+    </div>
+
+    <!-- Mode tabs -->
+    <div style="display:flex;gap:6px">
+      <button id="tab-cam" class="mode-tab active-tab" onclick="switchMode('cam')">📷 拍照/相簿</button>
+      <button id="tab-word" class="mode-tab" onclick="switchMode('word')">✍️ 單字</button>
+      <button id="tab-passage" class="mode-tab" onclick="switchMode('passage')">📝 文章段落</button>
+    </div>
+
+    <!-- Camera mode -->
+    <div id="mode-cam">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="cam-btn" onclick="triggerCamera()">📷 拍照</button>
+        <button class="cam-btn" onclick="triggerAlbum()">🖼 相簿</button>
       </div>
-      <input type="file" id="cam-input" accept="image/*" capture="environment" onchange="onImgSelect(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer"/>
+      <div id="img-preview" style="display:none;margin-bottom:10px">
+        <img id="preview-img" style="width:100%;border-radius:14px;display:block"/>
+        <button class="btn-secondary" style="margin-top:8px" onclick="clearImg()">✕ 清除圖片</button>
+      </div>
+      <input type="file" id="cam-shoot" accept="image/*" capture="environment" style="display:none" onchange="onImgSelect(event)"/>
+      <input type="file" id="cam-album" accept="image/*" style="display:none" onchange="onImgSelect(event)"/>
+      <button class="btn-primary" id="btn-analyze" onclick="analyzeImage()" disabled>🔍 AI 辨識並分析單字</button>
     </div>
-    <button class="btn-primary" id="btn-analyze" onclick="analyzeImage()" disabled>🔍 AI 辨識並分析單字</button>
 
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="flex:1;height:1px;background:var(--border)"></div>
-      <div style="font-size:12px;color:var(--muted)">或直接輸入</div>
-      <div style="flex:1;height:1px;background:var(--border)"></div>
+    <!-- Word mode -->
+    <div id="mode-word" style="display:none">
+      <input class="manual-input" id="manual-word" placeholder="輸入英文單字，可用逗號分隔多個（negotiate, leverage）" oninput="syncWordBtn()"/>
+      <button class="btn-primary" id="btn-manual" onclick="analyzeManual()" disabled style="margin-top:8px">🤖 AI 分析單字</button>
     </div>
 
-    <div class="section-label">✍️ 手動輸入單字</div>
-    <input class="manual-input" id="manual-word" placeholder="輸入英文單字..." oninput="document.getElementById('btn-manual').disabled=!this.value.trim()"/>
-    <button class="btn-primary" id="btn-manual" onclick="analyzeManual()" disabled>🤖 AI 分析這個單字</button>
+    <!-- Passage mode -->
+    <div id="mode-passage" style="display:none">
+      <textarea class="manual-input" id="passage-text" placeholder="貼上英文文章、逐字稿、句子... AI 自動擷取重要單字" rows="5" style="resize:vertical" oninput="syncPassageBtn()"></textarea>
+      <button class="btn-primary" id="btn-passage" onclick="analyzePassage()" disabled style="margin-top:8px">🤖 擷取並分析所有單字</button>
+    </div>
 
     <div id="result-area"></div>
   `;
   previewImg = null;
+}
+
+function switchMode(mode){
+  ['cam','word','passage'].forEach(m=>{
+    document.getElementById('mode-'+m).style.display = m===mode?'flex':'none';
+    document.getElementById('mode-'+m).style.flexDirection = 'column';
+    document.getElementById('mode-'+m).style.gap = '0';
+    document.getElementById('tab-'+m).classList.toggle('active-tab', m===mode);
+  });
+  document.getElementById('mode-'+mode).style.display='flex';
+}
+
+function triggerCamera(){ document.getElementById('cam-shoot').click(); }
+function triggerAlbum(){  document.getElementById('cam-album').click(); }
+function clearImg(){
+  previewImg=null;
+  document.getElementById('img-preview').style.display='none';
+  document.getElementById('btn-analyze').disabled=true;
+}
+function syncWordBtn(){
+  const v=document.getElementById('manual-word').value.trim();
+  document.getElementById('btn-manual').disabled=!v;
+}
+function syncPassageBtn(){
+  const v=document.getElementById('passage-text').value.trim();
+  document.getElementById('btn-passage').disabled=!v;
 }
 
 function submitKey(){
@@ -400,59 +461,75 @@ function onImgSelect(e){
   if(!file) return;
   previewImg = file;
   const url = URL.createObjectURL(file);
-  const zone = document.getElementById('cam-zone');
-  document.getElementById('cam-preview-wrap').innerHTML = `<img src="${url}" style="width:100%;border-radius:18px"/>`;
-  zone.classList.add('has-img');
+  document.getElementById('preview-img').src = url;
+  document.getElementById('img-preview').style.display = 'block';
   document.getElementById('btn-analyze').disabled = false;
+  // reset input so same file can be re-selected
+  e.target.value = '';
 }
 
 async function analyzeImage(){
   if(!previewImg) return;
   const btn = document.getElementById('btn-analyze');
-  btn.disabled = true; btn.textContent = '⏳ 分析中...';
-  const ra = document.getElementById('result-area');
-  ra.innerHTML = renderLoading('AI 正在辨識圖片中的英文單字...');
-
+  btn.disabled=true; btn.textContent='⏳ 分析中...';
+  document.getElementById('result-area').innerHTML = renderLoading('AI 正在辨識圖片中的英文單字...');
   try {
     const b64 = await fileToBase64(previewImg);
     const mime = previewImg.type || 'image/jpeg';
-
     const raw = await callOpenAI([
       {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
       {role:'user', content:[
         {type:'image_url', image_url:{url:`data:${mime};base64,${b64}`}},
-        {type:'text', text:'請辨識這張圖片中最重要的1-3個英文單字（優先選多益800分等級的詞彙）。對每個單字做完整分析，輸出純JSON，key為"words"，值為陣列：{"words":[{"word":"單字","phonetic":"音標","pos":"詞性縮寫","zh":"中文意思(2-5字)","en_def":"英文定義(1句)","example_en":"TOEIC風格例句","example_zh":"例句中文翻譯","roots":[{"part":"字根/字首/字尾","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"用字根記憶這個單字的方法(繁中,1-2句)","family_words":["同族單字1","同族單字2","同族單字3"],"memory_tip":"記憶技巧(繁中,1句)","level":"TOEIC分數範圍"}]}'}
+        {type:'text', text: WORD_PROMPT}
       ]}
     ]);
-
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); const words = parsed.words || parsed;
-    renderWordResults(words, '拍照');
-  } catch(e) {
-    ra.innerHTML = `<div class="api-prompt"><div class="api-label">❌ 分析失敗：${e.message}<br><br>請確認 API Key 正確，以及圖片清晰。</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderWordResults(parsed.words||parsed, '拍照');
+  } catch(e){
+    document.getElementById('result-area').innerHTML=`<div class="api-prompt"><div class="api-label">❌ ${e.message}</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
   }
-  btn.disabled = false; btn.textContent = '🔍 AI 辨識並分析單字';
+  btn.disabled=false; btn.textContent='🔍 AI 辨識並分析單字';
 }
 
 async function analyzeManual(){
-  const word = document.getElementById('manual-word').value.trim();
-  if(!word) return;
+  const input = document.getElementById('manual-word').value.trim();
+  if(!input) return;
+  const words = input.split(/[,，、\s]+/).filter(w=>w.trim());
   const btn = document.getElementById('btn-manual');
-  btn.disabled = true; btn.textContent = '⏳ 分析中...';
-  const ra = document.getElementById('result-area');
-  ra.innerHTML = renderLoading(`AI 正在分析「${word}」的字根字首...`);
+  btn.disabled=true; btn.textContent='⏳ 分析中...';
+  document.getElementById('result-area').innerHTML = renderLoading(`AI 正在分析 ${words.length} 個單字...`);
+  try {
+    // analyse each word, or batch if multiple
+    const prompt = words.length===1 ? TEXT_PROMPT(words[0]) : PASSAGE_PROMPT(words.join(', '));
+    const raw = await callOpenAI([
+      {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
+      {role:'user', content: prompt}
+    ]);
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderWordResults(parsed.words||parsed, '手動');
+  } catch(e){
+    document.getElementById('result-area').innerHTML=`<div class="api-prompt"><div class="api-label">❌ ${e.message}</div></div>`;
+  }
+  btn.disabled=false; btn.textContent='🤖 AI 分析單字';
+}
 
+async function analyzePassage(){
+  const text = document.getElementById('passage-text').value.trim();
+  if(!text) return;
+  const btn = document.getElementById('btn-passage');
+  btn.disabled=true; btn.textContent='⏳ 分析中...';
+  document.getElementById('result-area').innerHTML = renderLoading('AI 正在從文章中擷取重要單字...');
   try {
     const raw = await callOpenAI([
       {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
-      {role:'user', content:`請分析英文單字「${word}」，輸出純JSON，key為"words"，值為陣列（只含這一個單字）：{"words":[{"word":"${word}","phonetic":"音標","pos":"詞性縮寫","zh":"中文意思(2-5字)","en_def":"英文定義(1句)","example_en":"TOEIC風格例句","example_zh":"例句中文翻譯","roots":[{"part":"字根/字首/字尾","type":"prefix|root|suffix","meaning":"意思"}],"root_tip":"用字根記憶這個單字的方法(繁中,1-2句)","family_words":["同族單字1","同族單字2","同族單字3","同族單字4"],"memory_tip":"記憶技巧(繁中,1句)","level":"TOEIC分數範圍"}]}`}
+      {role:'user', content: PASSAGE_PROMPT(text)}
     ]);
-
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); const words = parsed.words || parsed;
-    renderWordResults(words, '手動');
-  } catch(e) {
-    ra.innerHTML = `<div class="api-prompt"><div class="api-label">❌ 分析失敗：${e.message}</div></div>`;
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderWordResults(parsed.words||parsed, '文章');
+  } catch(e){
+    document.getElementById('result-area').innerHTML=`<div class="api-prompt"><div class="api-label">❌ ${e.message}</div></div>`;
   }
-  btn.disabled = false; btn.textContent = '🤖 AI 分析這個單字';
+  btn.disabled=false; btn.textContent='🤖 擷取並分析所有單字';
 }
 
 function renderLoading(msg){
@@ -561,7 +638,7 @@ async function lookupFamily(word){
   try {
     const raw = await callOpenAI([
       {role:'system', content:'You are an English vocabulary expert. Always respond with valid JSON only, no markdown.'},
-      {role:'user', content:`分析英文單字「${word}」，輸出純JSON，key為"words"，值為陣列（只含這一個單字）：{"words":[{"word":"${word}","phonetic":"音標","pos":"詞性縮寫","zh":"中文意思(2-5字)","en_def":"英文定義(1句)","example_en":"TOEIC風格例句","example_zh":"例句中文翻譯","roots":[{"part":"字根","type":"root","meaning":"意思"}],"root_tip":"字根記憶法(繁中)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中)","level":"TOEIC分數範圍"}]}`}
+      {role:'user', content: TEXT_PROMPT(word)}
     ]);
     const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); const words = parsed.words || parsed;
     renderWordResults(words, '同族查詢');
