@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_9.html -->
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_10.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,6 +7,54 @@
 <meta name="apple-mobile-web-app-title" content="WordLens">
 <meta name="theme-color" content="#1a1a1a">
 <title>WordLens</title>
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",
+    authDomain: "kumoen.firebaseapp.com",
+    projectId: "kumoen",
+    storageBucket: "kumoen.firebasestorage.app",
+    messagingSenderId: "407042193066",
+    appId: "1:407042193066:web:f48c1b9ce10019437c42d3"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const db    = getFirestore(fbApp);
+  const USER_DOC = 'users/kumo';  // 你的私人文件路徑
+
+  // ── 讀取資料 ──
+  async function fbLoad(){
+    try{
+      const snap = await getDoc(doc(db, USER_DOC.split('/')[0], USER_DOC.split('/')[1]));
+      if(snap.exists()){
+        const data = snap.data();
+        window._library = data.library || [];
+        window._stats   = data.stats   || {quiz:0,today:0,date:''};
+      }
+    }catch(e){ console.warn('Firebase load error:', e); }
+  }
+
+  // ── 儲存整個單字庫 ──
+  async function fbSaveAll(){
+    try{
+      await setDoc(doc(db, USER_DOC.split('/')[0], USER_DOC.split('/')[1]
+      ), { library: window._library, stats: window._stats }, {merge:true});
+    }catch(e){ console.warn('Firebase save error:', e); }
+  }
+
+  // 掛到 window 讓主程式呼叫
+  window.fbLoad    = fbLoad;
+  window.fbSaveAll = fbSaveAll;
+
+  // 啟動：先載入資料再初始化 app
+  fbLoad().then(()=>{
+    window._fbReady = true;
+    if(window._onFbReady) window._onFbReady();
+  });
+</script>
 <link href="./index_files/css2" rel="stylesheet">
 <style>
 /* ── Claude 橘白深色主題 ── */
@@ -208,13 +256,26 @@ nav button.active{color:var(--accent-light)}
 </style>
 </head>
 <body>
+<!-- Firebase 載入畫面 -->
+<div id="fb-loading" style="position: fixed; inset: 0px; background: rgb(26, 26, 26); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 999;">
+  <div style="font-family:serif;font-size:36px;color:#f59e0b">Word<em>Lens</em></div>
+  <div style="width:36px;height:36px;border:3px solid #333;border-top-color:#d97706;border-radius:50%;animation:spin .7s linear infinite"></div>
+  <div style="font-size:13px;color:#888">載入資料中...</div>
+</div>
+
 <div id="app">
 
   <!-- HOME -->
   <div class="view show" id="v-home">
     <div class="home-hero">
-      <div class="app-name">Word<em>Lens</em></div>
-      <div class="app-sub">拍照・AI 字根字首分析・個人單字庫</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="app-name">Word<em>Lens</em></div>
+        <div id="sync-status" style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px">
+          <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>
+          <span id="sync-txt">已同步</span>
+        </div>
+      </div>
+      <div class="app-sub">拍照・AI 字根字首分析・個人單字庫・雲端同步</div>
     </div>
     <div class="home-divider"></div>
     <div class="stats-grid">
@@ -261,15 +322,47 @@ nav button.active{color:var(--accent-light)}
 
 <script>
 // ══ State ══
-let library  = JSON.parse(localStorage.getItem('wl-lib')   || '[]');
-let stats    = JSON.parse(localStorage.getItem('wl-stats') || '{"quiz":0,"today":0,"date":""}');
-let apiKey   = localStorage.getItem('wl-key') || '';
-let pending  = [];   // words returned by AI, waiting to be saved
-let quizSt   = {words:[],idx:0,score:0,ans:false};
+// library & stats are loaded from Firebase; apiKey stays in localStorage (device-specific)
+let library = [];
+let stats   = {quiz:0, today:0, date:''};
+let apiKey  = localStorage.getItem('wl-key') || '';
+let pending = [];
+let quizSt  = {words:[],idx:0,score:0,ans:false};
+let _saveTimer = null;
 
-const save  = ()=> localStorage.setItem('wl-lib',   JSON.stringify(library));
-const saveSt= ()=> localStorage.setItem('wl-stats', JSON.stringify(stats));
-const saveK = k  =>{ apiKey=k; localStorage.setItem('wl-key',k); };
+// Sync from Firebase globals (set by module script)
+function syncFromFb(){
+  if(window._library) library = window._library;
+  if(window._stats)   stats   = window._stats;
+}
+
+// Debounced save to Firebase
+function setSyncStatus(syncing){
+  const dot=document.getElementById('sync-dot');
+  const txt=document.getElementById('sync-txt');
+  if(!dot||!txt) return;
+  if(syncing){ dot.style.background='#f59e0b'; txt.textContent='同步中...'; }
+  else        { dot.style.background='var(--green)'; txt.textContent='已同步'; }
+}
+
+function save(){
+  window._library = library;
+  setSyncStatus(true);
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async ()=>{
+    if(window.fbSaveAll){ await window.fbSaveAll(); setSyncStatus(false); }
+  }, 800);
+}
+
+function saveSt(){
+  window._stats = stats;
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async ()=>{
+    if(window.fbSaveAll){ await window.fbSaveAll(); }
+  }, 800);
+}
+
+const saveK = k =>{ apiKey=k; localStorage.setItem('wl-key',k); };
 
 function ensureToday(){
   const t = new Date().toDateString();
@@ -947,7 +1040,21 @@ function renderScore(){
 }
 
 // ══ Init ══
-renderHome();
+// 等 Firebase 載入完成再啟動，若超過 3 秒則直接啟動（離線保護）
+function startApp(){
+  syncFromFb();
+  // 隱藏載入畫面
+  const ld = document.getElementById('fb-loading');
+  if(ld) ld.style.display='none';
+  renderHome();
+}
+
+if(window._fbReady){
+  startApp();
+} else {
+  window._onFbReady = startApp;
+  setTimeout(()=>{ if(!window._fbReady){ console.warn('Firebase timeout, starting offline'); startApp(); }}, 3000);
+}
 </script>
 
 
