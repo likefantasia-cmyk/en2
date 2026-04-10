@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_8.html -->
+<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_9.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -329,7 +329,7 @@ async function callAI(messages){
   const r = await fetch('https://api.openai.com/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-    body: JSON.stringify({model:'gpt-4o', max_tokens:2500, response_format:{type:'json_object'}, messages})
+    body: JSON.stringify({model:'gpt-4o', max_tokens:4000, response_format:{type:'json_object'}, messages})
   });
   if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error((e?.error?.message)||'API error '+r.status); }
   const d=await r.json();
@@ -343,13 +343,13 @@ function fileToB64(file){
     reader.onload=e=>{
       const img=new Image();
       img.onload=()=>{
-        const MAX=1280;
+        const MAX=2048;
         let {width:w,height:h}=img;
         if(w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
         const canvas=document.createElement('canvas');
         canvas.width=w; canvas.height=h;
         canvas.getContext('2d').drawImage(img,0,0,w,h);
-        const b64=canvas.toDataURL('image/jpeg',0.92).split(',')[1];
+        const b64=canvas.toDataURL('image/jpeg',0.95).split(',')[1];
         res(b64);
       };
       img.onerror=rej;
@@ -363,15 +363,58 @@ function fileToB64(file){
 // JSON prompt templates
 const SYS = 'You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown.';
 
-const IMG_PROMPT = `Step 1: Read ALL English text visible in this image carefully — including small text, captions, labels, signs, subtitles, and body text. Do not skip any words.
-Step 2: From all the English words you found, select the most useful vocabulary for TOEIC 800 learners (up to 10 words). Prioritize: less common words, academic/business vocabulary, words with interesting etymology. Skip: very basic words (a, the, is, go, eat), proper nouns (names, brands), numbers.
-Step 3: For each selected word, provide full analysis.
-Return JSON only: {"words":[{
-  "word":"exact word from image","phonetic":"IPA phonetic","pos":"part of speech (n./v./adj. etc)","zh":"中文意思2-5字",
-  "en_def":"one-sentence English definition","example_en":"TOEIC-style example sentence","example_zh":"例句中文翻譯",
-  "roots":[{"part":"actual prefix/root/suffix","type":"prefix or root or suffix","meaning":"中文意思"}],
-  "root_tip":"如何用字根記憶此單字(繁中1-2句)","family_words":["related word 1","related word 2","related word 3"],
-  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC score range e.g. 650-800"
+const IMG_PROMPT = `This image is likely a textbook vocabulary page. Your job:
+
+STEP 1 — OCR: Scan the ENTIRE image systematically from top-left to bottom-right. List every English word that appears in BOLD, larger font, or as a standalone vocabulary entry (headwords). These are the target words. Do NOT miss any — scan every column, every row.
+
+STEP 2 — Filter: Remove only: articles (a/an/the), prepositions (in/on/at/to/for/of/with), conjunctions (and/but/or), pronouns (he/she/it), and obvious proper nouns (country names, person names). Keep everything else including common-looking words if they appear as bold headwords.
+
+STEP 3 — Analyze: For EVERY word that passed the filter, provide full vocabulary analysis. Return up to 15 words.
+
+Return ONLY this JSON (no explanation, no markdown):
+{"words":[{
+  "word":"exact spelling from image",
+  "phonetic":"IPA phonetic transcription",
+  "pos":"part of speech (n./v./adj./adv. etc)",
+  "zh":"中文意思2-5字",
+  "en_def":"one clear English definition",
+  "example_en":"natural English example sentence",
+  "example_zh":"例句中文翻譯",
+  "roots":[{"part":"prefix/root/suffix","type":"prefix or root or suffix","meaning":"中文意思"}],
+  "root_tip":"用字根記憶此單字的方法(繁中1-2句)",
+  "family_words":["related1","related2","related3"],
+  "memory_tip":"記憶技巧(繁中1句)",
+  "level":"TOEIC score range"
+}]}`;
+
+const TEXTBOOK_PROMPT = `This is a textbook vocabulary list page. 
+
+YOUR ONLY JOB: Extract every single bold or highlighted English headword from this page. These are the vocabulary entries the textbook is teaching.
+
+RULES:
+- Include ALL bold/larger-font English words — every single one, no matter how simple
+- Read left to right, top to bottom, column by column
+- If a word has a number or bullet before it, that is a headword — include it
+- Do NOT skip any headword
+- Do NOT filter by difficulty
+- You may see up to 30+ words on one page — list them ALL
+- Skip only: page numbers, chapter titles, and Chinese/Japanese text
+
+For each headword found, provide full analysis.
+Return ONLY JSON (no markdown):
+{"words":[{
+  "word":"exact headword spelling",
+  "phonetic":"IPA phonetic",
+  "pos":"n./v./adj./adv. etc",
+  "zh":"中文意思2-5字",
+  "en_def":"clear English definition",
+  "example_en":"example sentence",
+  "example_zh":"例句中文翻譯",
+  "roots":[{"part":"prefix/root/suffix","type":"prefix or root or suffix","meaning":"中文意思"}],
+  "root_tip":"用字根記憶此單字(繁中1-2句)",
+  "family_words":["related1","related2","related3"],
+  "memory_tip":"記憶技巧(繁中1句)",
+  "level":"TOEIC score range"
 }]}`;
 
 const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON：{"words":[{
@@ -432,6 +475,18 @@ function renderAdd(){
       <div class="img-preview" id="img-prev">
         <img id="prev-img" src=""/>
         <button class="btn-secondary" onclick="clearImg()">✕ 清除圖片</button>
+      </div>
+      <!-- Mode selector -->
+      <div style="background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">📚 課本單字頁模式</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">掃描所有粗體單字，不篩選難易度</div>
+        </div>
+        <label style="position:relative;width:44px;height:24px;flex-shrink:0">
+          <input type="checkbox" id="textbook-mode" style="opacity:0;width:0;height:0" onchange="updateImgBtn()"/>
+          <span id="toggle-track" style="position:absolute;inset:0;background:var(--border2);border-radius:12px;transition:.2s;cursor:pointer"></span>
+          <span id="toggle-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none"></span>
+        </label>
       </div>
       <button class="btn-primary" id="btn-img" onclick="doImg()" disabled>🔍 AI 辨識圖片單字</button>
     </div>
@@ -496,25 +551,78 @@ function loading(msg){
   document.getElementById('result-area').innerHTML=`<div class="spinner-wrap"><div class="spinner"></div><div class="spin-msg">${msg}</div></div>`;
 }
 
+function updateImgBtn(){
+  const cb=document.getElementById('textbook-mode');
+  const track=document.getElementById('toggle-track');
+  const thumb=document.getElementById('toggle-thumb');
+  if(cb&&track&&thumb){
+    track.style.background=cb.checked?'var(--accent)':'var(--border2)';
+    thumb.style.left=cb.checked?'23px':'3px';
+  }
+}
+
 async function doImg(){
   if(!previewFile) return;
+  const isTextbook=document.getElementById('textbook-mode')?.checked||false;
   const btn=document.getElementById('btn-img');
-  btn.disabled=true; btn.textContent='⏳ 分析中...';
-  loading('AI 正在辨識圖片中的英文單字...');
+  btn.disabled=true; btn.textContent='⏳ 辨識中...';
+
   try{
     const b64=await fileToB64(previewFile);
-    const mime='image/jpeg'; // always jpeg after canvas compression
-    const raw=await callAI([
-      {role:'system', content:SYS},
-      {role:'user', content:[
-        {type:'image_url', image_url:{url:`data:${mime};base64,${b64}`}},
-        {type:'text', text:IMG_PROMPT}
-      ]}
-    ]);
-    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    showResults(d.words||d, '拍照');
+
+    if(isTextbook){
+      // ── 課本模式：兩步驟，先 OCR 再分析 ──
+      loading('第 1 步：辨識課本中所有粗體英文單字...');
+      const ocrRaw=await callAI([
+        {role:'system', content:'You are a precise OCR expert. Your job is to read text from images exactly as written.'},
+        {role:'user', content:[
+          {type:'image_url', image_url:{url:`data:image/jpeg;base64,${b64}`}},
+          {type:'text', text:`This is a textbook vocabulary list page.
+TASK: Find and list EVERY English headword entry on this page.
+- Headwords are usually in bold, larger font, or appear as numbered/bulleted list items
+- Read systematically: top to bottom, left to right, column by column
+- Include ALL of them — do not filter, do not skip any
+- Include simple words if they appear as headwords
+- Exclude: page numbers, chapter titles, Chinese/Japanese characters, pure numbers
+Return ONLY JSON: {"detected_words":["word1","word2","word3",...]}
+List every headword you can find.`}
+        ]}
+      ]);
+
+      let words=[];
+      try{
+        const parsed=JSON.parse(ocrRaw.replace(/\`\`\`json|\`\`\`/g,'').trim());
+        words=parsed.detected_words||[];
+      }catch(e){ words=[]; }
+
+      if(!words.length) throw new Error('找不到任何單字，請確認圖片清晰且正面朝上');
+
+      loading(`第 2 步：分析 ${words.length} 個單字（字根字首、例句...）約需 15 秒`);
+      const raw=await callAI([
+        {role:'system', content:SYS},
+        {role:'user', content:`以下是從課本辨識出的 ${words.length} 個英文單字：[${words.join(', ')}]
+請對每一個單字做完整分析，所有單字都要分析，不可跳過。
+回傳JSON：{"words":[{"word":"單字","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字","en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯","roots":[{"part":"字根","type":"prefix或root或suffix","meaning":"中文意思"}],"root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"}]}`}
+      ]);
+      const d=JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,'').trim());
+      showResults(d.words||d, '課本');
+
+    } else {
+      // ── 一般模式：單步驟，篩選重要單字 ──
+      loading('AI 正在辨識圖片中的英文單字...');
+      const raw=await callAI([
+        {role:'system', content:SYS},
+        {role:'user', content:[
+          {type:'image_url', image_url:{url:`data:image/jpeg;base64,${b64}`}},
+          {type:'text', text:IMG_PROMPT}
+        ]}
+      ]);
+      const d=JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,'').trim());
+      showResults(d.words||d, '拍照');
+    }
+
   }catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
+    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}<br><br>建議：圖片清晰、單字正面朝上、光線充足</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
   }
   btn.disabled=false; btn.textContent='🔍 AI 辨識圖片單字';
 }
