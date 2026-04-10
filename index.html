@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_10.html -->
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_11.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -279,12 +279,54 @@ nav button.active{color:var(--accent-light)}
     </div>
     <div class="home-divider"></div>
     <div class="stats-grid">
-      <div class="stat"><div class="stat-n" id="h-total">0</div><div class="stat-l">我的單字</div></div>
-      <div class="stat"><div class="stat-n" id="h-today">0</div><div class="stat-l">今日新增</div></div>
+      <div class="stat"><div class="stat-n" id="h-total">14</div><div class="stat-l">我的單字</div></div>
+      <div class="stat"><div class="stat-n" id="h-today">1</div><div class="stat-l">今日新增</div></div>
       <div class="stat"><div class="stat-n" id="h-quiz">0</div><div class="stat-l">測驗次數</div></div>
     </div>
     <div class="sec-head">最近新增</div>
-    <div class="recent-list" id="recent-list"><div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">還沒有單字，去拍照新增吧！📸</div></div>
+    <div class="recent-list" id="recent-list">
+    <div class="recent-item" onclick="openModal(&#39;major&#39;)">
+      <div style="flex:1">
+        <div class="ri-word">major</div>
+        <div class="ri-zh">主要的</div>
+      </div>
+      <span class="ri-badge">手動</span>
+    </div>
+    <div class="recent-item" onclick="openModal(&#39;sour&#39;)">
+      <div style="flex:1">
+        <div class="ri-word">sour</div>
+        <div class="ri-zh">酸的</div>
+      </div>
+      <span class="ri-badge">拍照</span>
+    </div>
+    <div class="recent-item" onclick="openModal(&#39;cocktail&#39;)">
+      <div style="flex:1">
+        <div class="ri-word">cocktail</div>
+        <div class="ri-zh">雞尾酒</div>
+      </div>
+      <span class="ri-badge">拍照</span>
+    </div>
+    <div class="recent-item" onclick="openModal(&#39;majority&#39;)">
+      <div style="flex:1">
+        <div class="ri-word">majority</div>
+        <div class="ri-zh">大多數</div>
+      </div>
+      <span class="ri-badge">拍照</span>
+    </div>
+    <div class="recent-item" onclick="openModal(&#39;stress&#39;)">
+      <div style="flex:1">
+        <div class="ri-word">stress</div>
+        <div class="ri-zh">壓力</div>
+      </div>
+      <span class="ri-badge">拍照</span>
+    </div>
+    <div class="recent-item" onclick="openModal(&#39;unique&#39;)">
+      <div style="flex:1">
+        <div class="ri-word">unique</div>
+        <div class="ri-zh">獨特的</div>
+      </div>
+      <span class="ri-badge">拍照</span>
+    </div></div>
   </div>
 
   <!-- ADD -->
@@ -454,7 +496,7 @@ function fileToB64(file){
 }
 
 // JSON prompt templates
-const SYS = 'You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown.';
+const SYS = 'You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL: In roots array, the "part" field must be the ACTUAL morpheme letters (e.g. "at-", "tract", "-ive", "re-", "un-"), NOT the meaning. The "meaning" field contains the Chinese meaning.';
 
 const IMG_PROMPT = `This image is likely a textbook vocabulary page. Your job:
 
@@ -473,7 +515,7 @@ Return ONLY this JSON (no explanation, no markdown):
   "en_def":"one clear English definition",
   "example_en":"natural English example sentence",
   "example_zh":"例句中文翻譯",
-  "roots":[{"part":"prefix/root/suffix","type":"prefix or root or suffix","meaning":"中文意思"}],
+  "roots":[{"part":"ACTUAL morpheme in English e.g. 'at-' or 'tract' or '-ive'","type":"prefix or root or suffix","meaning":"中文意思 e.g. 向/拉/形容詞字尾"}],
   "root_tip":"用字根記憶此單字的方法(繁中1-2句)",
   "family_words":["related1","related2","related3"],
   "memory_tip":"記憶技巧(繁中1句)",
@@ -503,7 +545,7 @@ Return ONLY JSON (no markdown):
   "en_def":"clear English definition",
   "example_en":"example sentence",
   "example_zh":"例句中文翻譯",
-  "roots":[{"part":"prefix/root/suffix","type":"prefix or root or suffix","meaning":"中文意思"}],
+  "roots":[{"part":"ACTUAL morpheme in English e.g. 'at-' or 'tract' or '-ive'","type":"prefix or root or suffix","meaning":"中文意思 e.g. 向/拉/形容詞字尾"}],
   "root_tip":"用字根記憶此單字(繁中1-2句)",
   "family_words":["related1","related2","related3"],
   "memory_tip":"記憶技巧(繁中1句)",
@@ -513,7 +555,7 @@ Return ONLY JSON (no markdown):
 const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON：{"words":[{
   "word":"${w}","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字",
   "en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯",
-  "roots":[{"part":"字根原文","type":"prefix或root或suffix","meaning":"中文意思"}],
+  "roots":[{"part":"實際字根字母如 un- 或 spect 或 -tion","type":"prefix或root或suffix","meaning":"字根中文意思如 不/看/名詞字尾"}],
   "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3","同族4"],
   "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
 }]}`;
@@ -523,7 +565,7 @@ const PASSAGE_PROMPT = txt=>`以下英文文字中，找出所有值得學習的
 回傳JSON：{"words":[{
   "word":"單字","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字",
   "en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯",
-  "roots":[{"part":"字根原文","type":"prefix或root或suffix","meaning":"中文意思"}],
+  "roots":[{"part":"實際字根字母如 un- 或 spect 或 -tion","type":"prefix或root或suffix","meaning":"字根中文意思如 不/看/名詞字尾"}],
   "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3"],
   "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
 }]}`;
