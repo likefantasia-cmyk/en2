@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_7.html -->
+<!-- saved from url=(0048)file:///Users/kumori67/Downloads/wordlens_8.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -329,7 +329,7 @@ async function callAI(messages){
   const r = await fetch('https://api.openai.com/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-    body: JSON.stringify({model:'gpt-4o-mini', max_tokens:2000, response_format:{type:'json_object'}, messages})
+    body: JSON.stringify({model:'gpt-4o', max_tokens:2500, response_format:{type:'json_object'}, messages})
   });
   if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error((e?.error?.message)||'API error '+r.status); }
   const d=await r.json();
@@ -337,24 +337,41 @@ async function callAI(messages){
 }
 
 function fileToB64(file){
+  // Compress image to max 1280px wide before sending — keeps quality high but reduces token cost
   return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result.split(',')[1]);
-    r.onerror=rej;
-    r.readAsDataURL(file);
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=1280;
+        let {width:w,height:h}=img;
+        if(w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const b64=canvas.toDataURL('image/jpeg',0.92).split(',')[1];
+        res(b64);
+      };
+      img.onerror=rej;
+      img.src=e.target.result;
+    };
+    reader.onerror=rej;
+    reader.readAsDataURL(file);
   });
 }
 
 // JSON prompt templates
 const SYS = 'You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown.';
 
-const IMG_PROMPT = `請辨識圖片中所有值得學習的英文單字（優先多益800分等級，最多8個）。
-每個單字輸出完整分析，回傳JSON：{"words":[{
-  "word":"單字","phonetic":"IPA音標","pos":"詞性(n./v./adj.等)","zh":"中文意思2-5字",
-  "en_def":"英文定義1句","example_en":"TOEIC風格例句","example_zh":"例句中文翻譯",
-  "roots":[{"part":"字根/字首/字尾原文","type":"prefix或root或suffix","meaning":"中文意思"}],
-  "root_tip":"利用字根記憶此單字的方法(繁中1-2句)","family_words":["同族單字1","同族單字2","同族單字3"],
-  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍如650-800"
+const IMG_PROMPT = `Step 1: Read ALL English text visible in this image carefully — including small text, captions, labels, signs, subtitles, and body text. Do not skip any words.
+Step 2: From all the English words you found, select the most useful vocabulary for TOEIC 800 learners (up to 10 words). Prioritize: less common words, academic/business vocabulary, words with interesting etymology. Skip: very basic words (a, the, is, go, eat), proper nouns (names, brands), numbers.
+Step 3: For each selected word, provide full analysis.
+Return JSON only: {"words":[{
+  "word":"exact word from image","phonetic":"IPA phonetic","pos":"part of speech (n./v./adj. etc)","zh":"中文意思2-5字",
+  "en_def":"one-sentence English definition","example_en":"TOEIC-style example sentence","example_zh":"例句中文翻譯",
+  "roots":[{"part":"actual prefix/root/suffix","type":"prefix or root or suffix","meaning":"中文意思"}],
+  "root_tip":"如何用字根記憶此單字(繁中1-2句)","family_words":["related word 1","related word 2","related word 3"],
+  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC score range e.g. 650-800"
 }]}`;
 
 const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON：{"words":[{
@@ -486,7 +503,7 @@ async function doImg(){
   loading('AI 正在辨識圖片中的英文單字...');
   try{
     const b64=await fileToB64(previewFile);
-    const mime=previewFile.type||'image/jpeg';
+    const mime='image/jpeg'; // always jpeg after canvas compression
     const raw=await callAI([
       {role:'system', content:SYS},
       {role:'user', content:[
