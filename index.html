@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_13.html -->
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_14.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -312,7 +312,7 @@ nav button.active{color:var(--accent-light)}
     <div class="stats-grid">
       <div class="stat"><div class="stat-n" id="h-total">32</div><div class="stat-l">我的單字</div></div>
       <div class="stat"><div class="stat-n" id="h-today">45</div><div class="stat-l">今日新增</div></div>
-      <div class="stat"><div class="stat-n" id="h-quiz">2</div><div class="stat-l">測驗次數</div></div>
+      <div class="stat"><div class="stat-n" id="h-quiz">7</div><div class="stat-l">測驗次數</div></div>
     </div>
     <div class="sec-head">最近新增</div>
     <div class="recent-list" id="recent-list">
@@ -1105,49 +1105,136 @@ function openModal(word){
 function closeModal(){ document.getElementById('modal').style.display='none'; }
 
 // ══ Quiz ══
+
+// ══════════════════════════════════════════════════
+//  SRS + 多題型系統
+// ══════════════════════════════════════════════════
+function getSRS(w){ return w.srs||{level:0,due:0,skip:false}; }
+
+function setSRS(word, correct){
+  const w=library.find(x=>x.word===word); if(!w) return;
+  if(!w.srs) w.srs={level:0,due:0,skip:false};
+  const gaps=[0,3600,28800,86400,259200,604800,1209600,2592000,7776000];
+  if(correct){
+    w.srs.level=Math.min(w.srs.level+1,8);
+    w.srs.due=Date.now()+(gaps[w.srs.level]||86400)*1000;
+  } else {
+    w.srs.level=Math.max(0,w.srs.level-2);
+    w.srs.due=Date.now()+300000;
+  }
+  save();
+}
+
+function setWordFreq(word, action){
+  const w=library.find(x=>x.word===word); if(!w) return;
+  if(!w.srs) w.srs={level:0,due:0,skip:false};
+  if(action==='boost'){ w.srs.level=0; w.srs.due=0; w.srs.skip=false; toast('🔥「'+word+'」已設為優先複習'); }
+  else if(action==='reduce'){ w.srs.level=6; w.srs.due=Date.now()+604800000; w.srs.skip=false; toast('😌「'+word+'」已設為減少出現'); }
+  else if(action==='skip'){ w.srs.skip=true; toast('⏸️「'+word+'」已停用，不再出題'); }
+  save();
+}
+
+function getQuizPool(){
+  const now=Date.now();
+  const due=library.filter(w=>!getSRS(w).skip&&getSRS(w).due<=now);
+  const fresh=library.filter(w=>!getSRS(w).skip&&getSRS(w).level===0&&getSRS(w).due>now);
+  const rest=library.filter(w=>!getSRS(w).skip&&getSRS(w).level>0&&getSRS(w).due>now);
+  return [...shuffle(due),...shuffle(fresh),...shuffle(rest)].slice(0,Math.min(15,library.length));
+}
+
+function makeQuestion(w, lib){
+  const types=['en2zh','zh2en','example'];
+  let type=types[Math.floor(Math.random()*types.length)];
+  if(type==='example'&&!w.example_en) type='en2zh';
+  const pool=shuffle(lib.filter(x=>x.word!==w.word));
+  if(type==='en2zh'){
+    const wrongs=pool.filter(x=>x.zh!==w.zh).slice(0,3).map(x=>x.zh);
+    if(wrongs.length<3) type='en2zh';
+    return {type,word:w.word,prompt:w.word,sublabel:w.phonetic||'',question:'這個單字的中文意思是？',correct:w.zh,opts:shuffle([w.zh,...wrongs.slice(0,3)]),ex:w.example_en,exzh:w.example_zh};
+  }
+  if(type==='zh2en'){
+    const wrongs=pool.slice(0,3).map(x=>x.word);
+    return {type,word:w.word,prompt:w.zh,sublabel:w.en_def||'',question:'哪個英文單字符合這個意思？',correct:w.word,opts:shuffle([w.word,...wrongs]),ex:w.example_en,exzh:w.example_zh};
+  }
+  if(type==='example'){
+    const blank=(w.example_en||'').replace(new RegExp('\\b'+w.word+'\\b','gi'),'_____');
+    const wrongs=pool.slice(0,3).map(x=>x.word);
+    return {type,word:w.word,prompt:blank,sublabel:w.example_zh||'',question:'填入正確的單字：',correct:w.word,opts:shuffle([w.word,...wrongs]),ex:w.example_en,exzh:w.example_zh};
+  }
+}
+
 function renderQuiz(){
   const el=document.getElementById('quiz-content');
-  if(library.length<4){
-    el.innerHTML=`<div class="empty-state"><div style="font-size:48px">📚</div><div style="font-size:18px;font-weight:700">單字不夠</div><div style="font-size:14px;color:var(--muted)">至少需要 4 個單字<br>目前有 ${library.length} 個</div><button class="btn-primary" style="margin-top:12px" onclick="goTab('add')">去新增單字</button></div>`;
+  const pool = getQuizPool();
+  if(pool.length<4){
+    const skipped = library.filter(w=>getSRS(w).skip).length;
+    el.innerHTML=`<div class="empty-state">
+      <div style="font-size:48px">📚</div>
+      <div style="font-size:18px;font-weight:700">單字不夠</div>
+      <div style="font-size:14px;color:var(--muted)">至少需要 4 個可測驗單字<br>目前有 ${library.length} 個（${skipped} 個停用中）</div>
+      <button class="btn-primary" style="margin-top:12px" onclick="goTab('add')">去新增單字</button>
+    </div>`;
     return;
   }
-  quizSt.words=shuffle(library).slice(0,Math.min(10,library.length));
-  quizSt.idx=0; quizSt.score=0; quizSt.ans=false;
+  quizSt.questions = pool.map(w=>makeQuestion(w, library)).filter(Boolean);
+  quizSt.idx=0; quizSt.score=0; quizSt.ans=false; quizSt.wrong=[];
   renderQ();
 }
 
 function renderQ(){
-  const q=quizSt.words[quizSt.idx]; if(!q){ renderScore(); return; }
-  const wrongs=shuffle(library.filter(w=>w.zh!==q.zh)).slice(0,3).map(w=>w.zh);
-  const opts=shuffle([q.zh,...wrongs]);
-  const pct=(quizSt.idx/quizSt.words.length)*100;
+  const q=quizSt.questions[quizSt.idx];
+  if(!q){ renderScore(); return; }
+  const pct=(quizSt.idx/quizSt.questions.length)*100;
+  const typeLabel = q.type==='en2zh'?'英文→中文': q.type==='zh2en'?'中文→英文':'例句填空';
+  const typeColor = q.type==='en2zh'?'var(--accent-light)': q.type==='zh2en'?'var(--blue)':'var(--purple)';
   document.getElementById('quiz-content').innerHTML=`
     <div class="qprog-bar"><div class="qprog-fill" style="width:${pct}%"></div></div>
-    <div style="font-size:12px;color:var(--muted);text-align:right">題目 ${quizSt.idx+1} / ${quizSt.words.length}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;font-weight:700;color:${typeColor};letter-spacing:.5px">${typeLabel}</span>
+      <span style="font-size:12px;color:var(--muted)">第 ${quizSt.idx+1} / ${quizSt.questions.length} 題</span>
+    </div>
     <div class="q-card">
-      <div class="q-label">這個單字的中文意思是？</div>
-      <div class="q-word">${q.word}</div>
-      <div class="q-ph">${q.phonetic||''}</div>
+      <div class="q-label">${q.question}</div>
+      <div class="q-word" style="font-size:${q.type==='example'?'17px':'34px'};line-height:1.4">${q.prompt}</div>
+      ${q.sublabel?`<div class="q-ph" style="margin-top:6px">${q.sublabel}</div>`:''}
     </div>
     <div class="opts">
-      ${opts.map(o=>`<button class="opt" onclick="ansQ(this,'${o.replace(/'/g,"\\'")}','${q.zh.replace(/'/g,"\\'")}','${q.word.replace(/'/g,"\\'")}','${(q.example_en||'').replace(/'/g,"\\'")}','${(q.example_zh||'').replace(/'/g,"\\'")}')">
+      ${q.opts.map(o=>`<button class="opt" onclick="ansQ(this,'${o.replace(/'/g,"\\'")}','${q.correct.replace(/'/g,"\\'")}','${q.word.replace(/'/g,"\\'")}','${(q.ex||'').replace(/'/g,"\\'")}','${(q.exzh||'').replace(/'/g,"\\'")}')">
         ${o}</button>`).join('')}
     </div>
     <div id="qfb" style="display:none"></div>
     <div id="qnxt" style="display:none">
-      <button class="btn-nq" onclick="nextQ()">${quizSt.idx+1<quizSt.words.length?'下一題 →':'查看結果 🎯'}</button>
+      <button class="btn-nq" onclick="nextQ()">${quizSt.idx+1<quizSt.questions.length?'下一題 →':'查看結果 🎯'}</button>
     </div>`;
 }
 
 function ansQ(btn,chosen,correct,word,ex,exzh){
   if(quizSt.ans) return; quizSt.ans=true;
   document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  if(chosen===correct){ btn.classList.add('ok'); quizSt.score++; }
-  else{ btn.classList.add('no'); document.querySelectorAll('.opt').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('ok'); }); }
+  const ok = chosen===correct;
+  if(ok){ btn.classList.add('ok'); quizSt.score++; }
+  else{
+    btn.classList.add('no');
+    document.querySelectorAll('.opt').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('ok'); });
+    quizSt.wrong.push(word);
+  }
+  setSRS(word, ok);
   speak(word);
+  const wObj = library.find(x=>x.word===word)||{};
+  const srsLv = getSRS(wObj).level;
+  const lvlTxt = ok ? `✅ 熟悉度 +1（Lv.${srsLv}）` : `❌ 熟悉度 -2（Lv.${srsLv}）`;
   const fb=document.getElementById('qfb');
   fb.style.display='block';
-  fb.innerHTML=`<div class="explain-box"><div class="exq">${ex}</div><div>${exzh}</div></div>`;
+  fb.innerHTML=`
+    <div class="explain-box">
+      <div style="font-size:12px;color:${ok?'var(--green)':'var(--red)'};margin-bottom:8px;font-weight:600">${lvlTxt}</div>
+      ${ex?`<div class="exq">${ex}</div><div style="font-size:13px;color:var(--muted)">${exzh}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button onclick="setWordFreq('${word.replace(/'/g,"\\'")}','boost')" style="background:rgba(217,119,6,.15);border:1px solid var(--accent-border);color:var(--accent-light);border-radius:8px;padding:5px 10px;font-size:12px">🔥 加強複習</button>
+        <button onclick="setWordFreq('${word.replace(/'/g,"\\'")}','reduce')" style="background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:8px;padding:5px 10px;font-size:12px">😌 減少出現</button>
+        <button onclick="setWordFreq('${word.replace(/'/g,"\\'")}','skip')" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--red);border-radius:8px;padding:5px 10px;font-size:12px">⏸️ 不再出題</button>
+      </div>
+    </div>`;
   document.getElementById('qnxt').style.display='block';
 }
 
@@ -1155,16 +1242,26 @@ function nextQ(){ quizSt.idx++; quizSt.ans=false; renderQ(); }
 
 function renderScore(){
   stats.quiz++; saveSt();
-  const pct=Math.round((quizSt.score/quizSt.words.length)*100);
+  const total=quizSt.questions.length;
+  const pct=Math.round((quizSt.score/total)*100);
   const e=pct>=80?'🏆':pct>=60?'💪':'📚';
-  const m=pct>=80?'太棒了！繼續拍照新增單字！':pct>=60?'不錯！繼續加油！':'多複習收藏的單字！';
+  const m=pct>=80?'太棒了！繼續保持！':pct>=60?'不錯！繼續加油！':'答錯的單字會優先出現，繼續練習！';
+  const dueNow = library.filter(w=>!getSRS(w).skip && getSRS(w).due<=Date.now()).length;
+  const dueToday = library.filter(w=>{const s=getSRS(w);return !s.skip&&s.due>Date.now()&&s.due<=Date.now()+86400000;}).length;
   document.getElementById('quiz-content').innerHTML=`
     <div class="score-screen">
       <div class="score-emoji">${e}</div>
       <div class="score-n">${pct}%</div>
-      <div class="score-sub">${quizSt.score} / ${quizSt.words.length} 答對</div>
+      <div class="score-sub">${quizSt.score} / ${total} 答對</div>
+      ${quizSt.wrong.length?`<div style="font-size:13px;color:var(--red);text-align:center">答錯：${quizSt.wrong.join('、')}</div>`:''}
       <div class="score-msg">${m}</div>
-      <button class="btn-retry" onclick="renderQuiz()">再測一次</button>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 20px;width:100%;text-align:left">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">複習排程</div>
+        <div style="font-size:14px;color:var(--text)">🔴 現在待複習：<strong style="color:var(--accent-light)">${dueNow}</strong> 個</div>
+        <div style="font-size:14px;color:var(--text);margin-top:4px">🟡 今日內到期：<strong style="color:var(--blue)">${dueToday}</strong> 個</div>
+        <div style="font-size:14px;color:var(--text);margin-top:4px">📚 可測驗單字：<strong>${library.filter(w=>!getSRS(w).skip).length}</strong> 個</div>
+      </div>
+      <button class="btn-retry" onclick="renderQuiz()">繼續測驗</button>
     </div>`;
   renderHome();
 }
