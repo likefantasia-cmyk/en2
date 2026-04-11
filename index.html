@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_12.html -->
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_13.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -310,51 +310,51 @@ nav button.active{color:var(--accent-light)}
     </div>
     <div class="home-divider"></div>
     <div class="stats-grid">
-      <div class="stat"><div class="stat-n" id="h-total">15</div><div class="stat-l">我的單字</div></div>
-      <div class="stat"><div class="stat-n" id="h-today">28</div><div class="stat-l">今日新增</div></div>
+      <div class="stat"><div class="stat-n" id="h-total">32</div><div class="stat-l">我的單字</div></div>
+      <div class="stat"><div class="stat-n" id="h-today">45</div><div class="stat-l">今日新增</div></div>
       <div class="stat"><div class="stat-n" id="h-quiz">2</div><div class="stat-l">測驗次數</div></div>
     </div>
     <div class="sec-head">最近新增</div>
     <div class="recent-list" id="recent-list">
-    <div class="recent-item" onclick="openModal(&#39;victim&#39;)">
+    <div class="recent-item" onclick="openModal(&#39;effective&#39;)">
       <div style="flex:1">
-        <div class="ri-word">victim</div>
-        <div class="ri-zh">受害者</div>
+        <div class="ri-word">effective</div>
+        <div class="ri-zh">有效的</div>
       </div>
       <span class="ri-badge">手動</span>
     </div>
-    <div class="recent-item" onclick="openModal(&#39;receive&#39;)">
+    <div class="recent-item" onclick="openModal(&#39;audience&#39;)">
       <div style="flex:1">
-        <div class="ri-word">receive</div>
-        <div class="ri-zh">接收</div>
+        <div class="ri-word">audience</div>
+        <div class="ri-zh">觀眾</div>
       </div>
       <span class="ri-badge">手動</span>
     </div>
-    <div class="recent-item" onclick="openModal(&#39;quantity&#39;)">
+    <div class="recent-item" onclick="openModal(&#39;confident&#39;)">
       <div style="flex:1">
-        <div class="ri-word">quantity</div>
-        <div class="ri-zh">數量</div>
+        <div class="ri-word">confident</div>
+        <div class="ri-zh">自信的</div>
       </div>
       <span class="ri-badge">手動</span>
     </div>
-    <div class="recent-item" onclick="openModal(&#39;specific&#39;)">
+    <div class="recent-item" onclick="openModal(&#39;encourage&#39;)">
       <div style="flex:1">
-        <div class="ri-word">specific</div>
-        <div class="ri-zh">具體的</div>
+        <div class="ri-word">encourage</div>
+        <div class="ri-zh">鼓勵</div>
       </div>
       <span class="ri-badge">手動</span>
     </div>
-    <div class="recent-item" onclick="openModal(&#39;scientist&#39;)">
+    <div class="recent-item" onclick="openModal(&#39;persuade&#39;)">
       <div style="flex:1">
-        <div class="ri-word">scientist</div>
-        <div class="ri-zh">科學家</div>
+        <div class="ri-word">persuade</div>
+        <div class="ri-zh">說服</div>
       </div>
       <span class="ri-badge">手動</span>
     </div>
-    <div class="recent-item" onclick="openModal(&#39;observe&#39;)">
+    <div class="recent-item" onclick="openModal(&#39;hesitate&#39;)">
       <div style="flex:1">
-        <div class="ri-word">observe</div>
-        <div class="ri-zh">觀察</div>
+        <div class="ri-word">hesitate</div>
+        <div class="ri-zh">猶豫</div>
       </div>
       <span class="ri-badge">拍照</span>
     </div></div>
@@ -559,7 +559,7 @@ Return ONLY this JSON (no explanation, no markdown):
   "en_def":"one clear English definition",
   "example_en":"natural English example sentence",
   "example_zh":"例句中文翻譯",
-  "roots":[{"part":"ACTUAL morpheme in English e.g. 'at-' or 'tract' or '-ive'","type":"prefix or root or suffix","meaning":"中文意思 e.g. 向/拉/形容詞字尾"}],
+  "conjugation":{"present":"verb base form or null","past":"past tense or null","pp":"past participle or null","ing":"present participle or null"},"roots":[{"part":"ACTUAL morpheme e.g. at- or tract or -ive","type":"prefix or root or suffix","meaning":"中文意思"}],
   "root_tip":"用字根記憶此單字的方法(繁中1-2句)",
   "family_words":["related1","related2","related3"],
   "memory_tip":"記憶技巧(繁中1句)",
@@ -596,21 +596,29 @@ Return ONLY JSON (no markdown):
   "level":"TOEIC score range"
 }]}`;
 
-const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON：{"words":[{
-  "word":"${w}","phonetic":"IPA音標","pos":"詞性",
-  "conjugation":{"present":"原形","past":"過去式（若為動詞）","pp":"過去分詞（若為動詞）","ing":"現在分詞（若為動詞）"},
-  "zh":"中文意思2-5字","en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯",
-  "roots":[{"part":"實際字根字母如 un- 或 spect 或 -tion","type":"prefix或root或suffix","meaning":"字根中文意思如 不/看/名詞字尾"}],
-  "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3","同族4"],
-  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
+const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON（只能回傳JSON不能有其他文字）：{"words":[{
+  "word":"${w}",
+  "phonetic":"IPA音標如/nəˈɡoʊʃieɪt/",
+  "pos":"詞性如 v. / n. / adj.",
+  "conjugation":{"present":"動詞原形（非動詞填null）","past":"過去式（非動詞填null）","pp":"過去分詞（非動詞填null）","ing":"現在分詞（非動詞填null）"},
+  "zh":"中文意思2-5字",
+  "en_def":"英文定義1句",
+  "example_en":"自然英文例句",
+  "example_zh":"例句中文翻譯",
+  "roots":[{"part":"實際字根字母如 re- 或 dict 或 -tion（非希臘/拉丁語系可填null陣列）","type":"prefix或root或suffix","meaning":"字根中文意思"}],
+  "root_tip":"利用字根記憶此單字的方法(繁中1-2句)",
+  "family_words":["同族單字1","同族單字2","同族單字3","同族單字4"],
+  "memory_tip":"記憶技巧(繁中1句)",
+  "level":"TOEIC分數範圍如650-800"
 }]}`;
 
 const PASSAGE_PROMPT = txt=>`以下英文文字中，找出所有值得學習的單字（優先多益800分，最多10個）。
 文字：「${txt}」
 回傳JSON：{"words":[{
-  "word":"單字","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字",
-  "en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯",
-  "roots":[{"part":"實際字根字母如 un- 或 spect 或 -tion","type":"prefix或root或suffix","meaning":"字根中文意思如 不/看/名詞字尾"}],
+  "word":"單字","phonetic":"IPA音標","pos":"詞性如v./n./adj.",
+  "conjugation":{"present":"動詞原形（非動詞填null）","past":"過去式（非動詞填null）","pp":"過去分詞（非動詞填null）","ing":"現在分詞（非動詞填null）"},
+  "zh":"中文意思2-5字","en_def":"英文定義1句","example_en":"例句","example_zh":"例句中文翻譯",
+  "roots":[{"part":"實際字根字母","type":"prefix或root或suffix","meaning":"字根中文意思"}],
   "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3"],
   "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
 }]}`;
@@ -902,12 +910,15 @@ function wordCard(w, idx){
       <div class="w-word">${w.word}</div>
       <div class="w-ph">${w.phonetic||''}</div>
       <div class="w-pos">${w.pos||''}</div>
-      ${(w.pos||'').toLowerCase().includes('v') && w.conjugation && w.conjugation.past ? `
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:3px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--accent-light)">原：${w.conjugation.present||w.word}</span>
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:3px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--blue)">過：${w.conjugation.past||'-'}</span>
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:3px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--purple)">p.p.：${w.conjugation.pp||'-'}</span>
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:3px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--muted2)">-ing：${w.conjugation.ing||'-'}</span>
+      ${w.conjugation && (w.conjugation.past || w.conjugation.pp) ? `
+      <div style="margin-top:8px">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px">動詞三態</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--accent-light)">原形 ${w.conjugation.present||w.word}</span>
+          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--blue)">過去 ${w.conjugation.past||'-'}</span>
+          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--purple)">p.p. ${w.conjugation.pp||'-'}</span>
+          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted2)">-ing ${w.conjugation.ing||'-'}</span>
+        </div>
       </div>` : ''}
       <div class="w-zh">${w.zh}</div>
       <div class="w-en">${w.en_def}</div>
@@ -1059,6 +1070,16 @@ function openModal(word){
     <div class="modal-word">${w.word}</div>
     <div class="w-ph">${w.phonetic||''}</div>
     <div class="w-pos" style="margin-top:10px">${w.pos||''}</div>
+    ${w.conjugation && (w.conjugation.past||w.conjugation.pp) ? `
+    <div style="margin-top:8px">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px">動詞三態</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--accent-light)">原形 ${w.conjugation.present||w.word}</span>
+        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--blue)">過去 ${w.conjugation.past||'-'}</span>
+        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--purple)">p.p. ${w.conjugation.pp||'-'}</span>
+        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted2)">-ing ${w.conjugation.ing||'-'}</span>
+      </div>
+    </div>` : ''}
     <div class="w-zh">${w.zh}</div>
     <div class="w-en">${w.en_def}</div>
     <div class="ex-block">
