@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_14.html -->
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_16.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -288,7 +288,7 @@ nav button.active{color:var(--accent-light)}
 </head>
 <body>
 <!-- Firebase 載入畫面 -->
-<div id="fb-loading" style="position: fixed; inset: 0px; background: rgb(26, 26, 26); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 999;">
+<div id="fb-loading" style="position:fixed;inset:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999">
   <div style="font-family:serif;font-size:36px;color:#f59e0b">Word<em>Lens</em></div>
   <div style="width:36px;height:36px;border:3px solid #333;border-top-color:#d97706;border-radius:50%;animation:spin .7s linear infinite"></div>
   <div style="font-size:13px;color:#888">載入資料中...</div>
@@ -310,54 +310,12 @@ nav button.active{color:var(--accent-light)}
     </div>
     <div class="home-divider"></div>
     <div class="stats-grid">
-      <div class="stat"><div class="stat-n" id="h-total">32</div><div class="stat-l">我的單字</div></div>
-      <div class="stat"><div class="stat-n" id="h-today">45</div><div class="stat-l">今日新增</div></div>
-      <div class="stat"><div class="stat-n" id="h-quiz">7</div><div class="stat-l">測驗次數</div></div>
+      <div class="stat"><div class="stat-n" id="h-total">0</div><div class="stat-l">我的單字</div></div>
+      <div class="stat"><div class="stat-n" id="h-today">0</div><div class="stat-l">今日新增</div></div>
+      <div class="stat"><div class="stat-n" id="h-quiz">0</div><div class="stat-l">測驗次數</div></div>
     </div>
     <div class="sec-head">最近新增</div>
-    <div class="recent-list" id="recent-list">
-    <div class="recent-item" onclick="openModal(&#39;effective&#39;)">
-      <div style="flex:1">
-        <div class="ri-word">effective</div>
-        <div class="ri-zh">有效的</div>
-      </div>
-      <span class="ri-badge">手動</span>
-    </div>
-    <div class="recent-item" onclick="openModal(&#39;audience&#39;)">
-      <div style="flex:1">
-        <div class="ri-word">audience</div>
-        <div class="ri-zh">觀眾</div>
-      </div>
-      <span class="ri-badge">手動</span>
-    </div>
-    <div class="recent-item" onclick="openModal(&#39;confident&#39;)">
-      <div style="flex:1">
-        <div class="ri-word">confident</div>
-        <div class="ri-zh">自信的</div>
-      </div>
-      <span class="ri-badge">手動</span>
-    </div>
-    <div class="recent-item" onclick="openModal(&#39;encourage&#39;)">
-      <div style="flex:1">
-        <div class="ri-word">encourage</div>
-        <div class="ri-zh">鼓勵</div>
-      </div>
-      <span class="ri-badge">手動</span>
-    </div>
-    <div class="recent-item" onclick="openModal(&#39;persuade&#39;)">
-      <div style="flex:1">
-        <div class="ri-word">persuade</div>
-        <div class="ri-zh">說服</div>
-      </div>
-      <span class="ri-badge">手動</span>
-    </div>
-    <div class="recent-item" onclick="openModal(&#39;hesitate&#39;)">
-      <div style="flex:1">
-        <div class="ri-word">hesitate</div>
-        <div class="ri-zh">猶豫</div>
-      </div>
-      <span class="ri-badge">拍照</span>
-    </div></div>
+    <div class="recent-list" id="recent-list"></div>
   </div>
 
   <!-- ADD -->
@@ -1142,24 +1100,104 @@ function getQuizPool(){
   return [...shuffle(due),...shuffle(fresh),...shuffle(rest)].slice(0,Math.min(15,library.length));
 }
 
+
+// ── 干擾選項資料庫（測驗時混入單字庫外的選項）──
+const DISTRACTOR_POOL = [
+  {word:"negotiate",zh:"談判・協商"},{word:"implement",zh:"實施・執行"},
+  {word:"collaborate",zh:"合作・協作"},{word:"revenue",zh:"營收・收入"},
+  {word:"outsource",zh:"外包"},{word:"streamline",zh:"簡化・精簡"},
+  {word:"leverage",zh:"槓桿・善用"},{word:"incentive",zh:"激勵・誘因"},
+  {word:"benchmark",zh:"基準・標竿"},{word:"initiative",zh:"倡議・主動性"},
+  {word:"provisional",zh:"暫定的・臨時的"},{word:"sustainable",zh:"永續的"},
+  {word:"delegate",zh:"委派・授權"},{word:"acquisition",zh:"收購"},
+  {word:"dividend",zh:"股利・紅利"},{word:"portfolio",zh:"投資組合"},
+  {word:"depreciation",zh:"折舊・貶值"},{word:"equity",zh:"股權"},
+  {word:"liability",zh:"負債・責任"},{word:"fiscal",zh:"財政的"},
+  {word:"audit",zh:"審計・審查"},{word:"inflation",zh:"通貨膨脹"},
+  {word:"liquidity",zh:"流動性"},{word:"yield",zh:"收益率"},
+  {word:"collateral",zh:"抵押品"},{word:"solvency",zh:"償債能力"},
+  {word:"agenda",zh:"議程・待辦事項"},{word:"tentative",zh:"暫定的"},
+  {word:"facilitate",zh:"促進・協助"},{word:"confidential",zh:"機密的"},
+  {word:"maintenance",zh:"維護・保養"},{word:"inventory",zh:"庫存"},
+  {word:"mandatory",zh:"強制的"},{word:"compatible",zh:"相容的"},
+  {word:"recruit",zh:"招募・徵才"},{word:"resignation",zh:"辭職"},
+  {word:"compensation",zh:"薪酬・補償"},{word:"appraisal",zh:"績效評估"},
+  {word:"turnover",zh:"員工流動率"},{word:"severance",zh:"遣散費"},
+  {word:"orientation",zh:"新人訓練"},{word:"subordinate",zh:"下屬"},
+  {word:"grievance",zh:"申訴・不滿"},{word:"mediator",zh:"調解人"},
+  {word:"demographic",zh:"人口統計"},{word:"branding",zh:"品牌建立"},
+  {word:"campaign",zh:"行銷活動"},{word:"niche",zh:"利基市場"},
+  {word:"viral",zh:"病毒式傳播"},{word:"conversion",zh:"轉換率"},
+  {word:"segmentation",zh:"市場區隔"},{word:"flagship",zh:"旗艦"},
+  {word:"testimonial",zh:"顧客見證"},{word:"prototype",zh:"原型"},
+  {word:"itinerary",zh:"行程表"},{word:"accommodation",zh:"住宿"},
+  {word:"reservation",zh:"預訂"},{word:"layover",zh:"轉機等待"},
+  {word:"vicinity",zh:"附近・周邊"},{word:"amenity",zh:"設施"},
+  {word:"complimentary",zh:"免費贈送的"},{word:"excursion",zh:"短途旅行"},
+  {word:"liability",zh:"法律責任"},{word:"arbitration",zh:"仲裁"},
+  {word:"compliance",zh:"合規・遵從"},{word:"clause",zh:"條款"},
+  {word:"jurisdiction",zh:"司法管轄權"},{word:"plaintiff",zh:"原告"},
+  {word:"defendant",zh:"被告"},{word:"statute",zh:"法規"},
+  {word:"infringement",zh:"侵權"},{word:"litigation",zh:"訴訟"},
+  {word:"negligence",zh:"疏失・過失"},{word:"waiver",zh:"棄權書"},
+  {word:"redundant",zh:"多餘的・裁員的"},{word:"eloquent",zh:"口才好的"},
+  {word:"meticulous",zh:"一絲不苟的"},{word:"prevalent",zh:"普遍的"},
+  {word:"ambiguous",zh:"模糊不清的"},{word:"explicit",zh:"明確的"},
+  {word:"implicit",zh:"隱含的"},{word:"substantial",zh:"大量的・實質的"},
+  {word:"consecutive",zh:"連續的"},{word:"preliminary",zh:"初步的・準備的"},
+  {word:"subsequent",zh:"隨後的"},{word:"prior",zh:"事先的・優先的"},
+  {word:"comprehensive",zh:"全面的・綜合的"},{word:"concurrent",zh:"同時發生的"},
+  {word:"delinquent",zh:"拖欠的・犯罪的"},{word:"proficient",zh:"熟練的"},
+  {word:"versatile",zh:"多才多藝的"},{word:"diligent",zh:"勤奮的"},
+  {word:"eloquence",zh:"雄辯・口才"},{word:"perseverance",zh:"毅力・堅持"},
+];
+
+function getDistr(excludeWords, count){
+  // Return distractors not in user library and not in exclude list
+  const libWords = new Set(library.map(w=>w.word.toLowerCase()));
+  const pool = DISTRACTOR_POOL.filter(d=>
+    !libWords.has(d.word.toLowerCase()) &&
+    !excludeWords.includes(d.word)
+  );
+  return shuffle(pool).slice(0, count);
+}
+
 function makeQuestion(w, lib){
   const types=['en2zh','zh2en','example'];
   let type=types[Math.floor(Math.random()*types.length)];
   if(type==='example'&&!w.example_en) type='en2zh';
-  const pool=shuffle(lib.filter(x=>x.word!==w.word));
+  const libPool=shuffle(lib.filter(x=>x.word!==w.word));
+
+  function buildOpts(correctObj, libWrongObjs, excludeWords){
+    const need=3-libWrongObjs.length;
+    const distr=getDistr([correctObj.word,...excludeWords],need).map(d=>({word:d.word,zh:d.zh,inLib:false}));
+    return shuffle([correctObj,...libWrongObjs,...distr]).slice(0,4);
+  }
+
   if(type==='en2zh'){
-    const wrongs=pool.filter(x=>x.zh!==w.zh).slice(0,3).map(x=>x.zh);
-    if(wrongs.length<3) type='en2zh';
-    return {type,word:w.word,prompt:w.word,sublabel:w.phonetic||'',question:'這個單字的中文意思是？',correct:w.zh,opts:shuffle([w.zh,...wrongs.slice(0,3)]),ex:w.example_en,exzh:w.example_zh};
+    const libW=libPool.filter(x=>x.zh!==w.zh).slice(0,2).map(x=>({word:x.word,zh:x.zh,inLib:true}));
+    const correctObj={word:w.word,zh:w.zh,inLib:true};
+    const allOpts=buildOpts(correctObj,libW,libW.map(x=>x.word));
+    return {type,word:w.word,prompt:w.word,sublabel:w.phonetic||'',
+      question:'這個單字的中文意思是？',correct:w.zh,correctWord:w.word,
+      allOpts,opts:allOpts.map(o=>o.zh),ex:w.example_en,exzh:w.example_zh};
   }
   if(type==='zh2en'){
-    const wrongs=pool.slice(0,3).map(x=>x.word);
-    return {type,word:w.word,prompt:w.zh,sublabel:w.en_def||'',question:'哪個英文單字符合這個意思？',correct:w.word,opts:shuffle([w.word,...wrongs]),ex:w.example_en,exzh:w.example_zh};
+    const libW=libPool.slice(0,2).map(x=>({word:x.word,zh:x.zh,inLib:true}));
+    const correctObj={word:w.word,zh:w.zh,inLib:true};
+    const allOpts=buildOpts(correctObj,libW,libW.map(x=>x.word));
+    return {type,word:w.word,prompt:w.zh,sublabel:w.en_def||'',
+      question:'哪個英文單字符合這個意思？',correct:w.word,correctWord:w.word,
+      allOpts,opts:allOpts.map(o=>o.word),ex:w.example_en,exzh:w.example_zh};
   }
   if(type==='example'){
     const blank=(w.example_en||'').replace(new RegExp('\\b'+w.word+'\\b','gi'),'_____');
-    const wrongs=pool.slice(0,3).map(x=>x.word);
-    return {type,word:w.word,prompt:blank,sublabel:w.example_zh||'',question:'填入正確的單字：',correct:w.word,opts:shuffle([w.word,...wrongs]),ex:w.example_en,exzh:w.example_zh};
+    const libW=libPool.slice(0,2).map(x=>({word:x.word,zh:x.zh,inLib:true}));
+    const correctObj={word:w.word,zh:w.zh,inLib:true};
+    const allOpts=buildOpts(correctObj,libW,libW.map(x=>x.word));
+    return {type,word:w.word,prompt:blank,sublabel:w.example_zh||'',
+      question:'填入正確的單字：',correct:w.word,correctWord:w.word,
+      allOpts,opts:allOpts.map(o=>o.word),ex:w.example_en,exzh:w.example_zh};
   }
 }
 
@@ -1210,6 +1248,7 @@ function renderQ(){
 
 function ansQ(btn,chosen,correct,word,ex,exzh){
   if(quizSt.ans) return; quizSt.ans=true;
+  const q = quizSt.questions[quizSt.idx];
   document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
   const ok = chosen===correct;
   if(ok){ btn.classList.add('ok'); quizSt.score++; }
@@ -1222,20 +1261,53 @@ function ansQ(btn,chosen,correct,word,ex,exzh){
   speak(word);
   const wObj = library.find(x=>x.word===word)||{};
   const srsLv = getSRS(wObj).level;
-  const lvlTxt = ok ? `✅ 熟悉度 +1（Lv.${srsLv}）` : `❌ 熟悉度 -2（Lv.${srsLv}）`;
+  const lvlTxt = ok ? '✅ 熟悉度 +1（Lv.'+srsLv+'）' : '❌ 熟悉度 -2（Lv.'+srsLv+'）';
+
+  const allOpts = (q&&q.allOpts)||[];
+  let optsHtml = '';
+  allOpts.forEach(function(opt){
+    const isCorrect = (q.type==='en2zh') ? opt.zh===correct : opt.word===correct;
+    const inLib = opt.inLib || library.some(function(l){ return l.word.toLowerCase()===opt.word.toLowerCase(); });
+    const canAdd = !inLib;
+    const border = isCorrect ? 'var(--green)' : 'var(--border2)';
+    const wc = isCorrect ? 'var(--green)' : 'var(--text)';
+    const newBadge = !inLib ? '<span style="font-size:10px;color:var(--blue);background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:10px;padding:1px 6px;margin-left:5px">新</span>' : '';
+    const safeWord = opt.word.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const safeZh = opt.zh.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const addBtn = canAdd ? '<button onclick="quickAddWord(''+safeWord+'',''+safeZh+'',this)" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;white-space:nowrap;flex-shrink:0">＋加入</button>' : '';
+    optsHtml += '<div style="background:var(--s2);border:1px solid '+border+';border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+      +'<div style="flex:1;min-width:0"><span style="font-family:serif;font-size:16px;color:'+wc+'">'+opt.word+'</span>'
+      +'<span style="font-size:12px;color:var(--muted);margin-left:8px">'+opt.zh+'</span>'+newBadge+'</div>'+addBtn+'</div>';
+  });
+
   const fb=document.getElementById('qfb');
   fb.style.display='block';
-  fb.innerHTML=`
-    <div class="explain-box">
-      <div style="font-size:12px;color:${ok?'var(--green)':'var(--red)'};margin-bottom:8px;font-weight:600">${lvlTxt}</div>
-      ${ex?`<div class="exq">${ex}</div><div style="font-size:13px;color:var(--muted)">${exzh}</div>`:''}
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-        <button onclick="setWordFreq('${word.replace(/'/g,"\\'")}','boost')" style="background:rgba(217,119,6,.15);border:1px solid var(--accent-border);color:var(--accent-light);border-radius:8px;padding:5px 10px;font-size:12px">🔥 加強複習</button>
-        <button onclick="setWordFreq('${word.replace(/'/g,"\\'")}','reduce')" style="background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:8px;padding:5px 10px;font-size:12px">😌 減少出現</button>
-        <button onclick="setWordFreq('${word.replace(/'/g,"\\'")}','skip')" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--red);border-radius:8px;padding:5px 10px;font-size:12px">⏸️ 不再出題</button>
-      </div>
-    </div>`;
+  const wordSafe = word.replace(/'/g,"\'");
+  fb.innerHTML='<div class="explain-box">'
+    +'<div style="font-size:12px;color:'+(ok?'var(--green)':'var(--red)')+';margin-bottom:10px;font-weight:600">'+lvlTxt+'</div>'
+    +'<div style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:8px">所有選項</div>'
+    +optsHtml
+    +(ex?'<div style="background:var(--s2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 12px;margin-top:8px"><div style="font-style:italic;color:var(--text);font-size:14px">'+ex+'</div><div style="font-size:12px;color:var(--muted);margin-top:4px">'+exzh+'</div></div>':'')
+    +'<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
+    +'<button onclick="setWordFreq(''+wordSafe+'','boost')" style="background:rgba(217,119,6,.15);border:1px solid var(--accent-border);color:var(--accent-light);border-radius:8px;padding:5px 10px;font-size:12px">🔥 加強複習</button>'
+    +'<button onclick="setWordFreq(''+wordSafe+'','reduce')" style="background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:8px;padding:5px 10px;font-size:12px">😌 減少出現</button>'
+    +'<button onclick="setWordFreq(''+wordSafe+'','skip')" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--red);border-radius:8px;padding:5px 10px;font-size:12px">⏸️ 不再出題</button>'
+    +'</div></div>';
   document.getElementById('qnxt').style.display='block';
+}
+
+function quickAddWord(word, zh, btn){
+  if(library.some(function(l){ return l.word.toLowerCase()===word.toLowerCase(); })){
+    toast('已在單字庫中'); return;
+  }
+  ensureToday();
+  library.push({word:word,phonetic:'',pos:'',zh:zh,en_def:'',
+    example_en:'',example_zh:'',roots:[],root_tip:'',
+    family_words:[],memory_tip:'',level:'',source:'測驗新增',addedAt:Date.now()
+  });
+  stats.today++; save(); saveSt();
+  btn.textContent='✅'; btn.style.background='var(--green)'; btn.disabled=true;
+  toast('✅「'+word+'」已加入！\n去新增頁輸入該單字可取得完整分析');
 }
 
 function nextQ(){ quizSt.idx++; quizSt.ans=false; renderQ(); }
