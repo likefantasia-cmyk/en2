@@ -1,212 +1,148 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="WordLens"/>
-<meta name="theme-color" content="#1a1a1a"/>
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_13.html -->
+<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WordLens">
+<meta name="theme-color" content="#1a1a1a">
 <title>WordLens</title>
-<!-- Firebase -->
+<link href="./index_files/css2" rel="stylesheet">
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",
-    authDomain: "kumoen.firebaseapp.com",
-    projectId: "kumoen",
-    storageBucket: "kumoen.firebasestorage.app",
-    messagingSenderId: "407042193066",
-    appId: "1:407042193066:web:f48c1b9ce10019437c42d3"
-  };
-
-  const fbApp = initializeApp(firebaseConfig);
-  const db    = getFirestore(fbApp);
-  const USER_DOC = 'users/kumo';  // 你的私人文件路徑
-
-  // ── 讀取資料 ──
-  async function fbLoad(){
-    try{
-      const snap = await getDoc(doc(db, USER_DOC.split('/')[0], USER_DOC.split('/')[1]));
-      if(snap.exists()){
-        const data = snap.data();
-        window._library = data.library || [];
-        window._stats   = data.stats   || {quiz:0,today:0,date:''};
-      }
-    }catch(e){ console.warn('Firebase load error:', e); }
-  }
-
-  // ── 儲存整個單字庫 ──
-  async function fbSaveAll(){
-    try{
-      await setDoc(doc(db, USER_DOC.split('/')[0], USER_DOC.split('/')[1]
-      ), { library: window._library, stats: window._stats }, {merge:true});
-    }catch(e){ console.warn('Firebase save error:', e); }
-  }
-
-  // 掛到 window 讓主程式呼叫
-  window.fbLoad    = fbLoad;
-  window.fbSaveAll = fbSaveAll;
-
-  // 啟動：先載入資料再初始化 app
-  fbLoad().then(()=>{
-    window._fbReady = true;
-    if(window._onFbReady) window._onFbReady();
-  });
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,doc,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",authDomain:"kumoen.firebaseapp.com",projectId:"kumoen",storageBucket:"kumoen.firebasestorage.app",messagingSenderId:"407042193066",appId:"1:407042193066:web:f48c1b9ce10019437c42d3"};
+const app=initializeApp(cfg);
+const db=getFirestore(app);
+const REF=doc(db,"users","kumo");
+async function fbLoad(){
+  try{
+    const snap=await getDoc(REF);
+    if(snap.exists()){
+      const d=snap.data();
+      window._lib=d.library||[];
+      window._st=d.stats||{quiz:0,today:0,date:""};
+    }
+  }catch(e){console.warn("fbLoad",e);}
+}
+async function fbSave(){
+  try{await setDoc(REF,{library:window._lib||[],stats:window._st||{}},{merge:true});}
+  catch(e){console.warn("fbSave",e);}
+}
+window.fbSave=fbSave;
+fbLoad().then(()=>{window._fbReady=true;if(window._onFbReady)window._onFbReady();});
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
-/* ── Claude 橘白深色主題 ── */
 :root{
-  --bg:#1a1a1a;
-  --s1:#222222;
-  --s2:#2a2a2a;
-  --s3:#333333;
-  --border:#3a3a3a;
-  --border2:#444444;
-  --accent:#d97706;      /* 琥珀橘 — Claude 主色 */
-  --accent-light:#f59e0b;
-  --accent-bg:rgba(217,119,6,.1);
-  --accent-border:rgba(217,119,6,.3);
-  --green:#22c55e;
-  --red:#ef4444;
-  --blue:#60a5fa;
-  --purple:#a78bfa;
-  --text:#f5f0eb;
-  --muted:#888880;
-  --muted2:#aaa8a0;
+  --bg:#1a1a1a;--s1:#222;--s2:#2a2a2a;--s3:#333;
+  --border:#3a3a3a;--border2:#444;
+  --accent:#d97706;--al:#f59e0b;--abg:rgba(217,119,6,.1);--aborder:rgba(217,119,6,.3);
+  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa;
+  --text:#f5f0eb;--muted:#888880;--muted2:#aaa8a0;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden}
-button{cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none}
-input,textarea{font-family:'Noto Sans TC',sans-serif;color:var(--text)}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
-
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Noto Sans TC",sans-serif;overflow:hidden}
+button{cursor:pointer;font-family:"Noto Sans TC",sans-serif;border:none}
+input,textarea{font-family:"Noto Sans TC",sans-serif;color:var(--text)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 #app{max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-
-/* ── Nav ── */
 nav{display:flex;background:var(--s1);border-top:1px solid var(--border);order:2;flex-shrink:0}
-nav button{flex:1;padding:10px 1px 12px;font-size:9px;font-weight:600;background:none;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
-nav button .ni{font-size:20px}
-nav button.active{color:var(--accent-light)}
-
-/* ── Views ── */
+nav button{flex:1;padding:10px 1px 12px;font-size:9px;font-weight:600;background:none;color:var(--muted);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s;letter-spacing:.3px}
+nav button .ni{font-size:19px}
+nav button.active{color:var(--al)}
 .view{flex:1;overflow-y:auto;display:none;flex-direction:column}
 .view.show{display:flex}
-
-/* ── Home ── */
-.home-hero{padding:48px 24px 18px}
-.app-name{font-family:'Playfair Display',serif;font-size:40px;color:var(--text);letter-spacing:-1px}
-.app-name em{color:var(--accent-light);font-style:italic}
+/* home */
+.home-hero{padding:44px 24px 16px}
+.app-name{font-family:"Playfair Display",serif;font-size:40px;color:var(--text);letter-spacing:-1px}
+.app-name em{color:var(--al);font-style:italic}
 .app-sub{font-size:13px;color:var(--muted);margin-top:6px}
-.home-divider{height:1px;background:var(--border);margin:0 24px 16px}
-
+.sync-row{display:flex;align-items:center;gap:6px;margin-top:8px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
+.sync-txt{font-size:11px;color:var(--muted)}
+.hdiv{height:1px;background:var(--border);margin:0 24px 16px}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 24px 16px}
 .stat{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
-.stat-n{font-family:'Playfair Display',serif;font-size:32px;color:var(--accent-light)}
+.stat-n{font-family:"Playfair Display",serif;font-size:32px;color:var(--al)}
 .stat-l{font-size:11px;color:var(--muted);margin-top:2px}
-
 .sec-head{padding:0 24px 8px;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
 .recent-list{padding:0 24px 20px;display:flex;flex-direction:column;gap:8px}
-.recent-item{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
-.recent-item:active{border-color:var(--accent)}
-.ri-word{font-family:'Playfair Display',serif;font-size:20px;flex:1}
+.ri{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
+.ri:active{border-color:var(--accent)}
+.ri-word{font-family:"Playfair Display",serif;font-size:20px;flex:1}
 .ri-zh{font-size:12px;color:var(--muted);margin-top:2px}
-.ri-badge{font-size:11px;color:var(--accent-light);background:var(--accent-bg);border:1px solid var(--accent-border);padding:2px 8px;border-radius:20px;white-space:nowrap}
-
-/* ── Add ── */
+.ri-badge{font-size:11px;color:var(--al);background:var(--abg);border:1px solid var(--aborder);padding:2px 8px;border-radius:20px;white-space:nowrap}
+/* add */
 .add-wrap{flex:1;display:flex;flex-direction:column;padding:20px 24px;gap:14px;overflow-y:auto}
 .sec-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700}
-
-.btn-primary{background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%;transition:opacity .15s}
-.btn-primary:active{opacity:.8}
-.btn-primary:disabled{opacity:.35;cursor:not-allowed}
-.btn-secondary{background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:14px;padding:13px;font-size:15px;font-weight:600;width:100%}
-.btn-green{background:var(--green);color:#fff;border-radius:14px;padding:13px;font-size:15px;font-weight:700;width:100%}
-
-.txt-input{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;font-size:16px;outline:none;width:100%;transition:border-color .2s}
-.txt-input:focus{border-color:var(--accent)}
-
-.spinner-wrap{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.btn-p{background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%;transition:opacity .15s}
+.btn-p:active{opacity:.8}
+.btn-p:disabled{opacity:.35;cursor:not-allowed}
+.btn-s{background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:14px;padding:13px;font-size:15px;font-weight:600;width:100%}
+.txt-in{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;font-size:16px;outline:none;width:100%;transition:border-color .2s}
+.txt-in:focus{border-color:var(--accent)}
+.spin-wrap{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
 .spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin-msg{font-size:14px;color:var(--muted2)}
-
-.mode-tabs{display:flex;gap:6px}
-.mtab{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted);border-radius:10px;padding:9px 4px;font-size:13px;font-weight:600;transition:all .15s}
-.mtab.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-light)}
+.mtabs{display:flex;gap:6px}
+.mtab{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted);border-radius:10px;padding:9px 4px;font-size:12px;font-weight:600;transition:all .15s}
+.mtab.on{background:var(--abg);border-color:var(--accent);color:var(--al)}
 .cam-btns{display:flex;gap:8px}
-.cbtn{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:14px;font-size:15px;font-weight:600;transition:all .15s}
-.cbtn:active{border-color:var(--accent);color:var(--accent-light)}
-
-.img-preview{display:none;flex-direction:column;gap:8px}
-.img-preview img{width:100%;border-radius:14px;display:block}
-.img-preview.show{display:flex}
-
-/* ── Word Result Card ── */
-.result-section{display:flex;flex-direction:column;gap:14px}
-
-.word-header{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:20px}
+.cbtn{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:14px;font-size:15px;font-weight:600}
+.cbtn:active{border-color:var(--accent);color:var(--al)}
+.img-prev{display:none;flex-direction:column;gap:8px}
+.img-prev img{width:100%;border-radius:14px;display:block}
+.img-prev.show{display:flex}
+.api-box{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.api-label{font-size:13px;color:var(--muted2);line-height:1.7}
+.api-input{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;width:100%;font-family:"JetBrains Mono",monospace;color:var(--text)}
+.api-input:focus{border-color:var(--accent)}
+/* result cards */
+.res-section{display:flex;flex-direction:column;gap:14px}
+.bulk-bar{background:var(--s1);border:1px solid var(--aborder);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.bulk-info{flex:1;font-size:14px;font-weight:600;color:var(--al)}
+.bulk-info span{font-size:12px;color:var(--muted);font-weight:400}
+.btn-bulk{background:var(--accent);color:#fff;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;white-space:nowrap}
+.word-hdr{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:20px}
 .wtag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .wtag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
-.wtag-lvl{color:var(--accent-light);background:var(--accent-bg);border:1px solid var(--accent-border)}
+.wtag-lvl{color:var(--al);background:var(--abg);border:1px solid var(--aborder)}
 .wtag-src{color:var(--purple);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25)}
 .wtag-dup{color:var(--red);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
-.w-word{font-family:'Playfair Display',serif;font-size:40px;line-height:1;color:var(--text)}
-.w-ph{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);margin-top:5px}
-.w-pos{font-size:12px;color:var(--accent-light);font-weight:700;margin-top:12px;letter-spacing:.5px;text-transform:uppercase}
-.w-zh{font-size:24px;font-weight:700;margin-top:4px;color:var(--text)}
+.w-word{font-family:"Playfair Display",serif;font-size:40px;line-height:1;color:var(--text)}
+.w-ph{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);margin-top:5px}
+.w-pos{font-size:12px;color:var(--al);font-weight:700;margin-top:12px;letter-spacing:.5px;text-transform:uppercase}
+.w-conj{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.conj-tag{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:"JetBrains Mono",monospace}
+.w-zh{font-size:24px;font-weight:700;margin-top:8px;color:var(--text)}
 .w-en{font-size:14px;color:var(--muted2);margin-top:3px;line-height:1.5}
 .ex-block{background:var(--s2);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 14px;margin-top:14px}
 .ex-en{font-size:15px;line-height:1.6;font-style:italic;color:var(--text)}
 .ex-zh{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.5}
 .speak-row{display:flex;gap:8px;margin-top:12px}
 .btn-speak{flex:1;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--blue);border-radius:11px;padding:10px;font-size:13px;font-weight:600}
-
-/* ── Root Analysis Card ── */
 .root-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
-.root-card-title{font-size:11px;color:var(--accent-light);letter-spacing:1px;text-transform:uppercase;font-weight:700}
-.root-parts-row{display:flex;gap:8px;flex-wrap:wrap}
+.root-title{font-size:11px;color:var(--al);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.root-parts{display:flex;gap:8px;flex-wrap:wrap}
 .rp{padding:8px 14px;border-radius:10px;text-align:center}
-.rp-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.rp-val{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700}
 .rp-mean{font-size:11px;margin-top:3px;opacity:.85}
-.rp-prefix{background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.35);color:var(--accent-light)}
+.rp-prefix{background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.35);color:var(--al)}
 .rp-root{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);color:var(--purple)}
 .rp-suffix{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);color:var(--blue)}
-.root-tip-box{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:12px;padding:12px 14px}
-.root-tip-label{font-size:11px;color:var(--accent-light);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
-.root-tip-text{font-size:14px;color:var(--muted2);line-height:1.6}
-.family-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.family-label{font-size:12px;color:var(--muted);margin-bottom:6px}
-.fw{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;color:var(--text);transition:border-color .15s}
+.tip-box{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:12px;padding:12px 14px}
+.tip-label{font-size:11px;color:var(--al);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
+.tip-text{font-size:14px;color:var(--muted2);line-height:1.6}
+.fam-row{display:flex;flex-wrap:wrap;gap:6px}
+.fam-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.fw{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer;color:var(--text)}
 .fw:active{border-color:var(--purple)}
-
-/* ── Memory tip ── */
-.mem-card{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:14px;padding:14px 16px}
-.mem-label{font-size:11px;color:var(--accent-light);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
-.mem-text{font-size:14px;color:var(--muted2);line-height:1.6}
-
-/* ── Save actions ── */
-.save-row{display:flex;gap:8px;margin-top:2px}
-.btn-save-one{flex:1;background:var(--accent);color:#fff;border-radius:12px;padding:12px;font-size:14px;font-weight:700;transition:opacity .15s}
-.btn-save-one:active{opacity:.8}
+.save-row{display:flex;gap:8px;margin-top:10px}
+.btn-save{flex:1;background:var(--accent);color:#fff;border-radius:12px;padding:12px;font-size:14px;font-weight:700}
+.btn-save:active{opacity:.8}
 .already-saved{flex:1;text-align:center;color:var(--muted);font-size:13px;padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:12px}
-
-/* ── Bulk save bar ── */
-.bulk-bar{background:var(--s1);border:1px solid var(--accent-border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
-.bulk-info{flex:1;font-size:14px;font-weight:600;color:var(--accent-light)}
-.bulk-info span{font-size:12px;color:var(--muted);font-weight:400}
-.btn-bulk{background:var(--accent);color:#fff;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;white-space:nowrap}
-
-/* ── API prompt ── */
-.api-box{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px}
-.api-label{font-size:13px;color:var(--muted2);line-height:1.7}
-.api-input{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;width:100%;font-family:'JetBrains Mono',monospace;color:var(--text)}
-.api-input:focus{border-color:var(--accent)}
-
-/* ── Library ── */
+/* lib */
 .lib-toolbar{padding:16px 24px 8px;display:flex;gap:10px}
 .search-inp{flex:1;background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;outline:none;color:var(--text)}
 .search-inp:focus{border-color:var(--accent)}
@@ -214,1433 +150,1020 @@ nav button.active{color:var(--accent-light)}
 .lib-list{flex:1;overflow-y:auto;padding:0 24px 24px;display:flex;flex-direction:column;gap:8px}
 .lib-item{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
 .lib-item:active{border-color:var(--accent)}
-.li-word{font-family:'Playfair Display',serif;font-size:22px;color:var(--text)}
+.li-word{font-family:"Playfair Display",serif;font-size:22px;color:var(--text)}
 .li-info{font-size:12px;color:var(--muted);margin-top:2px}
 .li-acts{display:flex;gap:4px}
-.btn-speak-sm{background:none;border:none;font-size:20px;padding:4px 6px}
 .btn-del{background:none;border:none;font-size:16px;color:var(--red);padding:4px 6px}
-.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);padding:40px;text-align:center}
-
-/* ── Quiz ── */
-.quiz-wrap{flex:1;display:flex;flex-direction:column;padding:20px 24px 32px;gap:12px;overflow-y:auto}
-.qprog-bar{height:3px;background:var(--border);border-radius:99px;overflow:hidden}
-.qprog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:99px;transition:width .4s}
-.q-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px}
-.q-label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.q-word{font-family:'Playfair Display',serif;font-size:36px;color:var(--text);margin-bottom:5px}
-.q-ph{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
-.opts{display:flex;flex-direction:column;gap:9px}
-.opt{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:15px 16px;font-size:15px;color:var(--text);text-align:left;transition:all .12s}
-.opt:active{transform:scale(.98)}
-.opt.ok{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
-.opt.no{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
-.explain-box{background:var(--s2);border-radius:14px;padding:14px;font-size:14px;color:var(--muted2);line-height:1.6;border-left:3px solid var(--green)}
-.explain-box .exq{font-style:italic;color:var(--text);margin-bottom:5px}
-.btn-nq{background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%}
-.score-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
-.score-emoji{font-size:64px}
-.score-n{font-family:'Playfair Display',serif;font-size:56px;color:var(--accent-light)}
-.score-sub{font-size:15px;color:var(--muted)}
-.score-msg{font-size:17px;font-weight:700}
-.btn-retry{background:var(--accent);color:#fff;border-radius:14px;padding:14px 40px;font-size:16px;font-weight:700;margin-top:8px}
-
-/* ── Modal ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;max-width:480px;margin:0 auto}
-.modal{background:var(--s1);border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:88dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.modal-word{font-family:'Playfair Display',serif;font-size:32px;color:var(--text)}
-.modal-close{background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:12px;font-size:15px;font-weight:600;width:100%}
-
-
-/* ── Grammar Tab ── */
-.gram-wrap{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-.gram-cat-bar{display:flex;gap:6px;overflow-x:auto;padding:14px 20px 6px;scrollbar-width:none;flex-shrink:0}
-.gram-cat-bar::-webkit-scrollbar{display:none}
+.empty-st{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);padding:40px;text-align:center}
+/* gram */
+.gram-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.gram-toolbar{padding:12px 20px 0;display:flex;gap:8px}
+.gram-search{flex:1;background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;outline:none;color:var(--text)}
+.gram-search:focus{border-color:var(--accent)}
+.gram-cats{display:flex;gap:6px;overflow-x:auto;padding:12px 20px 6px;scrollbar-width:none;flex-shrink:0}
+.gram-cats::-webkit-scrollbar{display:none}
 .gcat{background:var(--s2);border:1px solid var(--border2);color:var(--muted);padding:7px 14px;border-radius:20px;font-size:13px;white-space:nowrap;flex-shrink:0}
-.gcat.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-light);font-weight:600}
+.gcat.on{background:var(--abg);border-color:var(--accent);color:var(--al);font-weight:600}
 .gram-list{flex:1;overflow-y:auto;padding:8px 20px 100px;display:flex;flex-direction:column;gap:10px}
 .gram-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.gram-card-head{padding:16px 16px 12px;cursor:pointer;display:flex;align-items:flex-start;gap:10px}
-.gram-card-head:active{opacity:.8}
+.gram-head{padding:16px 16px 12px;cursor:pointer;display:flex;align-items:flex-start;gap:10px}
 .gram-badge{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px}
 .badge-jh{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
 .badge-sh{background:rgba(96,165,250,.12);color:var(--blue);border:1px solid rgba(96,165,250,.25)}
-.badge-ph{background:rgba(217,119,6,.12);color:var(--accent-light);border:1px solid rgba(217,119,6,.3)}
+.badge-ph{background:rgba(217,119,6,.12);color:var(--al);border:1px solid rgba(217,119,6,.3)}
 .gram-title{font-size:16px;font-weight:700;color:var(--text);flex:1;line-height:1.4}
 .gram-arrow{font-size:14px;color:var(--muted);flex-shrink:0;transition:transform .2s}
 .gram-arrow.open{transform:rotate(180deg)}
 .gram-body{padding:0 16px 16px;display:none;flex-direction:column;gap:10px}
 .gram-body.open{display:flex}
-.gram-formula{background:var(--s2);border-radius:10px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent-light);line-height:1.6}
+.gram-formula{background:var(--s2);border-radius:10px;padding:10px 14px;font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--al);line-height:1.6}
 .gram-note{font-size:13px;color:var(--muted2);line-height:1.7}
 .gram-exs{display:flex;flex-direction:column;gap:6px}
 .gram-ex{background:var(--s2);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:10px 12px}
 .gram-ex-en{font-size:14px;font-style:italic;color:var(--text);line-height:1.5}
 .gram-ex-zh{font-size:12px;color:var(--muted);margin-top:4px}
-.gram-speak{background:none;border:none;color:var(--blue);font-size:12px;padding:4px 0;text-align:left;text-decoration:underline;cursor:pointer}
-.gram-search{flex:1;background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:14px;outline:none;color:var(--text)}
-.gram-search:focus{border-color:var(--accent)}
-.gram-toolbar{padding:12px 20px 0;display:flex;gap:8px}
-
-/* ── Toast ── */
+.gram-speak-btn{background:none;border:none;color:var(--blue);font-size:12px;padding:4px 0;text-align:left;text-decoration:underline;cursor:pointer}
+/* quiz */
+.quiz-wrap{flex:1;display:flex;flex-direction:column;padding:20px 24px 32px;gap:12px;overflow-y:auto}
+.qprog{height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.qprog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--al));border-radius:99px;transition:width .4s}
+.q-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px}
+.q-label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.q-word{font-family:"Playfair Display",serif;color:var(--text);margin-bottom:5px}
+.q-ph{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:15px 16px;font-size:15px;color:var(--text);text-align:left;transition:all .12s}
+.opt:active{transform:scale(.98)}
+.opt.ok{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.opt.no{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.expl-box{background:var(--s2);border-radius:14px;padding:14px;font-size:14px;color:var(--muted2);line-height:1.6;border-left:3px solid var(--green)}
+.btn-nq{background:var(--accent);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%}
+.score-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
+.score-n{font-family:"Playfair Display",serif;font-size:56px;color:var(--al)}
+.btn-retry{background:var(--accent);color:#fff;border-radius:14px;padding:14px 40px;font-size:16px;font-weight:700;margin-top:8px}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;max-width:480px;margin:0 auto}
+.modal{background:var(--s1);border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:88dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal-word{font-family:"Playfair Display",serif;font-size:32px;color:var(--text)}
+.modal-close{background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:12px;padding:12px;font-size:15px;font-weight:600;width:100%}
+/* toast */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:20px;font-size:14px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px;text-align:center;white-space:pre-line}
 .toast.show{opacity:1}
+/* fb loading */
+#fb-load{position:fixed;inset:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
 </style>
 </head>
 <body>
-<!-- Firebase 載入畫面 -->
-<div id="fb-loading" style="position:fixed;inset:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999">
+<div id="fb-load" style="display: none;">
   <div style="font-family:serif;font-size:36px;color:#f59e0b">Word<em>Lens</em></div>
-  <div style="width:36px;height:36px;border:3px solid #333;border-top-color:#d97706;border-radius:50%;animation:spin .7s linear infinite"></div>
-  <div style="font-size:13px;color:#888">載入資料中...</div>
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:#888">載入中...</div>
 </div>
-
 <div id="app">
-
   <!-- HOME -->
   <div class="view show" id="v-home">
     <div class="home-hero">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div class="app-name">Word<em>Lens</em></div>
-        <div id="sync-status" style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px">
-          <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>
-          <span id="sync-txt">已同步</span>
-        </div>
+        <div class="sync-row"><span class="sync-dot" id="sync-dot" style="background: rgb(34, 197, 94);"></span><span class="sync-txt" id="sync-txt">已同步</span></div>
       </div>
-      <div class="app-sub">拍照・AI 字根字首分析・個人單字庫・雲端同步</div>
+      <div class="app-sub">拍照 · AI字根字首 · 雲端同步 · SRS測驗</div>
     </div>
-    <div class="home-divider"></div>
+    <div class="hdiv"></div>
     <div class="stats-grid">
-      <div class="stat"><div class="stat-n" id="h-total">0</div><div class="stat-l">我的單字</div></div>
+      <div class="stat"><div class="stat-n" id="h-total">32</div><div class="stat-l">我的單字</div></div>
       <div class="stat"><div class="stat-n" id="h-today">0</div><div class="stat-l">今日新增</div></div>
-      <div class="stat"><div class="stat-n" id="h-quiz">0</div><div class="stat-l">測驗次數</div></div>
+      <div class="stat"><div class="stat-n" id="h-quiz">8</div><div class="stat-l">測驗次數</div></div>
     </div>
     <div class="sec-head">最近新增</div>
-    <div class="recent-list" id="recent-list"></div>
+    <div class="recent-list" id="recent-list"><div class="ri" onclick="openModal(&#39;effective&#39;)"><div style="flex:1"><div class="ri-word">effective</div><div class="ri-zh">有效的</div></div><span class="ri-badge">手動</span></div><div class="ri" onclick="openModal(&#39;audience&#39;)"><div style="flex:1"><div class="ri-word">audience</div><div class="ri-zh">觀眾</div></div><span class="ri-badge">手動</span></div><div class="ri" onclick="openModal(&#39;confident&#39;)"><div style="flex:1"><div class="ri-word">confident</div><div class="ri-zh">自信的</div></div><span class="ri-badge">手動</span></div><div class="ri" onclick="openModal(&#39;encourage&#39;)"><div style="flex:1"><div class="ri-word">encourage</div><div class="ri-zh">鼓勵</div></div><span class="ri-badge">手動</span></div><div class="ri" onclick="openModal(&#39;persuade&#39;)"><div style="flex:1"><div class="ri-word">persuade</div><div class="ri-zh">說服</div></div><span class="ri-badge">手動</span></div><div class="ri" onclick="openModal(&#39;hesitate&#39;)"><div style="flex:1"><div class="ri-word">hesitate</div><div class="ri-zh">猶豫</div></div><span class="ri-badge">拍照</span></div></div>
   </div>
-
   <!-- ADD -->
-  <div class="view" id="v-add">
-    <div class="add-wrap" id="add-wrap"></div>
-  </div>
-
-  <!-- LIBRARY -->
+  <div class="view" id="v-add"><div class="add-wrap" id="add-wrap"></div></div>
+  <!-- LIB -->
   <div class="view" id="v-lib">
-    <div class="lib-toolbar">
-      <input class="search-inp" id="lib-search" placeholder="🔍 搜尋單字..." oninput="filterLib(this.value)"/>
-    </div>
+    <div class="lib-toolbar"><input class="search-inp" id="lib-search" placeholder="搜尋單字..." oninput="filterLib(this.value)"></div>
     <div class="lib-count" id="lib-count"></div>
     <div class="lib-list" id="lib-list"></div>
   </div>
-
-  <!-- QUIZ -->
-  <div class="view" id="v-quiz">
-    <div class="quiz-wrap" id="quiz-content"></div>
-  </div>
-
-  <!-- GRAMMAR -->
+  <!-- GRAM -->
   <div class="view" id="v-gram">
     <div class="gram-wrap">
-      <div class="gram-toolbar">
-        <input class="gram-search" id="gram-search" placeholder="🔍 搜尋文法..." oninput="filterGram(this.value)"/>
-      </div>
-      <div class="gram-cat-bar" id="gram-cats"></div>
+      <div class="gram-toolbar"><input class="gram-search" id="gram-search" placeholder="搜尋文法..." oninput="filterGram(this.value)"></div>
+      <div class="gram-cats" id="gram-cats"></div>
       <div class="gram-list" id="gram-list"></div>
     </div>
   </div>
-
+  <!-- QUIZ -->
+  <div class="view" id="v-quiz"><div class="quiz-wrap" id="quiz-content"></div></div>
   <nav>
-    <button class="active" onclick="goTab('home')"><span class="ni">🏠</span>首頁</button>
-    <button onclick="goTab('add')"><span class="ni">📸</span>新增</button>
-    <button onclick="goTab('lib')"><span class="ni">📚</span>單字庫</button>
-    <button onclick="goTab('gram')"><span class="ni">📖</span>文法</button>
-    <button onclick="goTab('quiz')"><span class="ni">✏️</span>測驗</button>
+    <button class="active" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
+    <button onclick="goTab(&#39;add&#39;)"><span class="ni">📸</span>新增</button>
+    <button onclick="goTab(&#39;lib&#39;)"><span class="ni">📚</span>單字庫</button>
+    <button onclick="goTab(&#39;gram&#39;)"><span class="ni">📖</span>文法</button>
+    <button onclick="goTab(&#39;quiz&#39;)"><span class="ni">✏️</span>測驗</button>
   </nav>
 </div>
-
-<!-- Modal -->
 <div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modal-body"></div>
 </div>
 <div class="toast" id="toast"></div>
-
 <script>
-// ══ State ══
-// library & stats are loaded from Firebase; apiKey stays in localStorage (device-specific)
-let library = [];
-let stats   = {quiz:0, today:0, date:''};
-let apiKey  = localStorage.getItem('wl-key') || '';
-let pending = [];
-let quizSt  = {words:[],idx:0,score:0,ans:false};
-let _saveTimer = null;
+// ===== STATE =====
+var library = [];
+var stats = {quiz:0, today:0, date:""};
+var apiKey = localStorage.getItem("wl-key") || "";
+var pending = [];
+var quizSt = {questions:[], idx:0, score:0, ans:false, wrong:[], curOpts:[], curWord:""};
+var saveTimer = null;
 
-// Sync from Firebase globals (set by module script)
-function syncFromFb(){
-  if(window._library) library = window._library;
-  if(window._stats)   stats   = window._stats;
+function syncFromFb() {
+  if (window._lib) library = window._lib;
+  if (window._st) stats = window._st;
 }
 
-// Debounced save to Firebase
-function setSyncStatus(syncing){
-  const dot=document.getElementById('sync-dot');
-  const txt=document.getElementById('sync-txt');
-  if(!dot||!txt) return;
-  if(syncing){ dot.style.background='#f59e0b'; txt.textContent='同步中...'; }
-  else        { dot.style.background='var(--green)'; txt.textContent='已同步'; }
+function setSyncUI(syncing) {
+  var dot = document.getElementById("sync-dot");
+  var txt = document.getElementById("sync-txt");
+  if (!dot || !txt) return;
+  dot.style.background = syncing ? "#f59e0b" : "#22c55e";
+  txt.textContent = syncing ? "同步中..." : "已同步";
 }
 
-function save(){
-  window._library = library;
-  setSyncStatus(true);
-  clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(async ()=>{
-    if(window.fbSaveAll){ await window.fbSaveAll(); setSyncStatus(false); }
+function save() {
+  window._lib = library;
+  setSyncUI(true);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function() {
+    if (window.fbSave) window.fbSave().then(function() { setSyncUI(false); });
   }, 800);
 }
 
-function saveSt(){
-  window._stats = stats;
-  clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(async ()=>{
-    if(window.fbSaveAll){ await window.fbSaveAll(); }
+function saveSt() {
+  window._st = stats;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function() {
+    if (window.fbSave) window.fbSave();
   }, 800);
 }
 
-const saveK = k =>{ apiKey=k; localStorage.setItem('wl-key',k); };
+function saveKey(k) { apiKey = k; localStorage.setItem("wl-key", k); }
 
-function ensureToday(){
-  const t = new Date().toDateString();
-  if(stats.date!==t){ stats.today=0; stats.date=t; saveSt(); }
+function todayStr() { return new Date().toDateString(); }
+function ensureToday() {
+  if (stats.date !== todayStr()) { stats.today = 0; stats.date = todayStr(); saveSt(); }
 }
 
-function toast(msg, dur=2400){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), dur);
+function toast(msg, dur) {
+  dur = dur || 2400;
+  var el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  setTimeout(function() { el.classList.remove("show"); }, dur);
 }
 
-function speak(t){
-  if(!window.speechSynthesis) return;
+function speak(text) {
+  if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.82;
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US"; u.rate = 0.82;
   window.speechSynthesis.speak(u);
 }
 
-function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+function shuffle(a) { return a.slice().sort(function() { return Math.random() - .5; }); }
 
-// ══ Nav ══
-function goTab(tab){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('show'));
-  document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('active',['home','add','lib','gram','quiz'][i]===tab));
-  document.getElementById('v-'+tab).classList.add('show');
-  if(tab==='home') renderHome();
-  if(tab==='add')  renderAdd();
-  if(tab==='lib')  renderLib();
-  if(tab==='gram') renderGram();
-  if(tab==='quiz') renderQuiz();
+// ===== NAV =====
+function goTab(tab) {
+  document.querySelectorAll(".view").forEach(function(v) { v.classList.remove("show"); });
+  document.querySelectorAll("nav button").forEach(function(b, i) {
+    b.classList.toggle("active", ["home","add","lib","gram","quiz"][i] === tab);
+  });
+  document.getElementById("v-" + tab).classList.add("show");
+  if (tab === "home") renderHome();
+  if (tab === "add")  renderAdd();
+  if (tab === "lib")  renderLib();
+  if (tab === "gram") renderGram();
+  if (tab === "quiz") renderQuiz();
 }
 
-// ══ Home ══
-function renderHome(){
+// ===== HOME =====
+function renderHome() {
   ensureToday();
-  document.getElementById('h-total').textContent = library.length;
-  document.getElementById('h-today').textContent = stats.today;
-  document.getElementById('h-quiz').textContent  = stats.quiz;
-  const el = document.getElementById('recent-list');
-  const rec = [...library].reverse().slice(0,6);
-  if(!rec.length){
-    el.innerHTML='<div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">還沒有單字，去拍照新增吧！📸</div>';
+  document.getElementById("h-total").textContent = library.length;
+  document.getElementById("h-today").textContent = stats.today;
+  document.getElementById("h-quiz").textContent  = stats.quiz;
+  var el = document.getElementById("recent-list");
+  var rec = library.slice().reverse().slice(0, 6);
+  if (!rec.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">還沒有單字，去拍照新增吧！</div>';
     return;
   }
-  el.innerHTML = rec.map(w=>`
-    <div class="recent-item" onclick="openModal('${w.word.replace(/'/g,"\\'")}')">
-      <div style="flex:1">
-        <div class="ri-word">${w.word}</div>
-        <div class="ri-zh">${w.zh}</div>
-      </div>
-      <span class="ri-badge">${w.source||'手動'}</span>
-    </div>`).join('');
+  el.innerHTML = rec.map(function(w) {
+    return '<div class="ri" onclick="openModal(\'' + esc(w.word) + '\')">' +
+      '<div style="flex:1"><div class="ri-word">' + w.word + '</div><div class="ri-zh">' + w.zh + '</div></div>' +
+      '<span class="ri-badge">' + (w.source || "手動") + '</span></div>';
+  }).join("");
 }
 
-// ══ API ══
-async function callAI(messages){
-  const r = await fetch('https://api.openai.com/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-    body: JSON.stringify({model:'gpt-4o', max_tokens:4000, response_format:{type:'json_object'}, messages})
-  });
-  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error((e?.error?.message)||'API error '+r.status); }
-  const d=await r.json();
-  return d.choices[0].message.content;
+function esc(s) { return (s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'"); }
+
+// ===== API =====
+function callAI(messages) {
+  return fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {"Content-Type":"application/json","Authorization":"Bearer " + apiKey},
+    body: JSON.stringify({model:"gpt-4o", max_tokens:3000, response_format:{type:"json_object"}, messages:messages})
+  }).then(function(r) {
+    if (!r.ok) return r.json().then(function(e) { throw new Error((e.error && e.error.message) || "API error " + r.status); });
+    return r.json();
+  }).then(function(d) { return d.choices[0].message.content; });
 }
 
-function fileToB64(file){
-  // Compress image to max 1280px wide before sending — keeps quality high but reduces token cost
-  return new Promise((res,rej)=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const img=new Image();
-      img.onload=()=>{
-        const MAX=2048;
-        let {width:w,height:h}=img;
-        if(w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
-        const canvas=document.createElement('canvas');
-        canvas.width=w; canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        const b64=canvas.toDataURL('image/jpeg',0.95).split(',')[1];
-        res(b64);
+function fileToB64(file) {
+  return new Promise(function(res, rej) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var MAX = 2048;
+        var w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        var c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        res(c.toDataURL("image/jpeg", 0.95).split(",")[1]);
       };
-      img.onerror=rej;
-      img.src=e.target.result;
+      img.onerror = rej;
+      img.src = e.target.result;
     };
-    reader.onerror=rej;
+    reader.onerror = rej;
     reader.readAsDataURL(file);
   });
 }
 
-// JSON prompt templates
-const SYS = 'You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL: In roots array, the "part" field must be the ACTUAL morpheme letters (e.g. "at-", "tract", "-ive", "re-", "un-"), NOT the meaning. The "meaning" field contains the Chinese meaning.';
+var SYS = "You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL: In roots array, the 'part' field must be the ACTUAL morpheme letters (e.g. at-, tract, -ive), NOT the meaning.";
 
-const IMG_PROMPT = `This image is likely a textbook vocabulary page. Your job:
+function wordPrompt(word) {
+  return "Analyse the English word \"" + word + "\". Return JSON: {\"words\":[{" +
+    "\"word\":\"" + word + "\"," +
+    "\"phonetic\":\"IPA\"," +
+    "\"pos\":\"part of speech e.g. v. n. adj.\"," +
+    "\"conjugation\":{\"present\":\"base form or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"}," +
+    "\"zh\":\"Chinese meaning 2-5 chars\"," +
+    "\"en_def\":\"one English definition\"," +
+    "\"example_en\":\"TOEIC example sentence\"," +
+    "\"example_zh\":\"Chinese translation\"," +
+    "\"roots\":[{\"part\":\"actual morpheme e.g. re- or dict or -tion\",\"type\":\"prefix or root or suffix\",\"meaning\":\"Chinese meaning\"}]," +
+    "\"root_tip\":\"how to remember using roots (Traditional Chinese 1-2 sentences)\"," +
+    "\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"]," +
+    "\"memory_tip\":\"memory tip (Traditional Chinese 1 sentence)\"," +
+    "\"level\":\"TOEIC score range\"" +
+    "}]}";
+}
 
-STEP 1 — OCR: Scan the ENTIRE image systematically from top-left to bottom-right. List every English word that appears in BOLD, larger font, or as a standalone vocabulary entry (headwords). These are the target words. Do NOT miss any — scan every column, every row.
+function passagePrompt(txt) {
+  return "From this text, find all vocabulary worth learning (TOEIC 800 level, max 10 words): \"" + txt + "\". " +
+    "Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null}," +
+    "\"zh\":\"\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\"," +
+    "\"roots\":[{\"part\":\"actual morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"\"}]," +
+    "\"root_tip\":\"\",\"family_words\":[],\"memory_tip\":\"\",\"level\":\"\"}]}";
+}
 
-STEP 2 — Filter: Remove only: articles (a/an/the), prepositions (in/on/at/to/for/of/with), conjunctions (and/but/or), pronouns (he/she/it), and obvious proper nouns (country names, person names). Keep everything else including common-looking words if they appear as bold headwords.
+var IMG_PROMPT = "This image likely contains English vocabulary. STEP 1: Read ALL English words visible (bold, larger font, vocabulary entries). STEP 2: Filter out articles, prepositions, conjunctions. STEP 3: Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"actual morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"\"}],\"root_tip\":\"\",\"family_words\":[],\"memory_tip\":\"\",\"level\":\"\"}]}";
 
-STEP 3 — Analyze: For EVERY word that passed the filter, provide full vocabulary analysis. Return up to 15 words.
+var TB_OCR = "This is a textbook vocabulary page. List EVERY English headword (bold/larger font/numbered entries). Do NOT filter. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
 
-Return ONLY this JSON (no explanation, no markdown):
-{"words":[{
-  "word":"exact spelling from image",
-  "phonetic":"IPA phonetic transcription",
-  "pos":"part of speech (n./v./adj./adv. etc)",
-  "zh":"中文意思2-5字",
-  "en_def":"one clear English definition",
-  "example_en":"natural English example sentence",
-  "example_zh":"例句中文翻譯",
-  "conjugation":{"present":"verb base form or null","past":"past tense or null","pp":"past participle or null","ing":"present participle or null"},"roots":[{"part":"ACTUAL morpheme e.g. at- or tract or -ive","type":"prefix or root or suffix","meaning":"中文意思"}],
-  "root_tip":"用字根記憶此單字的方法(繁中1-2句)",
-  "family_words":["related1","related2","related3"],
-  "memory_tip":"記憶技巧(繁中1句)",
-  "level":"TOEIC score range"
-}]}`;
+function batchPrompt(words) {
+  return "Analyse each of these " + words.length + " English words: [" + words.join(", ") + "]. " +
+    "Return JSON for ALL of them: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null}," +
+    "\"zh\":\"\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\"," +
+    "\"roots\":[{\"part\":\"actual morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"\"}]," +
+    "\"root_tip\":\"\",\"family_words\":[],\"memory_tip\":\"\",\"level\":\"\"}]}";
+}
 
-const TEXTBOOK_PROMPT = `This is a textbook vocabulary list page. 
+// ===== ADD PAGE =====
+var previewFile = null;
+var addMode = "cam";
 
-YOUR ONLY JOB: Extract every single bold or highlighted English headword from this page. These are the vocabulary entries the textbook is teaching.
-
-RULES:
-- Include ALL bold/larger-font English words — every single one, no matter how simple
-- Read left to right, top to bottom, column by column
-- If a word has a number or bullet before it, that is a headword — include it
-- Do NOT skip any headword
-- Do NOT filter by difficulty
-- You may see up to 30+ words on one page — list them ALL
-- Skip only: page numbers, chapter titles, and Chinese/Japanese text
-
-For each headword found, provide full analysis.
-Return ONLY JSON (no markdown):
-{"words":[{
-  "word":"exact headword spelling",
-  "phonetic":"IPA phonetic",
-  "pos":"n./v./adj./adv. etc",
-  "zh":"中文意思2-5字",
-  "en_def":"clear English definition",
-  "example_en":"example sentence",
-  "example_zh":"例句中文翻譯",
-  "roots":[{"part":"ACTUAL morpheme in English e.g. 'at-' or 'tract' or '-ive'","type":"prefix or root or suffix","meaning":"中文意思 e.g. 向/拉/形容詞字尾"}],
-  "root_tip":"用字根記憶此單字(繁中1-2句)",
-  "family_words":["related1","related2","related3"],
-  "memory_tip":"記憶技巧(繁中1句)",
-  "level":"TOEIC score range"
-}]}`;
-
-const WORD_PROMPT = w=>`請分析英文單字「${w}」，回傳JSON（只能回傳JSON不能有其他文字）：{"words":[{
-  "word":"${w}",
-  "phonetic":"IPA音標如/nəˈɡoʊʃieɪt/",
-  "pos":"詞性如 v. / n. / adj.",
-  "conjugation":{"present":"動詞原形（非動詞填null）","past":"過去式（非動詞填null）","pp":"過去分詞（非動詞填null）","ing":"現在分詞（非動詞填null）"},
-  "zh":"中文意思2-5字",
-  "en_def":"英文定義1句",
-  "example_en":"自然英文例句",
-  "example_zh":"例句中文翻譯",
-  "roots":[{"part":"實際字根字母如 re- 或 dict 或 -tion（非希臘/拉丁語系可填null陣列）","type":"prefix或root或suffix","meaning":"字根中文意思"}],
-  "root_tip":"利用字根記憶此單字的方法(繁中1-2句)",
-  "family_words":["同族單字1","同族單字2","同族單字3","同族單字4"],
-  "memory_tip":"記憶技巧(繁中1句)",
-  "level":"TOEIC分數範圍如650-800"
-}]}`;
-
-const PASSAGE_PROMPT = txt=>`以下英文文字中，找出所有值得學習的單字（優先多益800分，最多10個）。
-文字：「${txt}」
-回傳JSON：{"words":[{
-  "word":"單字","phonetic":"IPA音標","pos":"詞性如v./n./adj.",
-  "conjugation":{"present":"動詞原形（非動詞填null）","past":"過去式（非動詞填null）","pp":"過去分詞（非動詞填null）","ing":"現在分詞（非動詞填null）"},
-  "zh":"中文意思2-5字","en_def":"英文定義1句","example_en":"例句","example_zh":"例句中文翻譯",
-  "roots":[{"part":"實際字根字母","type":"prefix或root或suffix","meaning":"字根中文意思"}],
-  "root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3"],
-  "memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"
-}]}`;
-
-// ══ Add Page ══
-let previewFile = null;
-let addMode = 'cam';
-
-function renderAdd(){
-  const wrap = document.getElementById('add-wrap');
-  if(!apiKey){
-    wrap.innerHTML=`
-      <div class="sec-label">設定 API Key</div>
-      <div class="api-box">
-        <div class="api-label">輸入你的 <strong style="color:var(--accent-light)">OpenAI API Key</strong>（格式：sk-...）才能使用 AI 分析功能。<br><br>
-        前往 <strong>platform.openai.com/api-keys</strong> 取得，需儲值 $5，每次分析約 $0.001。</div>
-        <input class="api-input" id="key-inp" placeholder="sk-..." type="password"/>
-        <button class="btn-primary" onclick="submitKey()">儲存並開始</button>
-      </div>`;
+function renderAdd() {
+  var wrap = document.getElementById("add-wrap");
+  if (!apiKey) {
+    wrap.innerHTML = '<div class="sec-label">設定 API Key</div>' +
+      '<div class="api-box">' +
+        '<div class="api-label">輸入你的 <strong style="color:var(--al)">OpenAI API Key</strong>（sk-...）<br><br>前往 platform.openai.com/api-keys 取得</div>' +
+        '<input class="api-input" id="key-inp" placeholder="sk-..." type="password"/>' +
+        '<button class="btn-p" onclick="submitKey()">儲存並開始</button>' +
+      '</div>';
     return;
   }
-  wrap.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div class="sec-label">新增單字</div>
-      <button onclick="resetKey()" style="background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline">重設 Key</button>
-    </div>
-
-    <div class="mode-tabs">
-      <button id="mt-cam"     class="mtab on"  onclick="switchMode('cam')">📷 拍照/相簿</button>
-      <button id="mt-word"    class="mtab"     onclick="switchMode('word')">✍️ 單字</button>
-      <button id="mt-passage" class="mtab"     onclick="switchMode('passage')">📝 文章</button>
-    </div>
-
-    <!-- Camera -->
-    <div id="m-cam" style="display:flex;flex-direction:column;gap:10px">
-      <div class="cam-btns">
-        <button class="cbtn" onclick="document.getElementById('f-cam').click()">📷 拍照</button>
-        <button class="cbtn" onclick="document.getElementById('f-alb').click()">🖼 相簿</button>
-      </div>
-      <input type="file" id="f-cam" accept="image/*" capture="environment" style="display:none" onchange="onImg(event)"/>
-      <input type="file" id="f-alb" accept="image/*"                       style="display:none" onchange="onImg(event)"/>
-      <div class="img-preview" id="img-prev">
-        <img id="prev-img" src=""/>
-        <button class="btn-secondary" onclick="clearImg()">✕ 清除圖片</button>
-      </div>
-      <!-- Mode selector -->
-      <div style="background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:600;color:var(--text)">📚 課本單字頁模式</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">掃描所有粗體單字，不篩選難易度</div>
-        </div>
-        <label style="position:relative;width:44px;height:24px;flex-shrink:0">
-          <input type="checkbox" id="textbook-mode" style="opacity:0;width:0;height:0" onchange="updateImgBtn()"/>
-          <span id="toggle-track" style="position:absolute;inset:0;background:var(--border2);border-radius:12px;transition:.2s;cursor:pointer"></span>
-          <span id="toggle-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none"></span>
-        </label>
-      </div>
-      <button class="btn-primary" id="btn-img" onclick="doImg()" disabled>🔍 AI 辨識圖片單字</button>
-    </div>
-
-    <!-- Word -->
-    <div id="m-word" style="display:none;flex-direction:column;gap:10px">
-      <input class="txt-input" id="word-inp" placeholder="輸入英文單字，多個用逗號隔開 (negotiate, leverage)" oninput="toggleBtn('btn-word','word-inp')"/>
-      <button class="btn-primary" id="btn-word" onclick="doWord()" disabled>🤖 AI 分析單字</button>
-    </div>
-
-    <!-- Passage -->
-    <div id="m-passage" style="display:none;flex-direction:column;gap:10px">
-      <textarea class="txt-input" id="pass-inp" placeholder="貼上英文文章、逐字稿或句子... AI 自動擷取重要單字" rows="5" style="resize:vertical" oninput="toggleBtn('btn-pass','pass-inp')"></textarea>
-      <button class="btn-primary" id="btn-pass" onclick="doPassage()" disabled>🤖 擷取所有重要單字</button>
-    </div>
-
-    <div id="result-area"></div>
-  `;
-  previewFile=null; addMode='cam';
+  wrap.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<div class="sec-label">新增單字</div>' +
+      '<button onclick="resetKey()" style="background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline">重設Key</button>' +
+    '</div>' +
+    '<div class="mtabs">' +
+      '<button id="mt-cam" class="mtab on" onclick="switchMode(\'cam\')">📷 拍照/相簿</button>' +
+      '<button id="mt-word" class="mtab" onclick="switchMode(\'word\')">✍️ 單字</button>' +
+      '<button id="mt-passage" class="mtab" onclick="switchMode(\'passage\')">📝 文章</button>' +
+    '</div>' +
+    '<div id="m-cam" style="display:flex;flex-direction:column;gap:10px">' +
+      '<div class="cam-btns">' +
+        '<button class="cbtn" onclick="document.getElementById(\'f-cam\').click()">📷 拍照</button>' +
+        '<button class="cbtn" onclick="document.getElementById(\'f-alb\').click()">🖼 相簿</button>' +
+      '</div>' +
+      '<input type="file" id="f-cam" accept="image/*" capture="environment" style="display:none" onchange="onImg(event)"/>' +
+      '<input type="file" id="f-alb" accept="image/*" style="display:none" onchange="onImg(event)"/>' +
+      '<div class="img-prev" id="img-prev"><img id="prev-img" src=""/><button class="btn-s" onclick="clearImg()">✕ 清除圖片</button></div>' +
+      '<div style="background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">' +
+        '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">📚 課本單字頁模式</div><div style="font-size:11px;color:var(--muted);margin-top:2px">掃描所有粗體單字</div></div>' +
+        '<label style="position:relative;width:44px;height:24px;flex-shrink:0">' +
+          '<input type="checkbox" id="tb-mode" style="opacity:0;width:0;height:0" onchange="updateToggle()"/>' +
+          '<span id="tog-track" style="position:absolute;inset:0;background:var(--border2);border-radius:12px;transition:.2s;cursor:pointer"></span>' +
+          '<span id="tog-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none"></span>' +
+        '</label>' +
+      '</div>' +
+      '<button class="btn-p" id="btn-img" onclick="doImg()" disabled>🔍 AI 辨識圖片單字</button>' +
+    '</div>' +
+    '<div id="m-word" style="display:none;flex-direction:column;gap:10px">' +
+      '<input class="txt-in" id="word-inp" placeholder="輸入英文單字，多個用逗號隔開" oninput="toggleBtn(\'btn-word\',\'word-inp\')"/>' +
+      '<button class="btn-p" id="btn-word" onclick="doWord()" disabled>🤖 AI 分析單字</button>' +
+    '</div>' +
+    '<div id="m-passage" style="display:none;flex-direction:column;gap:10px">' +
+      '<textarea class="txt-in" id="pass-inp" placeholder="貼上英文文章、逐字稿..." rows="5" style="resize:vertical" oninput="toggleBtn(\'btn-pass\',\'pass-inp\')"></textarea>' +
+      '<button class="btn-p" id="btn-pass" onclick="doPassage()" disabled>🤖 擷取重要單字</button>' +
+    '</div>' +
+    '<div id="result-area"></div>';
+  previewFile = null;
 }
 
-function switchMode(m){
-  addMode=m;
-  ['cam','word','passage'].forEach(x=>{
-    document.getElementById('m-'+x).style.display = x===m?'flex':'none';
-    document.getElementById('mt-'+x).classList.toggle('on', x===m);
+function updateToggle() {
+  var cb = document.getElementById("tb-mode");
+  var track = document.getElementById("tog-track");
+  var thumb = document.getElementById("tog-thumb");
+  if (!cb || !track || !thumb) return;
+  track.style.background = cb.checked ? "var(--accent)" : "var(--border2)";
+  thumb.style.left = cb.checked ? "23px" : "3px";
+}
+
+function switchMode(m) {
+  addMode = m;
+  ["cam","word","passage"].forEach(function(x) {
+    document.getElementById("m-" + x).style.display = x === m ? "flex" : "none";
+    document.getElementById("m-" + x).style.flexDirection = "column";
+    document.getElementById("m-" + x).style.gap = "10px";
+    document.getElementById("mt-" + x).classList.toggle("on", x === m);
   });
 }
 
-function toggleBtn(btnId, inputId){
-  const v=document.getElementById(inputId).value.trim();
-  document.getElementById(btnId).disabled=!v;
+function toggleBtn(btnId, inputId) {
+  document.getElementById(btnId).disabled = !document.getElementById(inputId).value.trim();
 }
 
-function submitKey(){
-  const k=document.getElementById('key-inp').value.trim();
-  if(!k.startsWith('sk-')) return toast('⚠️ Key 格式不正確，應以 sk- 開頭');
-  saveK(k); toast('✅ API Key 已儲存！'); renderAdd();
+function submitKey() {
+  var k = document.getElementById("key-inp").value.trim();
+  if (!k.startsWith("sk-")) { toast("Key 格式不正確"); return; }
+  saveKey(k); toast("✅ API Key 已儲存！"); renderAdd();
 }
 
-function resetKey(){
-  if(!confirm('確定重設 API Key？')) return;
-  localStorage.removeItem('wl-key'); apiKey=''; renderAdd();
+function resetKey() {
+  if (!confirm("確定重設 API Key？")) return;
+  localStorage.removeItem("wl-key"); apiKey = ""; renderAdd();
 }
 
-function onImg(e){
-  const f=e.target.files[0]; if(!f) return;
-  previewFile=f;
-  const url=URL.createObjectURL(f);
-  document.getElementById('prev-img').src=url;
-  document.getElementById('img-prev').classList.add('show');
-  document.getElementById('btn-img').disabled=false;
-  e.target.value='';
-}
-function clearImg(){
-  previewFile=null;
-  document.getElementById('img-prev').classList.remove('show');
-  document.getElementById('btn-img').disabled=true;
+function onImg(e) {
+  var f = e.target.files[0]; if (!f) return;
+  previewFile = f;
+  document.getElementById("prev-img").src = URL.createObjectURL(f);
+  document.getElementById("img-prev").classList.add("show");
+  document.getElementById("btn-img").disabled = false;
+  e.target.value = "";
 }
 
-function loading(msg){
-  document.getElementById('result-area').innerHTML=`<div class="spinner-wrap"><div class="spinner"></div><div class="spin-msg">${msg}</div></div>`;
+function clearImg() {
+  previewFile = null;
+  document.getElementById("img-prev").classList.remove("show");
+  document.getElementById("btn-img").disabled = true;
 }
 
-function updateImgBtn(){
-  const cb=document.getElementById('textbook-mode');
-  const track=document.getElementById('toggle-track');
-  const thumb=document.getElementById('toggle-thumb');
-  if(cb&&track&&thumb){
-    track.style.background=cb.checked?'var(--accent)':'var(--border2)';
-    thumb.style.left=cb.checked?'23px':'3px';
-  }
+function loading(msg) {
+  document.getElementById("result-area").innerHTML =
+    '<div class="spin-wrap"><div class="spinner"></div><div class="spin-msg">' + msg + "</div></div>";
 }
 
-async function doImg(){
-  if(!previewFile) return;
-  const isTextbook=document.getElementById('textbook-mode')?.checked||false;
-  const btn=document.getElementById('btn-img');
-  btn.disabled=true; btn.textContent='⏳ 辨識中...';
+function parseWords(raw) {
+  var d = JSON.parse(raw.replace(/```json|```/g, "").trim());
+  return d.words || d;
+}
 
-  try{
-    const b64=await fileToB64(previewFile);
-
-    if(isTextbook){
-      // ── 課本模式：兩步驟，先 OCR 再分析 ──
-      loading('第 1 步：辨識課本中所有粗體英文單字...');
-      const ocrRaw=await callAI([
-        {role:'system', content:'You are a precise OCR expert. Your job is to read text from images exactly as written.'},
-        {role:'user', content:[
-          {type:'image_url', image_url:{url:`data:image/jpeg;base64,${b64}`}},
-          {type:'text', text:`This is a textbook vocabulary list page.
-TASK: Find and list EVERY English headword entry on this page.
-- Headwords are usually in bold, larger font, or appear as numbered/bulleted list items
-- Read systematically: top to bottom, left to right, column by column
-- Include ALL of them — do not filter, do not skip any
-- Include simple words if they appear as headwords
-- Exclude: page numbers, chapter titles, Chinese/Japanese characters, pure numbers
-Return ONLY JSON: {"detected_words":["word1","word2","word3",...]}
-List every headword you can find.`}
+function doImg() {
+  if (!previewFile) return;
+  var isTB = document.getElementById("tb-mode") && document.getElementById("tb-mode").checked;
+  var btn = document.getElementById("btn-img");
+  btn.disabled = true; btn.textContent = "⏳ 分析中...";
+  fileToB64(previewFile).then(function(b64) {
+    if (isTB) {
+      loading("第1步：辨識課本粗體單字...");
+      return callAI([
+        {role:"system", content:"You are an OCR expert. Extract text precisely."},
+        {role:"user", content:[
+          {type:"image_url", image_url:{url:"data:image/jpeg;base64," + b64}},
+          {type:"text", text:TB_OCR}
         ]}
-      ]);
-
-      let words=[];
-      try{
-        const parsed=JSON.parse(ocrRaw.replace(/\`\`\`json|\`\`\`/g,'').trim());
-        words=parsed.detected_words||[];
-      }catch(e){ words=[]; }
-
-      if(!words.length){
-        // fallback: try one-step analysis
-        loading('換用單步驟辨識中...');
-        const raw2=await callAI([
-          {role:'system',content:SYS},
-          {role:'user',content:[
-            {type:'image_url',image_url:{url:`data:image/jpeg;base64,${b64}`}},
-            {type:'text',text:TEXTBOOK_PROMPT}
-          ]}
-        ]);
-        const d2=JSON.parse(raw2.replace(/\`\`\`json|\`\`\`/g,'').trim());
-        showResults(d2.words||d2,'課本');
-        btn.disabled=false; btn.textContent='🔍 AI 辨識圖片單字';
-        return;
-      }
-
-      loading(`第 2 步：分析 ${words.length} 個單字（字根字首、例句...）約需 15 秒`);
-      const raw=await callAI([
-        {role:'system', content:SYS},
-        {role:'user', content:`以下是從課本辨識出的 ${words.length} 個英文單字：[${words.join(', ')}]
-請對每一個單字做完整分析，所有單字都要分析，不可跳過。
-回傳JSON：{"words":[{"word":"單字","phonetic":"IPA音標","pos":"詞性","zh":"中文意思2-5字","en_def":"英文定義1句","example_en":"TOEIC例句","example_zh":"例句中文翻譯","roots":[{"part":"字根","type":"prefix或root或suffix","meaning":"中文意思"}],"root_tip":"字根記憶法(繁中1-2句)","family_words":["同族1","同族2","同族3"],"memory_tip":"記憶技巧(繁中1句)","level":"TOEIC分數範圍"}]}`}
-      ]);
-      const d=JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,'').trim());
-      showResults(d.words||d, '課本');
-
+      ]).then(function(raw) {
+        var d = JSON.parse(raw.replace(/```json|```/g,"").trim());
+        var words = d.detected_words || [];
+        if (!words.length) throw new Error("找不到單字，請確認圖片清晰");
+        loading("第2步：分析 " + words.length + " 個單字（約15秒）...");
+        return callAI([{role:"system",content:SYS},{role:"user",content:batchPrompt(words)}]);
+      }).then(function(raw) { showResults(parseWords(raw), "課本"); });
     } else {
-      // ── 一般模式：單步驟，篩選重要單字 ──
-      loading('AI 正在辨識圖片中的英文單字...');
-      const raw=await callAI([
-        {role:'system', content:SYS},
-        {role:'user', content:[
-          {type:'image_url', image_url:{url:`data:image/jpeg;base64,${b64}`}},
-          {type:'text', text:IMG_PROMPT}
+      loading("AI 辨識圖片單字...");
+      return callAI([
+        {role:"system", content:SYS},
+        {role:"user", content:[
+          {type:"image_url", image_url:{url:"data:image/jpeg;base64," + b64}},
+          {type:"text", text:IMG_PROMPT}
         ]}
-      ]);
-      const d=JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,'').trim());
-      showResults(d.words||d, '拍照');
+      ]).then(function(raw) { showResults(parseWords(raw), "拍照"); });
     }
-
-  }catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}<br><br>建議：圖片清晰、單字正面朝上、光線充足</div><button class="btn-secondary" onclick="renderAdd()">重試</button></div>`;
-  }
-  btn.disabled=false; btn.textContent='🔍 AI 辨識圖片單字';
+  }).catch(function(e) {
+    document.getElementById("result-area").innerHTML =
+      '<div class="api-box"><div class="api-label">❌ ' + e.message + '</div><button class="btn-s" onclick="renderAdd()">重試</button></div>';
+  }).finally(function() {
+    btn.disabled = false; btn.textContent = "🔍 AI 辨識圖片單字";
+  });
 }
 
-async function doWord(){
-  const raw_input=document.getElementById('word-inp').value.trim();
-  if(!raw_input) return;
-  const words=raw_input.split(/[,，、\s]+/).map(w=>w.trim()).filter(Boolean);
-  const btn=document.getElementById('btn-word');
-  btn.disabled=true; btn.textContent='⏳ 分析中...';
-  loading(`AI 正在分析 ${words.length} 個單字的字根字首...`);
-  try{
-    const prompt = words.length===1 ? WORD_PROMPT(words[0]) : PASSAGE_PROMPT(words.join(', '));
-    const raw=await callAI([{role:'system',content:SYS},{role:'user',content:prompt}]);
-    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    showResults(d.words||d, '手動');
-  }catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}</div></div>`;
-  }
-  btn.disabled=false; btn.textContent='🤖 AI 分析單字';
+function doWord() {
+  var inp = document.getElementById("word-inp").value.trim(); if (!inp) return;
+  var words = inp.split(/[,，、\s]+/).map(function(w){return w.trim();}).filter(Boolean);
+  var btn = document.getElementById("btn-word");
+  btn.disabled = true; btn.textContent = "⏳ 分析中...";
+  loading("分析 " + words.length + " 個單字的字根字首...");
+  var prompt = words.length === 1 ? wordPrompt(words[0]) : passagePrompt(words.join(", "));
+  callAI([{role:"system",content:SYS},{role:"user",content:prompt}])
+    .then(function(raw) { showResults(parseWords(raw), "手動"); })
+    .catch(function(e) {
+      document.getElementById("result-area").innerHTML = '<div class="api-box"><div class="api-label">❌ ' + e.message + "</div></div>";
+    })
+    .finally(function() { btn.disabled = false; btn.textContent = "🤖 AI 分析單字"; });
 }
 
-async function doPassage(){
-  const txt=document.getElementById('pass-inp').value.trim();
-  if(!txt) return;
-  const btn=document.getElementById('btn-pass');
-  btn.disabled=true; btn.textContent='⏳ 分析中...';
-  loading('AI 正在從文章中擷取重要單字...');
-  try{
-    const raw=await callAI([{role:'system',content:SYS},{role:'user',content:PASSAGE_PROMPT(txt)}]);
-    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    showResults(d.words||d, '文章');
-  }catch(e){
-    document.getElementById('result-area').innerHTML=`<div class="api-box"><div class="api-label">❌ ${e.message}</div></div>`;
-  }
-  btn.disabled=false; btn.textContent='🤖 擷取所有重要單字';
+function doPassage() {
+  var txt = document.getElementById("pass-inp").value.trim(); if (!txt) return;
+  var btn = document.getElementById("btn-pass");
+  btn.disabled = true; btn.textContent = "⏳ 分析中...";
+  loading("擷取文章重要單字...");
+  callAI([{role:"system",content:SYS},{role:"user",content:passagePrompt(txt)}])
+    .then(function(raw) { showResults(parseWords(raw), "文章"); })
+    .catch(function(e) {
+      document.getElementById("result-area").innerHTML = '<div class="api-box"><div class="api-label">❌ ' + e.message + "</div></div>";
+    })
+    .finally(function() { btn.disabled = false; btn.textContent = "🤖 擷取重要單字"; });
 }
 
-// ══ Results ══
-function showResults(words, source){
-  pending = words.map(w=>({...w, source}));
-  const newCount = pending.filter(w=>!library.some(l=>l.word.toLowerCase()===w.word.toLowerCase())).length;
-  const dupCount = pending.length - newCount;
-
-  const bulkBar = pending.length > 1 ? `
-    <div class="bulk-bar">
-      <div class="bulk-info">
-        找到 ${pending.length} 個單字
-        <span>（${newCount} 個新・${dupCount} 個重複）</span>
-      </div>
-      <button class="btn-bulk" onclick="saveAll()">全部加入 ＋</button>
-    </div>` : '';
-
-  document.getElementById('result-area').innerHTML =
-    `<div class="result-section">${bulkBar}${pending.map((w,i)=>wordCard(w,i)).join('')}</div>`;
+// ===== RESULTS =====
+function showResults(words, source) {
+  pending = words.map(function(w) { return Object.assign({}, w, {source:source}); });
+  var newCount = pending.filter(function(w) {
+    return !library.some(function(l) { return l.word.toLowerCase() === w.word.toLowerCase(); });
+  }).length;
+  var dupCount = pending.length - newCount;
+  var bulkBar = pending.length > 1 ?
+    '<div class="bulk-bar"><div class="bulk-info">找到 ' + pending.length + ' 個單字 <span>（' + newCount + ' 新 · ' + dupCount + ' 重複）</span></div>' +
+    '<button class="btn-bulk" onclick="saveAll()">全部加入 ＋</button></div>' : "";
+  document.getElementById("result-area").innerHTML =
+    '<div class="res-section">' + bulkBar + pending.map(function(w, i) { return wordCard(w, i); }).join("") + "</div>";
 }
 
-function wordCard(w, idx){
-  const dup = library.some(l=>l.word.toLowerCase()===w.word.toLowerCase());
-
-  // ── Root parts ──
-  const rootParts = (w.roots||[]).map(r=>{
-    const cls = r.type==='prefix'?'rp-prefix': r.type==='suffix'?'rp-suffix':'rp-root';
-    return `<div class="rp ${cls}"><div class="rp-val">${r.part}</div><div class="rp-mean">${r.meaning}</div></div>`;
-  }).join('');
-
-  const familyWords = (w.family_words||[]).map(fw=>
-    `<span class="fw" onclick="lookupWord('${fw.replace(/'/g,"\\'")}')">🔗 ${fw}</span>`
-  ).join('');
-
-  const hasRoots = rootParts || w.root_tip || familyWords;
-
-  return `
-  <div id="wc-${idx}" style="display:flex;flex-direction:column;gap:10px">
-
-    <!-- Word header -->
-    <div class="word-header">
-      <div class="wtag-row">
-        <span class="wtag wtag-lvl">${w.level||'TOEIC'}</span>
-        <span class="wtag wtag-src">${w.source}</span>
-        ${dup ? '<span class="wtag wtag-dup">⚠️ 已有此單字</span>' : ''}
-      </div>
-      <div class="w-word">${w.word}</div>
-      <div class="w-ph">${w.phonetic||''}</div>
-      <div class="w-pos">${w.pos||''}</div>
-      ${w.conjugation && (w.conjugation.past || w.conjugation.pp) ? `
-      <div style="margin-top:8px">
-        <div style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px">動詞三態</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--accent-light)">原形 ${w.conjugation.present||w.word}</span>
-          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--blue)">過去 ${w.conjugation.past||'-'}</span>
-          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--purple)">p.p. ${w.conjugation.pp||'-'}</span>
-          <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted2)">-ing ${w.conjugation.ing||'-'}</span>
-        </div>
-      </div>` : ''}
-      <div class="w-zh">${w.zh}</div>
-      <div class="w-en">${w.en_def}</div>
-      <div class="ex-block">
-        <div class="ex-en">${w.example_en}</div>
-        <div class="ex-zh">${w.example_zh}</div>
-      </div>
-      <div class="speak-row">
-        <button class="btn-speak" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 單字</button>
-        <button class="btn-speak" onclick="speak('${(w.example_en||'').replace(/'/g,"\\'")}')">🔊 例句</button>
-      </div>
-      <div class="save-row" id="save-row-${idx}">
-        ${dup
-          ? `<div class="already-saved">✅ 已在單字庫中${dup?'（重複）':''}</div>`
-          : `<button class="btn-save-one" onclick="saveOne(${idx})">＋ 加入單字庫</button>`
-        }
-      </div>
-    </div>
-
-    <!-- Root card -->
-    ${hasRoots ? `
-    <div class="root-card">
-      <div class="root-card-title">🔤 字根字首分析</div>
-      ${rootParts ? `<div class="root-parts-row">${rootParts}</div>` : ''}
-      ${w.root_tip ? `
-      <div class="root-tip-box">
-        <div class="root-tip-label">字根記憶法</div>
-        <div class="root-tip-text">${w.root_tip}</div>
-      </div>` : ''}
-      ${familyWords ? `
-      <div>
-        <div class="family-label">同族單字（點擊查詢）</div>
-        <div class="family-row">${familyWords}</div>
-      </div>` : ''}
-    </div>` : ''}
-
-    <!-- Memory tip -->
-    ${w.memory_tip ? `
-    <div class="mem-card">
-      <div class="mem-label">💡 記憶技巧</div>
-      <div class="mem-text">${w.memory_tip}</div>
-    </div>` : ''}
-
-  </div>`;
+function wordCard(w, idx) {
+  var dup = library.some(function(l) { return l.word.toLowerCase() === w.word.toLowerCase(); });
+  var rootParts = (w.roots || []).map(function(r) {
+    var cls = r.type === "prefix" ? "rp-prefix" : r.type === "suffix" ? "rp-suffix" : "rp-root";
+    return '<div class="rp ' + cls + '"><div class="rp-val">' + r.part + '</div><div class="rp-mean">' + r.meaning + "</div></div>";
+  }).join("");
+  var famWords = (w.family_words || []).map(function(fw) {
+    return '<span class="fw" onclick="lookupWord(\'' + esc(fw) + '\')">' + fw + "</span>";
+  }).join("");
+  var hasRoots = rootParts || w.root_tip || famWords;
+  var conj = w.conjugation;
+  var hasConj = conj && (conj.past || conj.pp);
+  var conjHtml = hasConj ?
+    '<div style="margin-top:8px"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-bottom:6px">動詞三態</div>' +
+    '<div class="w-conj">' +
+      '<span class="conj-tag" style="color:var(--al)">原 ' + (conj.present || w.word) + "</span>" +
+      '<span class="conj-tag" style="color:var(--blue)">過 ' + (conj.past || "-") + "</span>" +
+      '<span class="conj-tag" style="color:var(--purple)">p.p. ' + (conj.pp || "-") + "</span>" +
+      '<span class="conj-tag" style="color:var(--muted2)">-ing ' + (conj.ing || "-") + "</span>" +
+    "</div></div>" : "";
+  return '<div id="wc-' + idx + '" style="display:flex;flex-direction:column;gap:10px">' +
+    '<div class="word-hdr">' +
+      '<div class="wtag-row">' +
+        '<span class="wtag wtag-lvl">' + (w.level || "TOEIC") + "</span>" +
+        '<span class="wtag wtag-src">' + w.source + "</span>" +
+        (dup ? '<span class="wtag wtag-dup">⚠️ 重複</span>' : "") +
+      "</div>" +
+      '<div class="w-word">' + w.word + "</div>" +
+      '<div class="w-ph">' + (w.phonetic || "") + "</div>" +
+      '<div class="w-pos">' + (w.pos || "") + "</div>" +
+      conjHtml +
+      '<div class="w-zh">' + w.zh + "</div>" +
+      '<div class="w-en">' + (w.en_def || "") + "</div>" +
+      '<div class="ex-block"><div class="ex-en">' + (w.example_en || "") + '</div><div class="ex-zh">' + (w.example_zh || "") + "</div></div>" +
+      '<div class="speak-row">' +
+        '<button class="btn-speak" onclick="speak(\'' + esc(w.word) + '\')">🔊 單字</button>' +
+        '<button class="btn-speak" onclick="speak(\'' + esc(w.example_en || "") + '\')">🔊 例句</button>' +
+      "</div>" +
+      '<div class="save-row" id="sr-' + idx + '">' +
+        (dup ? '<div class="already-saved">✅ 已在單字庫</div>' : '<button class="btn-save" onclick="saveOne(' + idx + ')">＋ 加入單字庫</button>') +
+      "</div>" +
+    "</div>" +
+    (hasRoots ?
+      '<div class="root-card">' +
+        '<div class="root-title">🔤 字根字首分析</div>' +
+        (rootParts ? '<div class="root-parts">' + rootParts + "</div>" : "") +
+        (w.root_tip ? '<div class="tip-box"><div class="tip-label">字根記憶法</div><div class="tip-text">' + w.root_tip + "</div></div>" : "") +
+        (famWords ? '<div><div class="fam-label">同族單字（點擊查詢）</div><div class="fam-row">' + famWords + "</div></div>" : "") +
+      "</div>" : "") +
+    (w.memory_tip ? '<div class="tip-box"><div class="tip-label">💡 記憶技巧</div><div class="tip-text">' + w.memory_tip + "</div></div>" : "") +
+    "</div>";
 }
 
-function saveOne(idx){
-  const w=pending[idx]; if(!w) return;
-  if(library.some(l=>l.word.toLowerCase()===w.word.toLowerCase())){
-    toast(`⚠️「${w.word}」已在單字庫`); return;
+function saveOne(idx) {
+  var w = pending[idx]; if (!w) return;
+  if (library.some(function(l) { return l.word.toLowerCase() === w.word.toLowerCase(); })) {
+    toast("已在單字庫中"); return;
   }
   pushToLib(w);
-  const row=document.getElementById('save-row-'+idx);
-  if(row) row.innerHTML=`<div class="already-saved">✅ 已儲存</div>`;
-  toast(`✅「${w.word}」已加入！`);
+  var row = document.getElementById("sr-" + idx);
+  if (row) row.innerHTML = '<div class="already-saved">✅ 已儲存</div>';
+  toast("✅「" + w.word + "」已加入！");
 }
 
-function saveAll(){
+function saveAll() {
   ensureToday();
-  let added=0, skipped=[];
-  pending.forEach(w=>{
-    if(library.some(l=>l.word.toLowerCase()===w.word.toLowerCase())){
+  var added = 0, skipped = [];
+  pending.forEach(function(w) {
+    if (library.some(function(l) { return l.word.toLowerCase() === w.word.toLowerCase(); })) {
       skipped.push(w.word);
-    } else {
-      pushToLib(w); added++;
-    }
+    } else { pushToLib(w); added++; }
   });
-  // update all save rows
-  pending.forEach((w,i)=>{
-    const row=document.getElementById('save-row-'+i);
-    if(row) row.innerHTML=`<div class="already-saved">✅ 已儲存</div>`;
+  pending.forEach(function(w, i) {
+    var row = document.getElementById("sr-" + i);
+    if (row) row.innerHTML = '<div class="already-saved">✅ 已儲存</div>';
   });
-  let msg = `✅ 已加入 ${added} 個單字！`;
-  if(skipped.length) msg += `\n⚠️ 跳過重複：${skipped.join('、')}`;
+  var msg = "✅ 已加入 " + added + " 個單字！";
+  if (skipped.length) msg += "\n⚠️ 跳過重複：" + skipped.join("、");
   toast(msg, 3500);
   renderHome();
 }
 
-function pushToLib(w){
+function pushToLib(w) {
   ensureToday();
   library.push({
-    word:w.word, phonetic:w.phonetic||'', pos:w.pos||'',
+    word:w.word, phonetic:w.phonetic||"", pos:w.pos||"",
     conjugation:w.conjugation||null,
-    zh:w.zh, en_def:w.en_def,
-    example_en:w.example_en, example_zh:w.example_zh,
-    roots:w.roots||[], root_tip:w.root_tip||'',
-    family_words:w.family_words||[], memory_tip:w.memory_tip||'',
-    level:w.level||'', source:w.source, addedAt:Date.now()
+    zh:w.zh, en_def:w.en_def||"",
+    example_en:w.example_en||"", example_zh:w.example_zh||"",
+    roots:w.roots||[], root_tip:w.root_tip||"",
+    family_words:w.family_words||[], memory_tip:w.memory_tip||"",
+    level:w.level||"", source:w.source, addedAt:Date.now()
   });
   stats.today++; save(); saveSt();
 }
 
-async function lookupWord(word){
-  document.getElementById('result-area').innerHTML=`<div class="spinner-wrap"><div class="spinner"></div><div class="spin-msg">查詢「${word}」的字根字首...</div></div>`;
-  try{
-    const raw=await callAI([{role:'system',content:SYS},{role:'user',content:WORD_PROMPT(word)}]);
-    const d=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    showResults(d.words||d, '同族查詢');
-    document.getElementById('add-wrap').scrollTo({top:99999,behavior:'smooth'});
-  }catch(e){ toast('查詢失敗：'+e.message); }
+function lookupWord(word) {
+  document.getElementById("result-area").innerHTML =
+    '<div class="spin-wrap"><div class="spinner"></div><div class="spin-msg">查詢「' + word + '」...</div></div>';
+  callAI([{role:"system",content:SYS},{role:"user",content:wordPrompt(word)}])
+    .then(function(raw) {
+      showResults(parseWords(raw), "查詢");
+      document.getElementById("add-wrap").scrollTo({top:99999, behavior:"smooth"});
+    })
+    .catch(function(e) { toast("查詢失敗：" + e.message); });
 }
 
-// ══ Library ══
-function renderLib(){
-  filterLib((document.getElementById('lib-search')||{}).value||'');
-}
+// ===== LIBRARY =====
+function renderLib() { filterLib(document.getElementById("lib-search").value || ""); }
 
-function filterLib(q){
-  const list=q ? library.filter(w=>w.word.toLowerCase().includes(q.toLowerCase())||w.zh.includes(q)) : library;
-  document.getElementById('lib-count').textContent=`共 ${library.length} 個單字${q?` · 顯示 ${list.length} 個`:''}`;
-  const el=document.getElementById('lib-list');
-  if(!list.length){
-    el.innerHTML=`<div class="empty-state"><div style="font-size:48px">${library.length?'🔍':'📚'}</div><div>${library.length?'找不到符合的單字':'單字庫是空的'}</div></div>`;
+function filterLib(q) {
+  var list = q ? library.filter(function(w) {
+    return w.word.toLowerCase().includes(q.toLowerCase()) || w.zh.includes(q);
+  }) : library;
+  document.getElementById("lib-count").textContent = "共 " + library.length + " 個單字" + (q ? " · 顯示 " + list.length + " 個" : "");
+  var el = document.getElementById("lib-list");
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-st"><div style="font-size:48px">' + (library.length ? "🔍" : "📚") + "</div><div>" + (library.length ? "找不到符合的單字" : "單字庫是空的") + "</div></div>";
     return;
   }
-  el.innerHTML=[...list].reverse().map(w=>`
-    <div class="lib-item" onclick="openModal('${w.word.replace(/'/g,"\\'")}')">
-      <div style="flex:1">
-        <div class="li-word">${w.word}</div>
-        <div class="li-info">${w.phonetic||''} · ${w.zh} · <span style="color:var(--accent-light)">${w.source||''}</span></div>
-      </div>
-      <div class="li-acts" onclick="event.stopPropagation()">
-        <button class="btn-speak-sm" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊</button>
-        <button class="btn-del" onclick="delWord('${w.word.replace(/'/g,"\\'")}')">🗑</button>
-      </div>
-    </div>`).join('');
+  el.innerHTML = list.slice().reverse().map(function(w) {
+    return '<div class="lib-item" onclick="openModal(\'' + esc(w.word) + '\')">' +
+      '<div style="flex:1"><div class="li-word">' + w.word + '</div><div class="li-info">' + (w.phonetic || "") + " · " + w.zh + " · " + (w.source || "") + "</div></div>" +
+      '<div class="li-acts" onclick="event.stopPropagation()">' +
+        '<button class="btn-del" onclick="delWord(\'' + esc(w.word) + '\')">🗑</button>' +
+        '<button style="background:none;border:none;font-size:20px;padding:4px 6px" onclick="speak(\'' + esc(w.word) + '\')">🔊</button>' +
+      "</div></div>";
+  }).join("");
 }
 
-function delWord(word){
-  if(!confirm(`確定刪除「${word}」？`)) return;
-  library=library.filter(w=>w.word!==word);
+function delWord(word) {
+  if (!confirm("確定刪除「" + word + "」？")) return;
+  library = library.filter(function(w) { return w.word !== word; });
   save(); renderLib(); renderHome();
-  toast(`🗑 已刪除「${word}」`);
+  toast("🗑 已刪除「" + word + "」");
 }
 
-// ══ Modal ══
-function openModal(word){
-  const w=library.find(x=>x.word===word); if(!w) return;
-
-  const rootParts=(w.roots||[]).map(r=>{
-    const cls=r.type==='prefix'?'rp-prefix':r.type==='suffix'?'rp-suffix':'rp-root';
-    return `<div class="rp ${cls}"><div class="rp-val">${r.part}</div><div class="rp-mean">${r.meaning}</div></div>`;
-  }).join('');
-
-  const familyWords=(w.family_words||[]).map(fw=>`<span class="fw">${fw}</span>`).join('');
-  const hasRoots=rootParts||w.root_tip||familyWords;
-
-  document.getElementById('modal-body').innerHTML=`
-    <div class="modal-word">${w.word}</div>
-    <div class="w-ph">${w.phonetic||''}</div>
-    <div class="w-pos" style="margin-top:10px">${w.pos||''}</div>
-    ${w.conjugation && (w.conjugation.past||w.conjugation.pp) ? `
-    <div style="margin-top:8px">
-      <div style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px">動詞三態</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--accent-light)">原形 ${w.conjugation.present||w.word}</span>
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--blue)">過去 ${w.conjugation.past||'-'}</span>
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--purple)">p.p. ${w.conjugation.pp||'-'}</span>
-        <span style="background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:4px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted2)">-ing ${w.conjugation.ing||'-'}</span>
-      </div>
-    </div>` : ''}
-    <div class="w-zh">${w.zh}</div>
-    <div class="w-en">${w.en_def}</div>
-    <div class="ex-block">
-      <div class="ex-en">${w.example_en}</div>
-      <div class="ex-zh">${w.example_zh}</div>
-    </div>
-    <div class="speak-row">
-      <button class="btn-speak" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 朗讀單字</button>
-      <button class="btn-speak" onclick="speak('${(w.example_en||'').replace(/'/g,"\\'")}')">🔊 朗讀例句</button>
-    </div>
-    ${hasRoots?`
-    <div class="root-card">
-      <div class="root-card-title">🔤 字根字首分析</div>
-      ${rootParts?`<div class="root-parts-row">${rootParts}</div>`:''}
-      ${w.root_tip?`<div class="root-tip-box"><div class="root-tip-label">字根記憶法</div><div class="root-tip-text">${w.root_tip}</div></div>`:''}
-      ${familyWords?`<div><div class="family-label" style="margin-bottom:6px">同族單字</div><div class="family-row">${familyWords}</div></div>`:''}
-    </div>`:''}
-    ${w.memory_tip?`<div class="mem-card"><div class="mem-label">💡 記憶技巧</div><div class="mem-text">${w.memory_tip}</div></div>`:''}
-    <button class="modal-close" onclick="closeModal()">關閉</button>
-  `;
-  document.getElementById('modal').style.display='flex';
+// ===== MODAL =====
+function openModal(word) {
+  var w = library.find(function(x) { return x.word === word; }); if (!w) return;
+  var rootParts = (w.roots || []).map(function(r) {
+    var cls = r.type === "prefix" ? "rp-prefix" : r.type === "suffix" ? "rp-suffix" : "rp-root";
+    return '<div class="rp ' + cls + '"><div class="rp-val">' + r.part + '</div><div class="rp-mean">' + r.meaning + "</div></div>";
+  }).join("");
+  var famWords = (w.family_words || []).map(function(fw) { return '<span class="fw">' + fw + "</span>"; }).join("");
+  var conj = w.conjugation;
+  var hasConj = conj && (conj.past || conj.pp);
+  var conjHtml = hasConj ?
+    '<div style="margin-top:8px"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:6px">動詞三態</div>' +
+    '<div class="w-conj">' +
+      '<span class="conj-tag" style="color:var(--al)">原 ' + (conj.present || w.word) + "</span>" +
+      '<span class="conj-tag" style="color:var(--blue)">過 ' + (conj.past || "-") + "</span>" +
+      '<span class="conj-tag" style="color:var(--purple)">p.p. ' + (conj.pp || "-") + "</span>" +
+      '<span class="conj-tag" style="color:var(--muted2)">-ing ' + (conj.ing || "-") + "</span>" +
+    "</div></div>" : "";
+  document.getElementById("modal-body").innerHTML =
+    '<div class="modal-word">' + w.word + "</div>" +
+    '<div class="w-ph">' + (w.phonetic || "") + "</div>" +
+    '<div class="w-pos" style="margin-top:10px">' + (w.pos || "") + "</div>" +
+    conjHtml +
+    '<div class="w-zh">' + w.zh + "</div>" +
+    '<div class="w-en">' + (w.en_def || "") + "</div>" +
+    '<div class="ex-block"><div class="ex-en">' + (w.example_en || "") + '</div><div class="ex-zh">' + (w.example_zh || "") + "</div></div>" +
+    '<div class="speak-row">' +
+      '<button class="btn-speak" onclick="speak(\'' + esc(w.word) + '\')">🔊 朗讀單字</button>' +
+      '<button class="btn-speak" onclick="speak(\'' + esc(w.example_en || "") + '\')">🔊 朗讀例句</button>' +
+    "</div>" +
+    (rootParts || w.root_tip || famWords ?
+      '<div class="root-card">' +
+        '<div class="root-title">🔤 字根字首分析</div>' +
+        (rootParts ? '<div class="root-parts">' + rootParts + "</div>" : "") +
+        (w.root_tip ? '<div class="tip-box"><div class="tip-label">字根記憶法</div><div class="tip-text">' + w.root_tip + "</div></div>" : "") +
+        (famWords ? '<div><div class="fam-label" style="margin-bottom:6px">同族單字</div><div class="fam-row">' + famWords + "</div></div>" : "") +
+      "</div>" : "") +
+    (w.memory_tip ? '<div class="tip-box"><div class="tip-label">💡 記憶技巧</div><div class="tip-text">' + w.memory_tip + "</div></div>" : "") +
+    '<button class="modal-close" onclick="closeModal()">關閉</button>';
+  document.getElementById("modal").style.display = "flex";
 }
-function closeModal(){ document.getElementById('modal').style.display='none'; }
 
-// ══ Quiz ══
-function renderQuiz(){
-  const el=document.getElementById('quiz-content');
-  if(library.length<4){
-    el.innerHTML=`<div class="empty-state"><div style="font-size:48px">📚</div><div style="font-size:18px;font-weight:700">單字不夠</div><div style="font-size:14px;color:var(--muted)">至少需要 4 個單字<br>目前有 ${library.length} 個</div><button class="btn-primary" style="margin-top:12px" onclick="goTab('add')">去新增單字</button></div>`;
+function closeModal() { document.getElementById("modal").style.display = "none"; }
+
+// ===== GRAMMAR =====
+var gramCat = "全部";
+var gramSearch = "";
+var GRAM_CATS = ["全部","時態","被動語態","比較級","不定詞/動名詞","關係子句","假設語氣","分詞構句","倒裝句","強調句型","使役動詞","感官動詞","條件句","時態一致","片語動詞","連接詞","特殊句型"];
+
+var GRAM_DB = [
+  {id:"g001",cat:"時態",level:"jh",title:"現在簡單式",formula:"S + V(s/es) / S + am/is/are",note:"表示習慣、事實、規律。第三人稱單數動詞加 s/es。",examples:[{en:"She drinks coffee every morning.",zh:"她每天早上喝咖啡。"},{en:"The sun rises in the east.",zh:"太陽從東方升起。"},{en:"He does not like spicy food.",zh:"他不喜歡辣的食物。"}]},
+  {id:"g002",cat:"時態",level:"jh",title:"過去簡單式",formula:"S + V-ed / S + was/were",note:"表示過去已完成的動作或狀態。不規則動詞需特別記憶。",examples:[{en:"She visited her grandparents last weekend.",zh:"她上週末去看望了祖父母。"},{en:"He was very tired after the game.",zh:"比賽後他非常疲憊。"},{en:"They did not come to the party.",zh:"他們沒有來派對。"}]},
+  {id:"g003",cat:"時態",level:"jh",title:"未來式",formula:"S + will + V / S + be going to + V",note:"will 用於臨時決定或預測；be going to 用於計劃或有跡象的預測。",examples:[{en:"I will call you later.",zh:"我待會打電話給你。"},{en:"She is going to study abroad next year.",zh:"她明年打算出國留學。"},{en:"Look at those clouds. It is going to rain.",zh:"看那些雲。要下雨了。"}]},
+  {id:"g004",cat:"時態",level:"jh",title:"現在進行式",formula:"S + am/is/are + V-ing",note:"表示現在正在進行的動作，或近期計劃。",examples:[{en:"She is talking on the phone right now.",zh:"她現在正在打電話。"},{en:"They are watching a movie tonight.",zh:"他們今晚在看電影。"},{en:"The dog is sleeping under the table.",zh:"狗正在桌子下睡覺。"}]},
+  {id:"g005",cat:"時態",level:"jh",title:"現在完成式",formula:"S + have/has + p.p.",note:"表示過去發生、對現在有影響的動作。常與 already、yet、ever、never、since、for 連用。",examples:[{en:"I have already finished my homework.",zh:"我已經完成作業了。"},{en:"She has never been to Japan.",zh:"她從未去過日本。"},{en:"He has lived here for ten years.",zh:"他在這裡住了十年了。"}]},
+  {id:"g006",cat:"時態",level:"sh",title:"過去完成式",formula:"S + had + p.p.",note:"表示在過去某時間點之前已完成的動作（過去的過去）。",examples:[{en:"When I arrived, she had already left.",zh:"當我到達時，她已經離開了。"},{en:"He had never eaten sushi before that day.",zh:"在那天之前他從未吃過壽司。"},{en:"They had finished the project before the deadline.",zh:"他們在截止日期前完成了專案。"}]},
+  {id:"g007",cat:"時態",level:"sh",title:"未來完成式",formula:"S + will have + p.p.",note:"表示在未來某時間點之前將已完成的動作。",examples:[{en:"By next year, I will have graduated.",zh:"到明年，我將已經畢業了。"},{en:"She will have finished the report by Monday.",zh:"她在週一之前將完成報告。"}]},
+  {id:"g010",cat:"被動語態",level:"jh",title:"現在式被動",formula:"S + am/is/are + p.p. (+ by ...)",note:"強調動作承受者，施事者用 by 引導（可省略）。",examples:[{en:"English is spoken all over the world.",zh:"英語在全世界被使用。"},{en:"The windows are cleaned every week.",zh:"窗戶每週被清潔一次。"},{en:"This book is written by a famous author.",zh:"這本書由著名作者所寫。"}]},
+  {id:"g011",cat:"被動語態",level:"jh",title:"過去式被動",formula:"S + was/were + p.p. (+ by ...)",note:"表示過去發生的被動動作。",examples:[{en:"The letter was sent yesterday.",zh:"這封信昨天被寄出了。"},{en:"The building was destroyed by the earthquake.",zh:"這棟建築物被地震摧毀了。"},{en:"She was invited to the party.",zh:"她被邀請參加派對。"}]},
+  {id:"g012",cat:"被動語態",level:"sh",title:"完成式被動",formula:"S + have/has/had + been + p.p.",note:"強調已完成且影響現在；過去完成被動強調過去某點前完成。",examples:[{en:"The project has been completed.",zh:"這個專案已經被完成了。"},{en:"The message had been sent before he arrived.",zh:"在他到達之前，訊息已被發送。"}]},
+  {id:"g020",cat:"比較級",level:"jh",title:"比較級",formula:"A + adj-er + than + B / A + more + adj + than + B",note:"短形容詞加 -er；長形容詞前加 more。不規則：good→better、bad→worse。",examples:[{en:"She is taller than her brother.",zh:"她比她哥哥高。"},{en:"This exam is more difficult than the last one.",zh:"這次考試比上次更難。"},{en:"He runs faster than anyone in the class.",zh:"他跑得比班上任何人都快。"}]},
+  {id:"g021",cat:"比較級",level:"jh",title:"最高級",formula:"the + adj-est / the most + adj",note:"最高級前必須加 the，表示在一群中最...的。",examples:[{en:"Mount Everest is the highest mountain in the world.",zh:"聖母峰是世界上最高的山。"},{en:"She is the most talented student in our class.",zh:"她是我們班最有才華的學生。"}]},
+  {id:"g022",cat:"比較級",level:"jh",title:"同級比較",formula:"as + adj/adv + as",note:"表示兩者程度相同。否定用 not as...as。",examples:[{en:"He is as tall as his father.",zh:"他和他父親一樣高。"},{en:"This movie is not as boring as I thought.",zh:"這部電影沒有我想的那麼無聊。"}]},
+  {id:"g030",cat:"不定詞/動名詞",level:"jh",title:"不定詞 to V",formula:"to + 原形動詞",note:"接不定詞的動詞：want、hope、plan、decide、need、agree、refuse、promise。",examples:[{en:"She wants to become a doctor.",zh:"她想成為一名醫生。"},{en:"He decided to quit his job.",zh:"他決定辭職。"},{en:"I need to finish this report by tomorrow.",zh:"我需要在明天前完成報告。"}]},
+  {id:"g031",cat:"不定詞/動名詞",level:"jh",title:"動名詞 V-ing",formula:"V-ing（當名詞用）",note:"接動名詞的動詞：enjoy、finish、keep、mind、avoid、suggest、practice、consider。",examples:[{en:"She enjoys reading novels.",zh:"她喜歡閱讀小說。"},{en:"He finished writing the essay.",zh:"他寫完了這篇文章。"},{en:"Would you mind closing the window?",zh:"你介意關上窗戶嗎？"}]},
+  {id:"g032",cat:"不定詞/動名詞",level:"sh",title:"不定詞 vs 動名詞（意義不同）",formula:"remember/forget/stop/try + to V 或 V-ing",note:"remember to V（記得去做）vs remember V-ing（記得曾做過）；stop to V（停下來去做）vs stop V-ing（停止做）。",examples:[{en:"Remember to lock the door.",zh:"記得鎖門。"},{en:"He stopped to rest. / He stopped smoking.",zh:"他停下來休息。/ 他戒菸了。"}]},
+  {id:"g040",cat:"關係子句",level:"jh",title:"who / which / that",formula:"先行詞 + who/which/that + 子句",note:"who 指人；which 指物；that 指人或物（限定用法）。",examples:[{en:"The man who called you is my uncle.",zh:"打電話給你的那個男人是我叔叔。"},{en:"This is the book which changed my life.",zh:"這就是改變我一生的那本書。"},{en:"She is the student that won the prize.",zh:"她是贏得獎項的那位學生。"}]},
+  {id:"g041",cat:"關係子句",level:"jh",title:"whose / whom",formula:"先行詞 + whose + 名詞 / 先行詞 + whom + 子句",note:"whose 表所有關係；whom 是 who 的受格（較正式）。",examples:[{en:"The girl whose bag was stolen called the police.",zh:"包包被偷的那個女孩報警了。"},{en:"The teacher whom we respect retired last year.",zh:"我們尊敬的老師去年退休了。"}]},
+  {id:"g042",cat:"關係子句",level:"sh",title:"非限定關係子句",formula:"先行詞, which/who + 子句",note:"加逗號，為補充說明。which 可代替整個前句。",examples:[{en:"My sister, who lives in Tokyo, is a nurse.",zh:"我姐姐住在東京，她是一名護士。"},{en:"He passed the exam, which surprised everyone.",zh:"他通過了考試，這讓所有人都很驚訝。"}]},
+  {id:"g050",cat:"假設語氣",level:"sh",title:"與現在事實相反",formula:"If S + V-ed/were..., S + would/could/might + V",note:"表示與現在事實相反的假設。be 動詞一律用 were。",examples:[{en:"If I were you, I would apologize.",zh:"如果我是你，我會道歉。"},{en:"If she had more time, she could travel more.",zh:"如果她有更多時間，她可以多旅遊。"},{en:"If it were not raining, we would go hiking.",zh:"如果沒有下雨，我們就去健行了。"}]},
+  {id:"g051",cat:"假設語氣",level:"sh",title:"與過去事實相反",formula:"If S + had + p.p., S + would/could/might + have + p.p.",note:"表示與過去事實相反的假設，對過去的後悔或遺憾。",examples:[{en:"If I had studied harder, I would have passed.",zh:"如果我當時更努力讀書，我就會通過了。"},{en:"If she had taken the job, she would have been rich.",zh:"如果她當時接受了那份工作，她就會有錢了。"}]},
+  {id:"g052",cat:"假設語氣",level:"sh",title:"混合假設",formula:"If S + had + p.p. (過去), S + would + V (現在)",note:"條件子句指過去，主要子句指現在影響。",examples:[{en:"If I had slept earlier, I would not be tired now.",zh:"如果我昨晚早點睡，我現在就不會這麼累了。"}]},
+  {id:"g060",cat:"分詞構句",level:"sh",title:"現在分詞構句",formula:"V-ing..., S + V",note:"省略連接詞和主詞，主詞需與主要子句相同。表示同時發生或因果。",examples:[{en:"Walking down the street, she met an old friend.",zh:"走在街上，她遇見了一位老朋友。"},{en:"Feeling tired, he went to bed early.",zh:"感到疲倦，他早早就去睡了。"}]},
+  {id:"g061",cat:"分詞構句",level:"sh",title:"過去分詞構句",formula:"p.p...., S + V",note:"過去分詞構句帶有被動或完成的含義。",examples:[{en:"Exhausted from the long journey, he fell asleep immediately.",zh:"長途旅行後精疲力竭，他立刻睡著了。"},{en:"Written in 1851, the novel is still popular today.",zh:"這部小說寫於1851年，至今仍廣受歡迎。"}]},
+  {id:"g070",cat:"倒裝句",level:"sh",title:"否定副詞倒裝",formula:"否定副詞 + 助動詞 + S + V",note:"never、seldom、hardly、not only 等置於句首時，主詞和助動詞需倒裝。",examples:[{en:"Never have I seen such a beautiful sunset.",zh:"我從未見過如此美麗的日落。"},{en:"Seldom does she complain about her work.",zh:"她很少抱怨她的工作。"}]},
+  {id:"g071",cat:"倒裝句",level:"sh",title:"only 倒裝",formula:"Only + 副詞子句/片語 + 助動詞 + S + V",note:"only 修飾副詞子句或片語置於句首時，主要子句需倒裝。",examples:[{en:"Only then did I realize my mistake.",zh:"直到那時我才意識到我的錯誤。"},{en:"Only by working hard can you succeed.",zh:"只有努力工作，你才能成功。"}]},
+  {id:"g080",cat:"強調句型",level:"sh",title:"It is...that 強調句",formula:"It is/was + 強調部分 + that/who + 其餘",note:"可強調主詞、受詞、副詞。強調人時可用 who。",examples:[{en:"It was Tom who broke the window.",zh:"打破窗戶的人正是湯姆。"},{en:"It is here that the accident happened.",zh:"事故就是在這裡發生的。"}]},
+  {id:"g090",cat:"使役動詞",level:"sh",title:"make / let / have",formula:"make/let/have + O + 原形V",note:"make（強迫）、let（允許）、have（使得）後面接原形動詞。",examples:[{en:"She made him apologize to everyone.",zh:"她強迫他向每個人道歉。"},{en:"He let his children stay up late on weekends.",zh:"他讓孩子們在週末晚點睡。"},{en:"She had her car repaired at the garage.",zh:"她讓修車廠修理了她的車。"}]},
+  {id:"g091",cat:"使役動詞",level:"sh",title:"get",formula:"get + O + to V（主動）/ get + O + p.p.（被動）",note:"get 與 make/let/have 不同，主動接 to V，被動接過去分詞。",examples:[{en:"I got him to help me move the furniture.",zh:"我讓他幫我搬家具。"},{en:"She got her hair cut yesterday.",zh:"她昨天去剪了頭髮。"}]},
+  {id:"g100",cat:"感官動詞",level:"sh",title:"感官動詞用法",formula:"see/hear/watch/feel/notice + O + 原形V / V-ing",note:"強調完整動作用原形；強調動作進行中用 V-ing。被動時改為 to V。",examples:[{en:"I saw him cross the road.",zh:"我看見他過馬路。"},{en:"She heard someone singing in the room.",zh:"她聽見有人在房間裡唱歌。"}]},
+  {id:"g110",cat:"條件句",level:"jh",title:"真實條件句（第一條件）",formula:"If S + V(現在), S + will + V",note:"表示現實可能發生的條件和結果。條件子句不用未來式。",examples:[{en:"If it rains tomorrow, we will cancel the trip.",zh:"如果明天下雨，我們將取消旅行。"},{en:"If you study hard, you will pass the exam.",zh:"如果你努力學習，你會通過考試。"}]},
+  {id:"g120",cat:"時態一致",level:"sh",title:"間接引語時態退後",formula:"直接引語 → 間接引語：現在→過去，will→would，can→could",note:"主要動詞為過去式時，that 子句的動詞需向過去退一步。科學事實不需退後。",examples:[{en:"'I am tired.' → She said that she was tired.",zh:"「我很累。」→ 她說她很累。"},{en:"'I will help you.' → He promised that he would help me.",zh:"「我會幫你。」→ 他承諾說他會幫我。"}]},
+  {id:"p001",cat:"片語動詞",level:"ph",title:"look 系列",formula:"look up / look out / look into / look for / look after / look forward to",note:"常見 look 片語動詞整理。",examples:[{en:"Look up the word in the dictionary.",zh:"在字典裡查這個單字。（look up 查詢）"},{en:"Look out! There is a car coming.",zh:"小心！有車子來了。（look out 小心）"},{en:"She looked after her sick mother.",zh:"她照顧生病的母親。（look after 照顧）"},{en:"I am looking forward to seeing you.",zh:"我期待見到你。（look forward to 期待）"}]},
+  {id:"p002",cat:"片語動詞",level:"ph",title:"give 系列",formula:"give up / give in / give out / give away / give back",note:"常見 give 片語動詞整理。",examples:[{en:"Never give up on your dreams.",zh:"永遠不要放棄你的夢想。（give up 放棄）"},{en:"He finally gave in to their demands.",zh:"他最終屈服於他們的要求。（give in 屈服）"},{en:"She gave away all her old clothes.",zh:"她把所有舊衣服都送出去了。（give away 送出）"}]},
+  {id:"p003",cat:"片語動詞",level:"ph",title:"take 系列",formula:"take off / take over / take up / take in / take out / take care of",note:"常見 take 片語動詞整理。",examples:[{en:"The plane takes off at 8 a.m.",zh:"飛機上午8點起飛。（take off 起飛）"},{en:"She took over the company after her father retired.",zh:"她父親退休後她接管了公司。（take over 接管）"},{en:"He took up painting as a hobby.",zh:"他把繪畫當成了愛好。（take up 開始從事）"}]},
+  {id:"p004",cat:"片語動詞",level:"ph",title:"put 系列",formula:"put on / put off / put up with / put away / put out / put forward",note:"常見 put 片語動詞整理。",examples:[{en:"Put on your coat. It is cold outside.",zh:"穿上你的外套，外面很冷。（put on 穿上）"},{en:"Do not put off until tomorrow what you can do today.",zh:"不要將今天能做的事拖到明天。（put off 拖延）"},{en:"How can you put up with such noise?",zh:"你怎麼能忍受這麼大的噪音？（put up with 忍受）"}]},
+  {id:"p005",cat:"片語動詞",level:"ph",title:"come 系列",formula:"come up with / come across / come down with / come out / come over",note:"常見 come 片語動詞整理。",examples:[{en:"She came up with a brilliant idea.",zh:"她想出了一個絕妙的主意。（come up with 想出）"},{en:"I came across an old friend at the market.",zh:"我在市場偶遇了一位老朋友。（come across 偶遇）"},{en:"He came down with the flu last week.",zh:"他上週得了流感。（come down with 染上疾病）"}]},
+  {id:"p006",cat:"片語動詞",level:"ph",title:"get 系列",formula:"get along with / get over / get rid of / get up / get through / get away with",note:"常見 get 片語動詞整理。",examples:[{en:"She gets along well with her colleagues.",zh:"她和同事相處得很好。（get along with 相處）"},{en:"It took him months to get over the breakup.",zh:"他花了好幾個月才從分手中走出來。（get over 克服）"},{en:"We need to get rid of these old files.",zh:"我們需要清除這些舊文件。（get rid of 擺脫）"}]},
+  {id:"p007",cat:"片語動詞",level:"ph",title:"run 系列",formula:"run out of / run into / run over / run away / run for",note:"常見 run 片語動詞整理。",examples:[{en:"We have run out of sugar.",zh:"我們的糖用完了。（run out of 用完）"},{en:"I ran into my old teacher at the supermarket.",zh:"我在超市偶遇了我的老師。（run into 偶遇）"},{en:"She is running for president.",zh:"她正在競選總統。（run for 競選）"}]},
+  {id:"p008",cat:"片語動詞",level:"ph",title:"turn 系列",formula:"turn on / turn off / turn up / turn down / turn out / turn into",note:"常見 turn 片語動詞整理。",examples:[{en:"Turn on the lights, please.",zh:"請開燈。（turn on 開啟）"},{en:"Turn off your phone during the movie.",zh:"看電影時請關手機。（turn off 關掉）"},{en:"She turned down the job offer.",zh:"她拒絕了那份工作邀請。（turn down 拒絕）"},{en:"Everything turned out well in the end.",zh:"最後一切都很順利。（turn out 結果是）"}]},
+  {id:"p009",cat:"片語動詞",level:"ph",title:"break 系列",formula:"break down / break up / break out / break in / break through",note:"常見 break 片語動詞整理。",examples:[{en:"My car broke down on the highway.",zh:"我的車在高速公路上拋錨了。（break down 故障）"},{en:"They broke up after three years together.",zh:"在一起三年後他們分手了。（break up 分手）"},{en:"A fire broke out in the building.",zh:"大樓發生了火災。（break out 爆發）"}]},
+  {id:"g130",cat:"連接詞",level:"jh",title:"對等連接詞 FANBOYS",formula:"for / and / nor / but / or / yet / so",note:"連接兩個對等的字、片語或子句。記憶口訣：FANBOYS。",examples:[{en:"She is smart and hardworking.",zh:"她既聰明又勤奮。"},{en:"He tried hard, but he failed.",zh:"他很努力，但是失敗了。"},{en:"Hurry up, or you will be late.",zh:"快點，不然你會遲到。"}]},
+  {id:"g131",cat:"連接詞",level:"jh",title:"從屬連接詞（時間）",formula:"when / while / before / after / since / until / as soon as",note:"引導副詞子句，表示時間關係。時間子句不用未來式。",examples:[{en:"Call me as soon as you arrive.",zh:"你一到就打電話給我。"},{en:"While she was cooking, he was watching TV.",zh:"她在做飯的時候，他在看電視。"},{en:"I will wait here until you come back.",zh:"我會在這裡等，直到你回來。"}]},
+  {id:"g132",cat:"連接詞",level:"sh",title:"從屬連接詞（讓步/對比）",formula:"although / though / even though / even if / whereas / while",note:"表示讓步或對比。although 和 but 不能同時使用。",examples:[{en:"Although it was raining, she went for a run.",zh:"雖然在下雨，她還是去跑步了。"},{en:"Even if I had the money, I would not buy it.",zh:"即使我有錢，我也不會買它。"}]},
+  {id:"g140",cat:"特殊句型",level:"jh",title:"so...that / such...that",formula:"so + adj/adv + that / such + (a) + adj + N + that",note:"表示「如此...以至於...」的結果子句。",examples:[{en:"She was so tired that she fell asleep immediately.",zh:"她累到立刻睡著了。"},{en:"It was such a hot day that we stayed indoors.",zh:"那天天氣如此炎熱，我們就待在室內。"}]},
+  {id:"g141",cat:"特殊句型",level:"sh",title:"no sooner...than / hardly...when",formula:"No sooner had S + p.p. than... / Hardly had S + p.p. when...",note:"表示「一...就...」，主要子句需倒裝。",examples:[{en:"No sooner had she sat down than the phone rang.",zh:"她一坐下電話就響了。"},{en:"Hardly had he arrived when it started to rain.",zh:"他一到就開始下雨了。"}]},
+  {id:"g142",cat:"特殊句型",level:"sh",title:"with + O + 分詞",formula:"with + O + V-ing / p.p.",note:"表示伴隨狀態，主動用 V-ing，被動用 p.p.。",examples:[{en:"She sat there with her eyes closed.",zh:"她坐在那裡，眼睛閉著。"},{en:"He walked into the room with music playing.",zh:"他走進房間，音樂正在播放。"}]}
+];
+
+function renderGram() {
+  var catBar = document.getElementById("gram-cats");
+  catBar.innerHTML = GRAM_CATS.map(function(c) {
+    return '<button class="gcat' + (c === gramCat ? " on" : "") + '" onclick="setGramCat(\'' + c + '\')">' + c + "</button>";
+  }).join("");
+  renderGramList();
+}
+
+function setGramCat(cat) {
+  gramCat = cat;
+  document.querySelectorAll(".gcat").forEach(function(b) { b.classList.toggle("on", b.textContent === cat); });
+  renderGramList();
+}
+
+function filterGram(q) { gramSearch = q.toLowerCase(); renderGramList(); }
+
+function renderGramList() {
+  var items = GRAM_DB;
+  if (gramCat !== "全部") items = items.filter(function(g) { return g.cat === gramCat; });
+  if (gramSearch) items = items.filter(function(g) {
+    return g.title.toLowerCase().includes(gramSearch) || g.note.toLowerCase().includes(gramSearch) ||
+      g.formula.toLowerCase().includes(gramSearch) ||
+      g.examples.some(function(e) { return e.en.toLowerCase().includes(gramSearch) || e.zh.includes(gramSearch); });
+  });
+  var el = document.getElementById("gram-list");
+  if (!items.length) { el.innerHTML = '<div class="empty-st"><div style="font-size:40px">🔍</div><div>找不到符合的文法</div></div>'; return; }
+  el.innerHTML = items.map(function(g) {
+    var bc = g.level === "jh" ? "badge-jh" : g.level === "sh" ? "badge-sh" : "badge-ph";
+    var bt = g.level === "jh" ? "國中" : g.level === "sh" ? "高中" : "片語";
+    return '<div class="gram-card">' +
+      '<div class="gram-head" onclick="toggleGram(\'' + g.id + '\')">' +
+        '<span class="gram-badge ' + bc + '">' + bt + "</span>" +
+        '<div class="gram-title">' + g.title + "</div>" +
+        '<span class="gram-arrow" id="arr-' + g.id + '">▼</span>' +
+      "</div>" +
+      '<div class="gram-body" id="body-' + g.id + '">' +
+        '<div class="gram-formula">' + g.formula + "</div>" +
+        '<div class="gram-note">' + g.note + "</div>" +
+        '<div class="gram-exs">' + g.examples.map(function(ex) {
+          var safeen = ex.en.replace(/\\/g,"\\\\").replace(/'/g,"\\'").split("→")[0].split("（")[0].trim();
+          return '<div class="gram-ex"><div class="gram-ex-en">' + ex.en + '</div><div class="gram-ex-zh">' + ex.zh + "</div>" +
+            '<button class="gram-speak-btn" onclick="speak(\'' + safeen + '\')">🔊 朗讀</button></div>';
+        }).join("") + "</div>" +
+      "</div></div>";
+  }).join("");
+}
+
+function toggleGram(id) {
+  var body = document.getElementById("body-" + id);
+  var arr = document.getElementById("arr-" + id);
+  var open = body.classList.toggle("open");
+  arr.classList.toggle("open", open);
+}
+
+// ===== SRS QUIZ =====
+var DISTRACTORS = [
+  {word:"negotiate",zh:"談判協商"},{word:"implement",zh:"實施執行"},{word:"collaborate",zh:"合作協作"},
+  {word:"revenue",zh:"營收收入"},{word:"streamline",zh:"簡化精簡"},{word:"leverage",zh:"善用槓桿"},
+  {word:"incentive",zh:"激勵誘因"},{word:"initiative",zh:"倡議主動性"},{word:"sustainable",zh:"永續的"},
+  {word:"delegate",zh:"委派授權"},{word:"acquisition",zh:"收購"},{word:"portfolio",zh:"投資組合"},
+  {word:"depreciation",zh:"折舊貶值"},{word:"equity",zh:"股權"},{word:"liability",zh:"負債責任"},
+  {word:"audit",zh:"審計審查"},{word:"inflation",zh:"通貨膨脹"},{word:"liquidity",zh:"流動性"},
+  {word:"agenda",zh:"議程待辦事項"},{word:"tentative",zh:"暫定的"},{word:"facilitate",zh:"促進協助"},
+  {word:"confidential",zh:"機密的"},{word:"inventory",zh:"庫存"},{word:"mandatory",zh:"強制的"},
+  {word:"recruit",zh:"招募徵才"},{word:"compensation",zh:"薪酬補償"},{word:"appraisal",zh:"績效評估"},
+  {word:"turnover",zh:"員工流動率"},{word:"mediator",zh:"調解人"},{word:"branding",zh:"品牌建立"},
+  {word:"campaign",zh:"行銷活動"},{word:"niche",zh:"利基市場"},{word:"conversion",zh:"轉換率"},
+  {word:"prototype",zh:"原型"},{word:"itinerary",zh:"行程表"},{word:"accommodation",zh:"住宿"},
+  {word:"complimentary",zh:"免費贈送的"},{word:"compliance",zh:"合規遵從"},{word:"clause",zh:"條款"},
+  {word:"infringement",zh:"侵權"},{word:"litigation",zh:"訴訟"},{word:"negligence",zh:"疏失過失"},
+  {word:"redundant",zh:"多餘的"},{word:"eloquent",zh:"口才好的"},{word:"meticulous",zh:"一絲不苟的"},
+  {word:"prevalent",zh:"普遍的"},{word:"ambiguous",zh:"模糊不清的"},{word:"explicit",zh:"明確的"},
+  {word:"substantial",zh:"大量實質的"},{word:"consecutive",zh:"連續的"},{word:"preliminary",zh:"初步準備的"},
+  {word:"subsequent",zh:"隨後的"},{word:"comprehensive",zh:"全面綜合的"},{word:"proficient",zh:"熟練的"},
+  {word:"versatile",zh:"多才多藝的"},{word:"diligent",zh:"勤奮的"},{word:"perseverance",zh:"毅力堅持"}
+];
+
+function getSRS(w) { return w.srs || {level:0, due:0, skip:false}; }
+
+function setSRS(word, correct) {
+  var w = library.find(function(x) { return x.word === word; }); if (!w) return;
+  if (!w.srs) w.srs = {level:0, due:0, skip:false};
+  var gaps = [0,3600,28800,86400,259200,604800,1209600,2592000,7776000];
+  if (correct) {
+    w.srs.level = Math.min(w.srs.level + 1, 8);
+    w.srs.due = Date.now() + (gaps[w.srs.level] || 86400) * 1000;
+  } else {
+    w.srs.level = Math.max(0, w.srs.level - 2);
+    w.srs.due = Date.now() + 300000;
+  }
+  save();
+}
+
+function setWordFreq(word, action) {
+  var w = library.find(function(x) { return x.word === word; }); if (!w) return;
+  if (!w.srs) w.srs = {level:0, due:0, skip:false};
+  if (action === "boost") { w.srs.level=0; w.srs.due=0; w.srs.skip=false; toast("🔥「" + word + "」已設為優先複習"); }
+  else if (action === "reduce") { w.srs.level=6; w.srs.due=Date.now()+604800000; w.srs.skip=false; toast("😌「" + word + "」已設為減少出現"); }
+  else if (action === "skip") { w.srs.skip=true; toast("⏸️「" + word + "」已停用"); }
+  save();
+}
+
+function getPool() {
+  var now = Date.now();
+  var due = library.filter(function(w) { return !getSRS(w).skip && getSRS(w).due <= now; });
+  var fresh = library.filter(function(w) { var s=getSRS(w); return !s.skip && s.level===0 && s.due>now; });
+  var rest = library.filter(function(w) { var s=getSRS(w); return !s.skip && s.level>0 && s.due>now; });
+  return shuffle(due).concat(shuffle(fresh)).concat(shuffle(rest)).slice(0, Math.min(15, library.length));
+}
+
+function getDistractors(excludeWords, count) {
+  var libWords = {};
+  library.forEach(function(w) { libWords[w.word.toLowerCase()] = true; });
+  var pool = DISTRACTORS.filter(function(d) {
+    return !libWords[d.word.toLowerCase()] && excludeWords.indexOf(d.word) === -1;
+  });
+  return shuffle(pool).slice(0, count);
+}
+
+function makeQ(w, lib) {
+  var types = ["en2zh","zh2en","example"];
+  var type = types[Math.floor(Math.random() * types.length)];
+  if (type === "example" && !w.example_en) type = "en2zh";
+  var libPool = shuffle(lib.filter(function(x) { return x.word !== w.word; }));
+
+  function buildOpts(correctObj, libWrongs) {
+    var need = 3 - libWrongs.length;
+    var distr = getDistractors([correctObj.word].concat(libWrongs.map(function(x){return x.word;})), need)
+      .map(function(d) { return {word:d.word, zh:d.zh, inLib:false}; });
+    return shuffle([correctObj].concat(libWrongs).concat(distr)).slice(0,4);
+  }
+
+  if (type === "en2zh") {
+    var lw = libPool.filter(function(x){return x.zh!==w.zh;}).slice(0,2).map(function(x){return {word:x.word,zh:x.zh,inLib:true};});
+    var allOpts = buildOpts({word:w.word,zh:w.zh,inLib:true}, lw);
+    return {type:type, word:w.word, prompt:w.word, sublabel:w.phonetic||"", question:"這個單字的中文意思是？",
+      correct:w.zh, allOpts:allOpts, opts:allOpts.map(function(o){return o.zh;}), ex:w.example_en, exzh:w.example_zh};
+  }
+  if (type === "zh2en") {
+    var lw2 = libPool.slice(0,2).map(function(x){return {word:x.word,zh:x.zh,inLib:true};});
+    var allOpts2 = buildOpts({word:w.word,zh:w.zh,inLib:true}, lw2);
+    return {type:type, word:w.word, prompt:w.zh, sublabel:w.en_def||"", question:"哪個英文單字符合這個意思？",
+      correct:w.word, allOpts:allOpts2, opts:allOpts2.map(function(o){return o.word;}), ex:w.example_en, exzh:w.example_zh};
+  }
+  if (type === "example") {
+    var blank = (w.example_en||"").replace(new RegExp(w.word,"gi"),"_____");
+    var lw3 = libPool.slice(0,2).map(function(x){return {word:x.word,zh:x.zh,inLib:true};});
+    var allOpts3 = buildOpts({word:w.word,zh:w.zh,inLib:true}, lw3);
+    return {type:type, word:w.word, prompt:blank, sublabel:w.example_zh||"", question:"填入正確的單字：",
+      correct:w.word, allOpts:allOpts3, opts:allOpts3.map(function(o){return o.word;}), ex:w.example_en, exzh:w.example_zh};
+  }
+}
+
+function renderQuiz() {
+  var el = document.getElementById("quiz-content");
+  var pool = getPool();
+  if (pool.length < 4) {
+    el.innerHTML = '<div class="empty-st"><div style="font-size:48px">📚</div><div style="font-size:18px;font-weight:700">單字不夠</div>' +
+      '<div style="font-size:14px;color:var(--muted)">至少需要 4 個單字<br>目前有 ' + library.length + ' 個</div>' +
+      '<button class="btn-p" style="margin-top:12px" onclick="goTab(\'add\')">去新增單字</button></div>';
     return;
   }
-  quizSt.words=shuffle(library).slice(0,Math.min(10,library.length));
-  quizSt.idx=0; quizSt.score=0; quizSt.ans=false;
+  quizSt.questions = pool.map(function(w) { return makeQ(w, library); }).filter(Boolean);
+  quizSt.idx = 0; quizSt.score = 0; quizSt.ans = false; quizSt.wrong = [];
   renderQ();
 }
 
-function renderQ(){
-  const q=quizSt.words[quizSt.idx]; if(!q){ renderScore(); return; }
-  const wrongs=shuffle(library.filter(w=>w.zh!==q.zh)).slice(0,3).map(w=>w.zh);
-  const opts=shuffle([q.zh,...wrongs]);
-  const pct=(quizSt.idx/quizSt.words.length)*100;
-  document.getElementById('quiz-content').innerHTML=`
-    <div class="qprog-bar"><div class="qprog-fill" style="width:${pct}%"></div></div>
-    <div style="font-size:12px;color:var(--muted);text-align:right">題目 ${quizSt.idx+1} / ${quizSt.words.length}</div>
-    <div class="q-card">
-      <div class="q-label">這個單字的中文意思是？</div>
-      <div class="q-word">${q.word}</div>
-      <div class="q-ph">${q.phonetic||''}</div>
-    </div>
-    <div class="opts">
-      ${opts.map(o=>`<button class="opt" onclick="ansQ(this,'${o.replace(/'/g,"\\'")}','${q.zh.replace(/'/g,"\\'")}','${q.word.replace(/'/g,"\\'")}','${(q.example_en||'').replace(/'/g,"\\'")}','${(q.example_zh||'').replace(/'/g,"\\'")}')">
-        ${o}</button>`).join('')}
-    </div>
-    <div id="qfb" style="display:none"></div>
-    <div id="qnxt" style="display:none">
-      <button class="btn-nq" onclick="nextQ()">${quizSt.idx+1<quizSt.words.length?'下一題 →':'查看結果 🎯'}</button>
-    </div>`;
+function renderQ() {
+  var q = quizSt.questions[quizSt.idx];
+  if (!q) { renderScore(); return; }
+  var pct = (quizSt.idx / quizSt.questions.length) * 100;
+  var typeLabel = q.type==="en2zh" ? "英文→中文" : q.type==="zh2en" ? "中文→英文" : "例句填空";
+  var typeColor = q.type==="en2zh" ? "var(--al)" : q.type==="zh2en" ? "var(--blue)" : "var(--purple)";
+  var fontSize = q.type === "example" ? "17px" : "34px";
+  document.getElementById("quiz-content").innerHTML =
+    '<div class="qprog"><div class="qprog-fill" style="width:' + pct + '%"></div></div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<span style="font-size:11px;font-weight:700;color:' + typeColor + ';letter-spacing:.5px">' + typeLabel + "</span>" +
+      '<span style="font-size:12px;color:var(--muted)">第 ' + (quizSt.idx+1) + " / " + quizSt.questions.length + " 題</span>" +
+    "</div>" +
+    '<div class="q-card">' +
+      '<div class="q-label">' + q.question + "</div>" +
+      '<div class="q-word" style="font-size:' + fontSize + ';line-height:1.4">' + q.prompt + "</div>" +
+      (q.sublabel ? '<div class="q-ph" style="margin-top:6px">' + q.sublabel + "</div>" : "") +
+    "</div>" +
+    '<div class="opts">' +
+      q.opts.map(function(o) {
+        return '<button class="opt" onclick="ansQ(this,\'' + esc(o) + '\',\'' + esc(q.correct) + '\',\'' + esc(q.word) + '\',\'' + esc(q.ex||"") + '\',\'' + esc(q.exzh||"") + '\')">' + o + "</button>";
+      }).join("") +
+    "</div>" +
+    '<div id="qfb" style="display:none"></div>' +
+    '<div id="qnxt" style="display:none"><button class="btn-nq" onclick="nextQ()">' + (quizSt.idx+1 < quizSt.questions.length ? "下一題 →" : "查看結果 🎯") + "</button></div>";
 }
 
-function ansQ(btn,chosen,correct,word,ex,exzh){
-  if(quizSt.ans) return; quizSt.ans=true;
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  if(chosen===correct){ btn.classList.add('ok'); quizSt.score++; }
-  else{ btn.classList.add('no'); document.querySelectorAll('.opt').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('ok'); }); }
-  speak(word);
-  const fb=document.getElementById('qfb');
-  fb.style.display='block';
-  fb.innerHTML=`<div class="explain-box"><div class="exq">${ex}</div><div>${exzh}</div></div>`;
-  document.getElementById('qnxt').style.display='block';
-}
-
-function nextQ(){ quizSt.idx++; quizSt.ans=false; renderQ(); }
-
-function renderScore(){
-  stats.quiz++; saveSt();
-  const pct=Math.round((quizSt.score/quizSt.words.length)*100);
-  const e=pct>=80?'🏆':pct>=60?'💪':'📚';
-  const m=pct>=80?'太棒了！繼續拍照新增單字！':pct>=60?'不錯！繼續加油！':'多複習收藏的單字！';
-  document.getElementById('quiz-content').innerHTML=`
-    <div class="score-screen">
-      <div class="score-emoji">${e}</div>
-      <div class="score-n">${pct}%</div>
-      <div class="score-sub">${quizSt.score} / ${quizSt.words.length} 答對</div>
-      <div class="score-msg">${m}</div>
-      <button class="btn-retry" onclick="renderQuiz()">再測一次</button>
-    </div>`;
-  renderHome();
-}
-
-
-// ══════════════════════════════════════════════════
-//  Grammar & Phrase Database
-// ══════════════════════════════════════════════════
-// level: jh=國中 sh=高中 ph=片語動詞
-const GRAM_DB = [
-
-// ─── 國中時態 ───────────────────────────────────
-{id:'g001', cat:'時態', level:'jh', title:'現在簡單式',
- formula:'S + V(s/es) / S + am/is/are',
- note:'表示習慣、事實、規律發生的事情。第三人稱單數動詞加 s/es。',
- examples:[
-   {en:'She drinks coffee every morning.', zh:'她每天早上喝咖啡。'},
-   {en:'The sun rises in the east.', zh:'太陽從東方升起。'},
-   {en:'He does not like spicy food.', zh:'他不喜歡辣的食物。'}
- ]},
-{id:'g002', cat:'時態', level:'jh', title:'過去簡單式',
- formula:'S + V-ed / S + was/were',
- note:'表示過去已完成的動作或狀態。不規則動詞需特別記憶。',
- examples:[
-   {en:'She visited her grandparents last weekend.', zh:'她上週末去看望了祖父母。'},
-   {en:'He was very tired after the game.', zh:'比賽結束後他非常疲憊。'},
-   {en:'They did not come to the party.', zh:'他們沒有來派對。'}
- ]},
-{id:'g003', cat:'時態', level:'jh', title:'未來式',
- formula:'S + will + V / S + be going to + V',
- note:'will 用於臨時決定或預測；be going to 用於計劃或有跡象的預測。',
- examples:[
-   {en:'I will call you later.', zh:'我待會打電話給你。'},
-   {en:'She is going to study abroad next year.', zh:'她明年打算出國留學。'},
-   {en:'Look at those clouds. It is going to rain.', zh:'看那些雲。要下雨了。'}
- ]},
-{id:'g004', cat:'時態', level:'jh', title:'現在進行式',
- formula:'S + am/is/are + V-ing',
- note:'表示現在正在進行的動作，或表示近期計劃。',
- examples:[
-   {en:'She is talking on the phone right now.', zh:'她現在正在打電話。'},
-   {en:'They are watching a movie tonight.', zh:'他們今晚在看電影。'},
-   {en:'The dog is sleeping under the table.', zh:'狗正在桌子下睡覺。'}
- ]},
-{id:'g005', cat:'時態', level:'jh', title:'現在完成式',
- formula:'S + have/has + p.p.',
- note:'表示過去發生、對現在有影響的動作，或從過去持續到現在的狀態。常與 already、yet、ever、never、since、for 連用。',
- examples:[
-   {en:'I have already finished my homework.', zh:'我已經完成作業了。'},
-   {en:'She has never been to Japan.', zh:'她從未去過日本。'},
-   {en:'He has lived here for ten years.', zh:'他在這裡住了十年了。'}
- ]},
-{id:'g006', cat:'時態', level:'sh', title:'過去完成式',
- formula:'S + had + p.p.',
- note:'表示在過去某時間點之前已完成的動作（過去的過去）。',
- examples:[
-   {en:'When I arrived, she had already left.', zh:'當我到達時，她已經離開了。'},
-   {en:'He had never eaten sushi before that day.', zh:'在那天之前他從未吃過壽司。'},
-   {en:'They had finished the project before the deadline.', zh:'他們在截止日期前完成了專案。'}
- ]},
-{id:'g007', cat:'時態', level:'sh', title:'未來完成式',
- formula:'S + will have + p.p.',
- note:'表示在未來某時間點之前將已完成的動作。',
- examples:[
-   {en:'By next year, I will have graduated.', zh:'到明年，我將已經畢業了。'},
-   {en:'She will have finished the report by Monday.', zh:'她在週一之前將完成報告。'},
-   {en:'By 2030, they will have built the bridge.', zh:'到2030年，他們將已建好橋樑。'}
- ]},
-
-// ─── 被動語態 ────────────────────────────────────
-{id:'g010', cat:'被動語態', level:'jh', title:'現在式被動',
- formula:'S + am/is/are + p.p. (+ by ...)',
- note:'強調動作承受者，施事者用 by 引導（可省略）。',
- examples:[
-   {en:'English is spoken all over the world.', zh:'英語在全世界被使用。'},
-   {en:'The windows are cleaned every week.', zh:'窗戶每週被清潔一次。'},
-   {en:'This book is written by a famous author.', zh:'這本書是由一位著名作者所寫的。'}
- ]},
-{id:'g011', cat:'被動語態', level:'jh', title:'過去式被動',
- formula:'S + was/were + p.p. (+ by ...)',
- note:'表示過去發生的被動動作。',
- examples:[
-   {en:'The letter was sent yesterday.', zh:'這封信昨天被寄出了。'},
-   {en:'The building was destroyed by the earthquake.', zh:'這棟建築物被地震摧毀了。'},
-   {en:'She was invited to the party.', zh:'她被邀請參加派對。'}
- ]},
-{id:'g012', cat:'被動語態', level:'sh', title:'完成式被動',
- formula:'S + have/has/had + been + p.p.',
- note:'現在完成被動強調已完成且影響現在；過去完成被動強調過去某點前完成。',
- examples:[
-   {en:'The project has been completed.', zh:'這個專案已經被完成了。'},
-   {en:'The message had been sent before he arrived.', zh:'在他到達之前，訊息已被發送。'},
-   {en:'Many trees have been cut down in this area.', zh:'這個地區已有許多樹木被砍倒。'}
- ]},
-
-// ─── 比較級/最高級 ───────────────────────────────
-{id:'g020', cat:'比較級', level:'jh', title:'比較級',
- formula:'A + V + adj-er + than + B / A + V + more + adj + than + B',
- note:'短形容詞（一音節）加 -er；長形容詞（兩音節以上）前加 more。不規則：good→better、bad→worse、many→more。',
- examples:[
-   {en:'She is taller than her brother.', zh:'她比她哥哥高。'},
-   {en:'This exam is more difficult than the last one.', zh:'這次考試比上次更難。'},
-   {en:'He runs faster than anyone in the class.', zh:'他跑得比班上任何人都快。'}
- ]},
-{id:'g021', cat:'比較級', level:'jh', title:'最高級',
- formula:'the + adj-est / the most + adj',
- note:'最高級前必須加 the，表示在一群中最⋯⋯的。',
- examples:[
-   {en:'Mount Everest is the highest mountain in the world.', zh:'聖母峰是世界上最高的山。'},
-   {en:'She is the most talented student in our class.', zh:'她是我們班最有才華的學生。'},
-   {en:'This is the best meal I have ever had.', zh:'這是我吃過最好的一餐。'}
- ]},
-{id:'g022', cat:'比較級', level:'jh', title:'同級比較',
- formula:'as + adj/adv + as',
- note:'表示兩者程度相同。否定用 not as...as 或 not so...as。',
- examples:[
-   {en:'He is as tall as his father.', zh:'他和他父親一樣高。'},
-   {en:'This movie is not as boring as I thought.', zh:'這部電影沒有我想的那麼無聊。'},
-   {en:'Please speak as clearly as possible.', zh:'請盡可能說清楚。'}
- ]},
-
-// ─── 不定詞 vs 動名詞 ──────────────────────────
-{id:'g030', cat:'不定詞/動名詞', level:'jh', title:'不定詞 to V',
- formula:'to + 原形動詞',
- note:'表示目的、意圖或未來性動作。接不定詞的動詞：want、hope、plan、decide、need、agree、refuse、promise。',
- examples:[
-   {en:'She wants to become a doctor.', zh:'她想成為一名醫生。'},
-   {en:'He decided to quit his job.', zh:'他決定辭職。'},
-   {en:'I need to finish this report by tomorrow.', zh:'我需要在明天前完成這份報告。'}
- ]},
-{id:'g031', cat:'不定詞/動名詞', level:'jh', title:'動名詞 V-ing',
- formula:'V-ing（當名詞用）',
- note:'接動名詞的動詞：enjoy、finish、keep、mind、avoid、suggest、practice、consider。',
- examples:[
-   {en:'She enjoys reading novels.', zh:'她喜歡閱讀小說。'},
-   {en:'He finished writing the essay.', zh:'他寫完了這篇文章。'},
-   {en:'Would you mind closing the window?', zh:'你介意關上窗戶嗎？'}
- ]},
-{id:'g032', cat:'不定詞/動名詞', level:'sh', title:'不定詞 vs 動名詞（意義不同）',
- formula:'remember/forget/stop/try + to V 或 V-ing',
- note:'remember to V（記得去做）vs remember V-ing（記得曾做過）；stop to V（停下來去做）vs stop V-ing（停止做）。',
- examples:[
-   {en:'Remember to lock the door. / I remember locking the door.', zh:'記得鎖門。/ 我記得（曾）鎖了門。'},
-   {en:'He stopped to rest. / He stopped smoking.', zh:'他停下來休息。/ 他戒菸了。'},
-   {en:'Try to wake up early. / Try waking up early.', zh:'試著早點起床。/ 試試看早點起床（看看效果）。'}
- ]},
-
-// ─── 關係子句 ──────────────────────────────────
-{id:'g040', cat:'關係子句', level:'jh', title:'who / which / that',
- formula:'先行詞 + who/which/that + 子句',
- note:'who 指人；which 指物；that 指人或物（限定用法）。關係代名詞在子句中當主詞或受詞。',
- examples:[
-   {en:'The man who called you is my uncle.', zh:'打電話給你的那個男人是我叔叔。'},
-   {en:'This is the book which changed my life.', zh:'這就是改變我一生的那本書。'},
-   {en:'She is the student that won the prize.', zh:'她是贏得獎項的那位學生。'}
- ]},
-{id:'g041', cat:'關係子句', level:'jh', title:'whose / whom',
- formula:'先行詞 + whose + 名詞 / 先行詞 + whom + 子句',
- note:'whose 表所有關係；whom 是 who 的受格（較正式）。',
- examples:[
-   {en:'The girl whose bag was stolen called the police.', zh:'包包被偷的那個女孩報警了。'},
-   {en:'The teacher whom we respect retired last year.', zh:'我們尊敬的老師去年退休了。'},
-   {en:'This is the family whose dog I found.', zh:'這是我找到他們的狗的那戶人家。'}
- ]},
-{id:'g042', cat:'關係子句', level:'sh', title:'非限定關係子句',
- formula:'先行詞, which/who + 子句',
- note:'加逗號，為補充說明，不限定先行詞範圍。which 可代替整個前句。',
- examples:[
-   {en:'My sister, who lives in Tokyo, is a nurse.', zh:'我姐姐住在東京，她是一名護士。'},
-   {en:'He passed the exam, which surprised everyone.', zh:'他通過了考試，這讓所有人都很驚訝。'},
-   {en:'The report, which took weeks to finish, was rejected.', zh:'那份花了好幾週完成的報告被拒絕了。'}
- ]},
-
-// ─── 假設語氣 ──────────────────────────────────
-{id:'g050', cat:'假設語氣', level:'sh', title:'與現在事實相反',
- formula:'If S + V-ed/were..., S + would/could/might + V',
- note:'表示與現在事實相反的假設。be 動詞一律用 were（包括第一、三人稱單數）。',
- examples:[
-   {en:'If I were you, I would apologize.', zh:'如果我是你，我會道歉。'},
-   {en:'If she had more time, she could travel more.', zh:'如果她有更多時間，她可以多旅遊。'},
-   {en:'If it were not raining, we would go hiking.', zh:'如果沒有下雨，我們就去健行了。'}
- ]},
-{id:'g051', cat:'假設語氣', level:'sh', title:'與過去事實相反',
- formula:'If S + had + p.p., S + would/could/might + have + p.p.',
- note:'表示與過去事實相反的假設，對過去的後悔或遺憾。',
- examples:[
-   {en:'If I had studied harder, I would have passed.', zh:'如果我當時更努力讀書，我就會通過了。'},
-   {en:'If she had taken the job, she would have been rich.', zh:'如果她當時接受了那份工作，她就會有錢了。'},
-   {en:'He could have won if he had trained more.', zh:'如果他當時多訓練，他本可以贏的。'}
- ]},
-{id:'g052', cat:'假設語氣', level:'sh', title:'混合假設（時間不同）',
- formula:'If S + had + p.p. (過去), S + would + V (現在)',
- note:'條件子句指過去，主要子句指現在影響。',
- examples:[
-   {en:'If I had slept earlier, I would not be tired now.', zh:'如果我昨晚早點睡，我現在就不會這麼累了。'},
-   {en:'If she had taken the medicine, she would feel better now.', zh:'如果她吃了藥，她現在會感覺好一些。'},
-   {en:'If he had saved money, he could afford it now.', zh:'如果他當時存了錢，他現在就買得起了。'}
- ]},
-
-// ─── 分詞構句 ──────────────────────────────────
-{id:'g060', cat:'分詞構句', level:'sh', title:'現在分詞構句',
- formula:'V-ing..., S + V',
- note:'省略連接詞和主詞，主詞需與主要子句相同。表示同時發生或因果關係。',
- examples:[
-   {en:'Walking down the street, she met an old friend.', zh:'走在街上，她遇見了一位老朋友。'},
-   {en:'Feeling tired, he went to bed early.', zh:'感到疲倦，他早早就去睡了。'},
-   {en:'Not knowing the answer, she remained silent.', zh:'不知道答案，她保持沉默。'}
- ]},
-{id:'g061', cat:'分詞構句', level:'sh', title:'過去分詞構句',
- formula:'p.p...., S + V',
- note:'過去分詞構句帶有被動或完成的含義。',
- examples:[
-   {en:'Exhausted from the long journey, he fell asleep immediately.', zh:'長途旅行後精疲力竭，他立刻睡著了。'},
-   {en:'Written in 1851, the novel is still popular today.', zh:'這部小說寫於1851年，至今仍然廣受歡迎。'},
-   {en:'Seen from above, the city looks beautiful.', zh:'從上方俯瞰，這座城市看起來很美麗。'}
- ]},
-
-// ─── 倒裝句 ──────────────────────────────────
-{id:'g070', cat:'倒裝句', level:'sh', title:'否定副詞倒裝',
- formula:'否定副詞 + 助動詞 + S + V',
- note:'當 never、seldom、hardly、not only、no sooner 等置於句首時，主詞和助動詞需倒裝。',
- examples:[
-   {en:'Never have I seen such a beautiful sunset.', zh:'我從未見過如此美麗的日落。'},
-   {en:'Seldom does she complain about her work.', zh:'她很少抱怨她的工作。'},
-   {en:'Not only did he pass, but he also got the highest score.', zh:'他不只通過了，還得到了最高分。'}
- ]},
-{id:'g071', cat:'倒裝句', level:'sh', title:'only 倒裝',
- formula:'Only + 副詞子句/片語 + 助動詞 + S + V',
- note:'only 修飾副詞子句或片語置於句首時，主要子句需倒裝。',
- examples:[
-   {en:'Only then did I realize my mistake.', zh:'直到那時我才意識到我的錯誤。'},
-   {en:'Only by working hard can you succeed.', zh:'只有努力工作，你才能成功。'},
-   {en:'Only after she left did he say anything.', zh:'她離開之後，他才說了些話。'}
- ]},
-
-// ─── 強調句型 ──────────────────────────────────
-{id:'g080', cat:'強調句型', level:'sh', title:'It is...that 強調句',
- formula:'It is/was + 強調部分 + that/who + 其餘',
- note:'可強調主詞、受詞、副詞（時間/地點/原因）。強調人時可用 who。',
- examples:[
-   {en:'It was Tom who broke the window.', zh:'打破窗戶的人正是湯姆。'},
-   {en:'It is here that the accident happened.', zh:'事故就是在這裡發生的。'},
-   {en:'It was because of the rain that we stayed home.', zh:'正是因為下雨，我們才待在家裡。'}
- ]},
-
-// ─── 使役動詞 ──────────────────────────────────
-{id:'g090', cat:'使役動詞', level:'sh', title:'make / let / have',
- formula:'make/let/have + O + 原形V',
- note:'make（強迫）、let（允許）、have（使得）後面接原形動詞。被動時 make 改為 to V。',
- examples:[
-   {en:'She made him apologize to everyone.', zh:'她強迫他向每個人道歉。'},
-   {en:'He let his children stay up late on weekends.', zh:'他讓孩子們在週末晚點睡。'},
-   {en:'She had her car repaired at the garage.', zh:'她讓修車廠修理了她的車。'}
- ]},
-{id:'g091', cat:'使役動詞', level:'sh', title:'get',
- formula:'get + O + to V（主動）/ get + O + p.p.（被動）',
- note:'get 與 make/let/have 不同，主動接 to V，被動接過去分詞。',
- examples:[
-   {en:'I got him to help me move the furniture.', zh:'我讓他幫我搬家具。'},
-   {en:'She got her hair cut yesterday.', zh:'她昨天去剪了頭髮。'},
-   {en:'He got the report finished before the meeting.', zh:'他在會議前讓報告完成了。'}
- ]},
-
-// ─── 感官動詞 ──────────────────────────────────
-{id:'g100', cat:'感官動詞', level:'sh', title:'感官動詞用法',
- formula:'see/hear/watch/feel/notice + O + 原形V（完整動作）/ V-ing（進行中）',
- note:'強調完整動作用原形；強調動作進行中用 V-ing。被動時改為 to V。',
- examples:[
-   {en:'I saw him cross the road.', zh:'我看見他（完整地）過馬路。'},
-   {en:'She heard someone singing in the room.', zh:'她聽見有人在房間裡唱歌（進行中）。'},
-   {en:'He was seen to enter the building.', zh:'他被看見進入了那棟建築物。'}
- ]},
-
-// ─── 條件句 ──────────────────────────────────
-{id:'g110', cat:'條件句', level:'jh', title:'真實條件句（第一條件）',
- formula:'If S + V(現在), S + will + V',
- note:'表示現實可能發生的條件和結果。條件子句不用未來式。',
- examples:[
-   {en:'If it rains tomorrow, we will cancel the trip.', zh:'如果明天下雨，我們將取消旅行。'},
-   {en:'If you study hard, you will pass the exam.', zh:'如果你努力學習，你會通過考試。'},
-   {en:'If she calls, please let me know.', zh:'如果她打來電話，請告訴我。'}
- ]},
-
-// ─── 時態一致 ──────────────────────────────────
-{id:'g120', cat:'時態一致', level:'sh', title:'間接引語時態退後',
- formula:'直接引語 → 間接引語：現在→過去，will→would，can→could',
- note:'主要動詞為過去式時，that 子句的動詞需向過去退一步。科學事實、習慣等不需退後。',
- examples:[
-   {en:'"I am tired." → She said that she was tired.', zh:'「我很累。」→ 她說她很累。'},
-   {en:'"I will help you." → He promised that he would help me.', zh:'「我會幫你。」→ 他承諾說他會幫我。'},
-   {en:'"The earth is round." → She said the earth is round.（科學事實不退後）', zh:'「地球是圓的。」→ 她說地球是圓的（不退後）。'}
- ]},
-
-// ─── 片語動詞 ──────────────────────────────────
-{id:'p001', cat:'片語動詞', level:'ph', title:'look 系列',
- formula:'look up / look out / look into / look for / look after / look forward to',
- note:'常見 look 片語動詞整理。',
- examples:[
-   {en:'Look up the word in the dictionary.', zh:'在字典裡查這個單字。（look up 查詢）'},
-   {en:'Look out! There is a car coming.', zh:'小心！有車子來了。（look out 小心）'},
-   {en:'She looked after her sick mother.', zh:'她照顧生病的母親。（look after 照顧）'},
-   {en:'I am looking forward to seeing you.', zh:'我期待見到你。（look forward to 期待）'}
- ]},
-{id:'p002', cat:'片語動詞', level:'ph', title:'give 系列',
- formula:'give up / give in / give out / give away / give back',
- note:'常見 give 片語動詞整理。',
- examples:[
-   {en:'Never give up on your dreams.', zh:'永遠不要放棄你的夢想。（give up 放棄）'},
-   {en:'He finally gave in to their demands.', zh:'他最終屈服於他們的要求。（give in 屈服）'},
-   {en:'She gave away all her old clothes.', zh:'她把所有舊衣服都送給別人了。（give away 送出）'},
-   {en:'Please give back the book when you finish.', zh:'讀完後請把書還回來。（give back 歸還）'}
- ]},
-{id:'p003', cat:'片語動詞', level:'ph', title:'take 系列',
- formula:'take off / take over / take up / take in / take out / take care of',
- note:'常見 take 片語動詞整理。',
- examples:[
-   {en:'The plane takes off at 8 a.m.', zh:'飛機上午8點起飛。（take off 起飛/脫掉）'},
-   {en:'She took over the company after her father retired.', zh:'她父親退休後她接管了公司。（take over 接管）'},
-   {en:'He took up painting as a hobby.', zh:'他把繪畫當成了愛好。（take up 開始從事）'},
-   {en:'Please take care of yourself.', zh:'請多保重。（take care of 照顧）'}
- ]},
-{id:'p004', cat:'片語動詞', level:'ph', title:'put 系列',
- formula:'put on / put off / put up with / put away / put out / put forward',
- note:'常見 put 片語動詞整理。',
- examples:[
-   {en:'Put on your coat. It is cold outside.', zh:'穿上你的外套，外面很冷。（put on 穿上）'},
-   {en:'Do not put off until tomorrow what you can do today.', zh:'不要將今天能做的事拖到明天。（put off 拖延）'},
-   {en:'How can you put up with such noise?', zh:'你怎麼能忍受這麼大的噪音？（put up with 忍受）'},
-   {en:'She put away her books after studying.', zh:'讀完書後她把書收起來了。（put away 收好）'}
- ]},
-{id:'p005', cat:'片語動詞', level:'ph', title:'come 系列',
- formula:'come up with / come across / come down with / come out / come over',
- note:'常見 come 片語動詞整理。',
- examples:[
-   {en:'She came up with a brilliant idea.', zh:'她想出了一個絕妙的主意。（come up with 想出）'},
-   {en:'I came across an old friend at the market.', zh:'我在市場偶遇了一位老朋友。（come across 偶遇）'},
-   {en:'He came down with the flu last week.', zh:'他上週得了流感。（come down with 染上疾病）'},
-   {en:'Come over for dinner tonight.', zh:'今晚來我家吃晚飯。（come over 過來拜訪）'}
- ]},
-{id:'p006', cat:'片語動詞', level:'ph', title:'get 系列',
- formula:'get along with / get over / get rid of / get up / get through / get away with',
- note:'常見 get 片語動詞整理。',
- examples:[
-   {en:'She gets along well with her colleagues.', zh:'她和同事相處得很好。（get along with 相處）'},
-   {en:'It took him months to get over the breakup.', zh:'他花了好幾個月才從分手中走出來。（get over 克服/恢復）'},
-   {en:'We need to get rid of these old files.', zh:'我們需要清除這些舊文件。（get rid of 擺脫）'},
-   {en:'He got away with cheating on the test.', zh:'他作弊沒被抓到。（get away with 逃脫責任）'}
- ]},
-{id:'p007', cat:'片語動詞', level:'ph', title:'run 系列',
- formula:'run out of / run into / run over / run away / run for',
- note:'常見 run 片語動詞整理。',
- examples:[
-   {en:'We have run out of sugar.', zh:'我們的糖用完了。（run out of 用完）'},
-   {en:'I ran into my old teacher at the supermarket.', zh:'我在超市偶遇了我的老師。（run into 偶遇）'},
-   {en:'She is running for president.', zh:'她正在競選總統。（run for 競選）'}
- ]},
-{id:'p008', cat:'片語動詞', level:'ph', title:'turn 系列',
- formula:'turn on / turn off / turn up / turn down / turn out / turn into',
- note:'常見 turn 片語動詞整理。',
- examples:[
-   {en:'Turn on the lights, please.', zh:'請開燈。（turn on 開啟）'},
-   {en:'Turn off your phone during the movie.', zh:'看電影時請關手機。（turn off 關掉）'},
-   {en:'She turned down the job offer.', zh:'她拒絕了那份工作邀請。（turn down 拒絕）'},
-   {en:'Everything turned out well in the end.', zh:'最後一切都很順利。（turn out 結果是）'}
- ]},
-{id:'p009', cat:'片語動詞', level:'ph', title:'break 系列',
- formula:'break down / break up / break out / break in / break through',
- note:'常見 break 片語動詞整理。',
- examples:[
-   {en:'My car broke down on the highway.', zh:'我的車在高速公路上拋錨了。（break down 故障）'},
-   {en:'They broke up after three years together.', zh:'在一起三年後他們分手了。（break up 分手）'},
-   {en:'A fire broke out in the building.', zh:'大樓發生了火災。（break out 爆發）'}
- ]},
-
-// ─── 連接詞/副詞子句 ─────────────────────────────
-{id:'g130', cat:'連接詞', level:'jh', title:'對等連接詞',
- formula:'and / but / or / so / for / nor / yet',
- note:'連接兩個對等的字、片語或子句。記憶口訣：FANBOYS（for、and、nor、but、or、yet、so）。',
- examples:[
-   {en:'She is smart and hardworking.', zh:'她既聰明又勤奮。'},
-   {en:'He tried hard, but he failed.', zh:'他很努力，但是失敗了。'},
-   {en:'Hurry up, or you will be late.', zh:'快點，不然你會遲到。'}
- ]},
-{id:'g131', cat:'連接詞', level:'jh', title:'從屬連接詞（時間）',
- formula:'when / while / before / after / since / until / as soon as',
- note:'引導副詞子句，表示時間關係。時間子句不用未來式，用現在式代替。',
- examples:[
-   {en:'Call me as soon as you arrive.', zh:'你一到就打電話給我。'},
-   {en:'While she was cooking, he was watching TV.', zh:'她在做飯的時候，他在看電視。'},
-   {en:'I will wait here until you come back.', zh:'我會在這裡等，直到你回來。'}
- ]},
-{id:'g132', cat:'連接詞', level:'sh', title:'從屬連接詞（讓步/對比）',
- formula:'although / though / even though / even if / whereas / while',
- note:'表示讓步（雖然）或對比關係。although 和 but 不能同時使用。',
- examples:[
-   {en:'Although it was raining, she went for a run.', zh:'雖然在下雨，她還是去跑步了。'},
-   {en:'Even if I had the money, I would not buy it.', zh:'即使我有錢，我也不會買它。'},
-   {en:'She likes coffee, whereas her husband prefers tea.', zh:'她喜歡咖啡，而她丈夫則偏好茶。'}
- ]},
-
-// ─── so...that / such...that ────────────────────
-{id:'g140', cat:'特殊句型', level:'jh', title:'so...that / such...that',
- formula:'so + adj/adv + that / such + (a) + adj + N + that',
- note:'表示「如此⋯⋯以至於⋯⋯」的結果子句。',
- examples:[
-   {en:'She was so tired that she fell asleep immediately.', zh:'她累到立刻睡著了。'},
-   {en:'It was such a hot day that we stayed indoors.', zh:'那天天氣如此炎熱，我們就待在室內。'},
-   {en:'He spoke so quickly that no one could understand him.', zh:'他說話太快，沒有人能聽懂他。'}
- ]},
-{id:'g141', cat:'特殊句型', level:'sh', title:'no sooner...than / hardly...when',
- formula:'No sooner had S + p.p. than... / Hardly had S + p.p. when...',
- note:'表示「一⋯⋯就⋯⋯」，主要子句需倒裝。',
- examples:[
-   {en:'No sooner had she sat down than the phone rang.', zh:'她一坐下電話就響了。'},
-   {en:'Hardly had he arrived when it started to rain.', zh:'他一到就開始下雨了。'}
- ]},
-{id:'g142', cat:'特殊句型', level:'sh', title:'with + O + 分詞（獨立分詞構句）',
- formula:'with + O + V-ing / p.p.',
- note:'表示伴隨狀態，主動用 V-ing，被動用 p.p.。',
- examples:[
-   {en:'She sat there with her eyes closed.', zh:'她坐在那裡，眼睛閉著。'},
-   {en:'He walked into the room with music playing.', zh:'他走進房間，音樂正在播放。'},
-   {en:'With the work done, we could relax.', zh:'工作完成後，我們可以放鬆了。'}
- ]},
-];
-
-// ─── Grammar Render ─────────────────────────────
-let gramCat = '全部';
-let gramSearch = '';
-const GRAM_CATS = ['全部','時態','被動語態','比較級','不定詞/動名詞','關係子句','假設語氣','分詞構句','倒裝句','強調句型','使役動詞','感官動詞','條件句','時態一致','片語動詞','連接詞','特殊句型'];
-
-function renderGram(){
-  // Category pills
-  const catBar = document.getElementById('gram-cats');
-  catBar.innerHTML = GRAM_CATS.map(c=>`
-    <button class="gcat${c===gramCat?' on':''}" onclick="setGramCat('${c}')">${c}</button>
-  `).join('');
-  renderGramList();
-}
-
-function setGramCat(cat){
-  gramCat = cat;
-  document.querySelectorAll('.gcat').forEach(b=>b.classList.toggle('on', b.textContent===cat));
-  renderGramList();
-}
-
-function filterGram(q){
-  gramSearch = q.toLowerCase();
-  renderGramList();
-}
-
-function renderGramList(){
-  let items = GRAM_DB;
-  if(gramCat !== '全部') items = items.filter(g=>g.cat===gramCat);
-  if(gramSearch) items = items.filter(g=>
-    g.title.toLowerCase().includes(gramSearch) ||
-    g.note.toLowerCase().includes(gramSearch) ||
-    g.formula.toLowerCase().includes(gramSearch) ||
-    g.examples.some(e=>e.en.toLowerCase().includes(gramSearch)||e.zh.includes(gramSearch))
-  );
-
-  const el = document.getElementById('gram-list');
-  if(!items.length){
-    el.innerHTML='<div class="empty-state"><div style="font-size:40px">🔍</div><div>找不到符合的文法</div></div>';
-    return;
+function ansQ(btn, chosen, correct, word, ex, exzh) {
+  if (quizSt.ans) return;
+  quizSt.ans = true;
+  quizSt.curWord = word;
+  var q = quizSt.questions[quizSt.idx];
+  quizSt.curOpts = (q && q.allOpts) || [];
+  document.querySelectorAll(".opt").forEach(function(b) { b.disabled = true; });
+  var ok = chosen === correct;
+  if (ok) { btn.classList.add("ok"); quizSt.score++; }
+  else {
+    btn.classList.add("no");
+    document.querySelectorAll(".opt").forEach(function(b) { if (b.textContent.trim() === correct) b.classList.add("ok"); });
+    quizSt.wrong.push(word);
   }
-
-  el.innerHTML = items.map(g=>{
-    const badgeCls = g.level==='jh'?'badge-jh': g.level==='sh'?'badge-sh':'badge-ph';
-    const badgeTxt = g.level==='jh'?'國中': g.level==='sh'?'高中':'片語';
-    return `
-    <div class="gram-card">
-      <div class="gram-card-head" onclick="toggleGram('${g.id}')">
-        <span class="gram-badge ${badgeCls}">${badgeTxt}</span>
-        <div class="gram-title">${g.title}</div>
-        <span class="gram-arrow" id="arr-${g.id}">▼</span>
-      </div>
-      <div class="gram-body" id="body-${g.id}">
-        <div class="gram-formula">${g.formula}</div>
-        <div class="gram-note">${g.note}</div>
-        <div class="gram-exs">
-          ${g.examples.map((ex,i)=>`
-            <div class="gram-ex">
-              <div class="gram-ex-en">${ex.en}</div>
-              <div class="gram-ex-zh">${ex.zh}</div>
-              <button class="gram-speak" onclick="speak('${ex.en.replace(/'/g,"\'").split('→')[0].split('（')[0].trim()}')">🔊 朗讀例句</button>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  setSRS(word, ok);
+  speak(word);
+  var wObj = library.find(function(x) { return x.word === word; }) || {};
+  var srsLv = getSRS(wObj).level;
+  var lvlColor = ok ? "var(--green)" : "var(--red)";
+  var lvlTxt = (ok ? "✅ 熟悉度 +1" : "❌ 熟悉度 -2") + "（Lv." + srsLv + "）";
+  var optsHtml = '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:8px">所有選項</div>';
+  quizSt.curOpts.forEach(function(opt, i) {
+    var isCorrect = (q && q.type === "en2zh") ? opt.zh === correct : opt.word === correct;
+    var inLib = opt.inLib || library.some(function(l) { return l.word.toLowerCase() === opt.word.toLowerCase(); });
+    var border = isCorrect ? "var(--green)" : "var(--border2)";
+    var wc = isCorrect ? "var(--green)" : "var(--text)";
+    var newBadge = !inLib ? '<span style="font-size:10px;color:var(--blue);background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:10px;padding:1px 6px;margin-left:5px">新</span>' : "";
+    var addBtn = !inLib ? '<button onclick="quickAdd(' + i + ',this)" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;white-space:nowrap;flex-shrink:0">＋加入</button>' : "";
+    optsHtml += '<div style="background:var(--s2);border:1px solid ' + border + ';border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<div style="flex:1"><span style="font-family:serif;font-size:16px;color:' + wc + '">' + opt.word + '</span><span style="font-size:12px;color:var(--muted);margin-left:8px">' + opt.zh + "</span>" + newBadge + "</div>" + addBtn + "</div>";
+  });
+  var exHtml = ex ? '<div style="background:var(--s2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 12px;margin-top:8px"><div style="font-style:italic;color:var(--text);font-size:14px">' + ex + '</div><div style="font-size:12px;color:var(--muted);margin-top:4px">' + exzh + "</div></div>" : "";
+  var freqHtml = '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">' +
+    '<button onclick="setWordFreq(quizSt.curWord,\'boost\')" style="background:rgba(217,119,6,.15);border:1px solid var(--aborder);color:var(--al);border-radius:8px;padding:5px 10px;font-size:12px">🔥 加強複習</button>' +
+    '<button onclick="setWordFreq(quizSt.curWord,\'reduce\')" style="background:var(--s2);border:1px solid var(--border2);color:var(--muted2);border-radius:8px;padding:5px 10px;font-size:12px">😌 減少出現</button>' +
+    '<button onclick="setWordFreq(quizSt.curWord,\'skip\')" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--red);border-radius:8px;padding:5px 10px;font-size:12px">⏸️ 不再出題</button>' +
+    "</div>";
+  var fb = document.getElementById("qfb");
+  fb.style.display = "block";
+  fb.innerHTML = '<div class="expl-box"><div style="font-size:12px;color:' + lvlColor + ';margin-bottom:10px;font-weight:600">' + lvlTxt + "</div>" + optsHtml + exHtml + freqHtml + "</div>";
+  document.getElementById("qnxt").style.display = "block";
 }
 
-function toggleGram(id){
-  const body = document.getElementById('body-'+id);
-  const arr  = document.getElementById('arr-'+id);
-  const open = body.classList.toggle('open');
-  arr.classList.toggle('open', open);
+function quickAdd(idx, btn) {
+  var opt = quizSt.curOpts[idx]; if (!opt) return;
+  if (library.some(function(l) { return l.word.toLowerCase() === opt.word.toLowerCase(); })) { toast("已在單字庫中"); return; }
+  ensureToday();
+  library.push({word:opt.word, phonetic:"", pos:"", zh:opt.zh, en_def:"",
+    example_en:"", example_zh:"", roots:[], root_tip:"", family_words:[], memory_tip:"",
+    level:"", source:"測驗新增", addedAt:Date.now()});
+  stats.today++; save(); saveSt();
+  btn.textContent = "✅"; btn.style.background = "var(--green)"; btn.disabled = true;
+  toast("✅「" + opt.word + "」已加入！\n去新增頁可取得完整分析");
 }
 
+function nextQ() { quizSt.idx++; quizSt.ans = false; renderQ(); }
 
-// ══ Init ══
-// 等 Firebase 載入完成再啟動，若超過 3 秒則直接啟動（離線保護）
-function startApp(){
-  syncFromFb();
-  // 隱藏載入畫面
-  const ld = document.getElementById('fb-loading');
-  if(ld) ld.style.display='none';
+function renderScore() {
+  stats.quiz++; saveSt();
+  var total = quizSt.questions.length;
+  var pct = Math.round((quizSt.score / total) * 100);
+  var e = pct>=80 ? "🏆" : pct>=60 ? "💪" : "📚";
+  var m = pct>=80 ? "太棒了！繼續保持！" : pct>=60 ? "不錯！繼續加油！" : "答錯的單字會優先出現！";
+  var dueNow = library.filter(function(w) { return !getSRS(w).skip && getSRS(w).due <= Date.now(); }).length;
+  var dueToday = library.filter(function(w) { var s=getSRS(w); return !s.skip && s.due>Date.now() && s.due<=Date.now()+86400000; }).length;
+  document.getElementById("quiz-content").innerHTML =
+    '<div class="score-screen">' +
+      '<div style="font-size:64px">' + e + "</div>" +
+      '<div class="score-n">' + pct + "%</div>" +
+      '<div style="font-size:15px;color:var(--muted)">' + quizSt.score + " / " + total + " 答對</div>" +
+      (quizSt.wrong.length ? '<div style="font-size:13px;color:var(--red)">答錯：' + quizSt.wrong.join("、") + "</div>" : "") +
+      '<div style="font-size:17px;font-weight:700">' + m + "</div>" +
+      '<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px 20px;width:100%;text-align:left">' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase">複習排程</div>' +
+        '<div style="font-size:14px">🔴 現在待複習：<strong style="color:var(--al)">' + dueNow + "</strong> 個</div>" +
+        '<div style="font-size:14px;margin-top:4px">🟡 今日內到期：<strong style="color:var(--blue)">' + dueToday + "</strong> 個</div>" +
+        '<div style="font-size:14px;margin-top:4px">📚 可測驗單字：<strong>' + library.filter(function(w){return !getSRS(w).skip;}).length + "</strong> 個</div>" +
+      "</div>" +
+      '<button class="btn-retry" onclick="renderQuiz()">繼續測驗</button>' +
+    "</div>";
   renderHome();
 }
 
-if(window._fbReady){
+// ===== INIT =====
+function startApp() {
+  syncFromFb();
+  var ld = document.getElementById("fb-load");
+  if (ld) ld.style.display = "none";
+  setSyncUI(false);
+  renderHome();
+}
+
+if (window._fbReady) {
   startApp();
 } else {
   window._onFbReady = startApp;
-  setTimeout(()=>{ if(!window._fbReady){ console.warn('Firebase timeout, starting offline'); startApp(); }}, 3000);
+  setTimeout(function() { if (!window._fbReady) { console.warn("Firebase timeout"); startApp(); } }, 3000);
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
