@@ -1,70 +1,32 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="WordLens"/>
-<meta name="theme-color" content="#1a1a1a"/>
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_12.html -->
+<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WordLens">
+<meta name="theme-color" content="#1a1a1a">
 <title>WordLens</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-
+<link href="./index_files/css2" rel="stylesheet">
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const cfg = {
-  apiKey: "AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",
-  authDomain: "kumoen.firebaseapp.com",
-  projectId: "kumoen",
-  storageBucket: "kumoen.firebasestorage.app",
-  messagingSenderId: "407042193066",
-  appId: "1:407042193066:web:f48c1b9ce10019437c42d3"
-};
-const fbApp = initializeApp(cfg);
-const db = getFirestore(fbApp);
-const REF = doc(db, "users", "kumo");
-
-async function fbLoad() {
-  try {
-    const snap = await getDoc(REF);
-    if (snap.exists()) {
-      const d = snap.data();
-      // 重要修正：確保全域變數 LIB 被正確賦值
-      window.LIB = d.library || [];
-      window._st = d.stats || { quiz: 0, today: 0, date: "" };
-    } else {
-      window.LIB = [];
-      window._st = { quiz: 0, today: 0, date: "" };
-    }
-    window._lib = window.LIB; // 相容性
-  } catch (e) {
-    console.error("Firebase Load Error:", e);
-  }
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,doc,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",authDomain:"kumoen.firebaseapp.com",projectId:"kumoen",storageBucket:"kumoen.firebasestorage.app",messagingSenderId:"407042193066",appId:"1:407042193066:web:f48c1b9ce10019437c42d3"};
+const fbApp=initializeApp(cfg);
+const db=getFirestore(fbApp);
+const REF=doc(db,"users","kumo");
+async function fbLoad(){
+  try{
+    const snap=await getDoc(REF);
+    if(snap.exists()){const d=snap.data();window._lib=d.library||[];window._st=d.stats||{quiz:0,today:0,date:""};}
+  }catch(e){console.warn(e);}
 }
-
-async function fbSave() {
-  try {
-    await setDoc(REF, {
-      library: window.LIB || [],
-      stats: window._st || {}
-    }, { merge: true });
-  } catch (e) {
-    console.error("Firebase Save Error:", e);
-  }
+async function fbSave(){
+  try{await setDoc(REF,{library:window._lib||[],stats:window._st||{}},{merge:true});}catch(e){console.warn(e);}
 }
-
-window.fbSave = fbSave;
-
-// 頁面啟動流程
-fbLoad().then(() => {
-  window._fbReady = true;
-  console.log("Firebase Data Loaded. Library size:", window.LIB.length);
-  // 載入完成後執行初始化渲染
-  if (typeof renderHome === "function") renderHome();
-  if (window._onFbReady) window._onFbReady();
-});
+window.fbSave=fbSave;
+fbLoad().then(()=>{window._fbReady=true;if(window._onFbReady)window._onFbReady();});
 </script>
-
 <style>
 :root{--bg:#1a1a1a;--s1:#222;--s2:#2a2a2a;--border:#3a3a3a;--border2:#444;--accent:#d97706;--al:#f59e0b;--abg:rgba(217,119,6,.1);--aborder:rgba(217,119,6,.3);--green:#22c55e;--red:#ef4444;--blue:#60a5fa;--purple:#a78bfa;--text:#f5f0eb;--muted:#888;--muted2:#aaa;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -237,10 +199,10 @@ nav button.active{color:var(--al)}
 </style>
 </head>
 <body>
-<div id="fb-load">
+<div id="fb-load" style="display: none;">
   <div style="font-family:serif;font-size:36px;color:#f59e0b">Word<em>Lens</em></div>
   <div class="spin"></div>
-  <div style="font-size:13px;color:#888">Loading...</div>
+  <div style="font-size:13px;color:#888">載入中...</div>
 </div>
 <div id="app">
   <div class="view show" id="v-home">
@@ -249,37 +211,37 @@ nav button.active{color:var(--al)}
         <div class="app-name">Word<em>Lens</em></div>
         <div class="sync-row"><span class="sdot" id="sdot"></span><span class="stxt" id="stxt">Loading</span></div>
       </div>
-      <div class="app-sub">Photo · AI Etymology · Cloud Sync · SRS Quiz</div>
+      <div class="app-sub">拍照・AI字根字首・雲端同步・SRS測驗</div>
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stat-n" id="h-total">0</div><div class="stat-l">Words</div></div>
-      <div class="stat"><div class="stat-n" id="h-today">0</div><div class="stat-l">Today</div></div>
-      <div class="stat"><div class="stat-n" id="h-quiz">0</div><div class="stat-l">Quizzes</div></div>
+      <div class="stat"><div class="stat-n" id="h-total">0</div><div class="stat-l">我的單字</div></div>
+      <div class="stat"><div class="stat-n" id="h-today">0</div><div class="stat-l">今日新增</div></div>
+      <div class="stat"><div class="stat-n" id="h-quiz">0</div><div class="stat-l">測驗次數</div></div>
     </div>
-    <div class="sec-h">Recent</div>
+    <div class="sec-h">最近新增</div>
     <div class="rec-list" id="rec-list"></div>
   </div>
   <div class="view" id="v-add"><div class="add-wrap" id="add-wrap"></div></div>
   <div class="view" id="v-lib">
-    <div class="lib-tb"><input class="search" id="lib-search" placeholder="Search..." oninput="filterLib(this.value)"/></div>
+    <div class="lib-tb"><input class="search" id="lib-search" placeholder="🔍 搜尋單字..." oninput="filterLib(this.value)"></div>
     <div class="lib-count" id="lib-count"></div>
     <div class="lib-list" id="lib-list"></div>
   </div>
   <div class="view" id="v-gram">
     <div class="gram-wrap">
-      <div class="gram-tb"><input class="gram-search" id="gram-search" placeholder="Search grammar..." oninput="filterGram(this.value)"/></div>
+      <div class="gram-tb"><input class="gram-search" id="gram-search" placeholder="🔍 搜尋文法..." oninput="filterGram(this.value)"></div>
       <div class="gram-cats" id="gram-cats"></div>
       <div class="gram-list" id="gram-list"></div>
     </div>
   </div>
   <div class="view" id="v-quiz"><div class="quiz-wrap" id="qc"></div></div>
   <nav>
-    <button class="active" id="nb-home" onclick="goTab('home')"><span class="ni">&#127968;</span>Home</button>
-    <button id="nb-add" onclick="goTab('add')"><span class="ni">&#128247;</span>Add</button>
-    <button id="nb-lib" onclick="goTab('lib')"><span class="ni">&#128218;</span>Words</button>
-    <button id="nb-gram" onclick="goTab('gram')"><span class="ni">&#128214;</span>Grammar</button>
-    <button id="nb-quiz" onclick="goTab('quiz')"><span class="ni">&#9999;&#65039;</span>Quiz</button>
+    <button class="active" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
+    <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
+    <button id="nb-lib" onclick="goTab(&#39;lib&#39;)"><span class="ni">📚</span>單字庫</button>
+    <button id="nb-gram" onclick="goTab(&#39;gram&#39;)"><span class="ni">📖</span>文法</button>
+    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)"><span class="ni">✏️</span>測驗</button>
   </nav>
 </div>
 <div class="modal-bg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
@@ -287,8 +249,6 @@ nav button.active{color:var(--al)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-var LIB = window.LIB || [];
-
 // ===== GRAMMAR DB =====
 var GDB=[
 {id:"g001",cat:"Tense",lv:"jh",title:"Simple Present",formula:"S + V(s/es) / S + am/is/are",note:"Habits, facts, routines. Add s/es for 3rd person singular.",
@@ -345,7 +305,7 @@ ex:[{en:"Only then did I realize my mistake.",zh:""},{en:"Only by working hard c
 ex:[{en:"It was Tom who broke the window.",zh:""},{en:"It is here that the accident happened.",zh:""}]},
 {id:"g090",cat:"Causative",lv:"sh",title:"make / let / have",formula:"make/let/have + O + base verb",note:"make (force), let (allow), have (arrange for).",
 ex:[{en:"She made him apologize to everyone.",zh:""},{en:"He let his children stay up late.",zh:""},{en:"She had her car repaired.",zh:""}]},
-{id:"g091",cat:"Causative",lv:"sh",title:"get",formula:"get + O + to V / get + O + p.p.",note:"Active: to V. Passive: past participle.",
+{id:"g091",cat:"Causative",lv:"sh",title:"get",formula:"get + O + to V / get + O + p.p.",note:"可測驗單字：to V. Passive: past participle.",
 ex:[{en:"I got him to help me move the furniture.",zh:""},{en:"She got her hair cut yesterday.",zh:""}]},
 {id:"g100",cat:"Sensory",lv:"sh",title:"Sensory Verb Pattern",formula:"see/hear/watch/feel + O + base V or V-ing",note:"Base verb: complete action. V-ing: in progress. Passive: to V.",
 ex:[{en:"I saw him cross the road.",zh:""},{en:"She heard someone singing in the room.",zh:""}]},
@@ -354,7 +314,7 @@ ex:[{en:"If it rains tomorrow, we will cancel the trip.",zh:""},{en:"If you stud
 {id:"g120",cat:"Tense Seq",lv:"sh",title:"Reported Speech Backshift",formula:"present -> past; will -> would; can -> could",note:"When main verb is past, that-clause verbs backshift. Scientific facts do not.",
 ex:[{en:"I am tired. -> She said that she was tired.",zh:""},{en:"I will help. -> He promised that he would help.",zh:""}]},
 {id:"p001",cat:"Phrasal",lv:"ph",title:"look: up/out/for/after/forward to",formula:"look up / look out / look for / look after / look forward to",note:"Common phrasal verbs with look.",
-ex:[{en:"Look up the word in the dictionary. (search)",zh:""},{en:"Look out! (be careful)",zh:""},{en:"She looked after her sick mother. (care for)",zh:""},{en:"I am looking forward to seeing you. (anticipate)",zh:""}]},
+ex:[{en:"Look up the word in the dictionary. (search)",zh:""},{en:"Look out! (be careful)",zh:""},{en:"She looked after her sick mother. (照顧)",zh:""},{en:"I am looking forward to seeing you. (anticipate)",zh:""}]},
 {id:"p002",cat:"Phrasal",lv:"ph",title:"give: up/in/away/back",formula:"give up / give in / give away / give back",note:"Common phrasal verbs with give.",
 ex:[{en:"Never give up on your dreams. (quit)",zh:""},{en:"He finally gave in to their demands. (yield)",zh:""},{en:"She gave away all her old clothes. (donate)",zh:""}]},
 {id:"p003",cat:"Phrasal",lv:"ph",title:"take: off/over/up/care of",formula:"take off / take over / take up / take care of",note:"Common phrasal verbs with take.",
@@ -371,7 +331,7 @@ ex:[{en:"We have run out of sugar. (deplete)",zh:""},{en:"I ran into my old teac
 ex:[{en:"Turn on the lights. (switch on)",zh:""},{en:"She turned down the job offer. (reject)",zh:""},{en:"Everything turned out well. (result)",zh:""}]},
 {id:"p009",cat:"Phrasal",lv:"ph",title:"break: down/up/out",formula:"break down / break up / break out",note:"Common phrasal verbs with break.",
 ex:[{en:"My car broke down on the highway. (malfunction)",zh:""},{en:"They broke up after three years. (end relationship)",zh:""},{en:"A fire broke out in the building. (start suddenly)",zh:""}]},
-{id:"g130",cat:"Conjunction",lv:"jh",title:"Coordinating (FANBOYS)",formula:"for / and / nor / but / or / yet / so",note:"Connect equal words, phrases, or clauses.",
+{id:"g130",cat:"Conjunction",lv:"jh",title:"Coordinating (FANBOYS)",formula:"for / and / nor / but / or / yet / so",note:"Connect equal 個單字, phrases, or clauses.",
 ex:[{en:"She is smart and hardworking.",zh:""},{en:"He tried hard, but he failed.",zh:""},{en:"Hurry up, or you will be late.",zh:""}]},
 {id:"g131",cat:"Conjunction",lv:"jh",title:"Subordinating (Time)",formula:"when / while / before / after / since / until / as soon as",note:"Introduce adverbial clauses. No future tense in time clauses.",
 ex:[{en:"Call me as soon as you arrive.",zh:""},{en:"While she was cooking, he was watching TV.",zh:""}]},
@@ -381,7 +341,7 @@ ex:[{en:"Although it was raining, she went for a run.",zh:""},{en:"Even if I had
 ex:[{en:"She was so tired that she fell asleep immediately.",zh:""},{en:"It was such a hot day that we stayed indoors.",zh:""}]},
 {id:"g141",cat:"Special",lv:"sh",title:"no sooner...than",formula:"No sooner had S + p.p. than... / Hardly had S + p.p. when...",note:"As soon as. Main clause inverts.",
 ex:[{en:"No sooner had she sat down than the phone rang.",zh:""}]},
-{id:"g142",cat:"Special",lv:"sh",title:"with + O + Participle",formula:"with + O + V-ing / p.p.",note:"Accompanying state. Active: V-ing. Passive: p.p.",
+{id:"g142",cat:"Special",lv:"sh",title:"with + O + Participle",formula:"with + O + V-ing / p.p.",note:"Accompanying state. 可測驗單字：V-ing. Passive: p.p.",
 ex:[{en:"She sat there with her eyes closed.",zh:""},{en:"He walked into the room with music playing.",zh:""}]}
 ];
 
@@ -405,12 +365,12 @@ function renderGList(){
   if(gCat!=="All")items=items.filter(function(g){return g.cat===gCat;});
   if(gQ)items=items.filter(function(g){return g.title.toLowerCase().includes(gQ)||g.note.toLowerCase().includes(gQ)||g.formula.toLowerCase().includes(gQ)||g.ex.some(function(e){return e.en.toLowerCase().includes(gQ);});});
   var el=document.getElementById("gram-list");el.innerHTML="";
-  if(!items.length){var emp=document.createElement("div");emp.className="empty";emp.textContent="No matches";el.appendChild(emp);return;}
+  if(!items.length){var emp=document.createElement("div");emp.className="empty";emp.textContent="找不到符合的單字";el.appendChild(emp);return;}
   items.forEach(function(g){
     var card=document.createElement("div");card.className="gc";
     var head=document.createElement("div");head.className="gc-head";
     var bc=g.lv==="jh"?"bjh":g.lv==="sh"?"bsh":"bph";
-    var bt=g.lv==="jh"?"JH":g.lv==="sh"?"SH":"PV";
+    var bt=g.lv==="jh"?"國中":g.lv==="sh"?"高中":"片語";
     var badge=document.createElement("span");badge.className="gc-badge "+bc;badge.textContent=bt;
     var title=document.createElement("div");title.className="gc-title";title.textContent=g.title;
     var arr=document.createElement("span");arr.className="gc-arr";arr.id="ga-"+g.id;arr.textContent="▼";
@@ -471,9 +431,9 @@ function setSRS(word,ok){
 function setFreq(word,action){
   var w=LIB.find(function(x){return x.word===word;});if(!w)return;
   if(!w.srs)w.srs={level:0,due:0,skip:false};
-  if(action==="boost"){w.srs.level=0;w.srs.due=0;w.srs.skip=false;toast("Boosted: "+word);}
-  else if(action==="reduce"){w.srs.level=6;w.srs.due=Date.now()+604800000;w.srs.skip=false;toast("Reduced: "+word);}
-  else{w.srs.skip=true;toast("Paused: "+word);}
+  if(action==="boost"){w.srs.level=0;w.srs.due=0;w.srs.skip=false;toast("🔥 已加強複習："+word);}
+  else if(action==="reduce"){w.srs.level=6;w.srs.due=Date.now()+604800000;w.srs.skip=false;toast("😌 已設為減少出現："+word);}
+  else{w.srs.skip=true;toast("⏸️ 已停用："+word);}
   saveData();
 }
 function getPool(){
@@ -501,17 +461,17 @@ function makeQ(w){
   if(type==="en2zh"){
     var lw=lp.filter(function(x){return x.zh!==w.zh;}).slice(0,2).map(function(x){return{word:x.word,zh:x.zh,inLib:true};});
     var ao=buildOpts({word:w.word,zh:w.zh,inLib:true},lw);
-    return{type:type,word:w.word,prompt:w.word,sub:w.phonetic||"",q:"What does this word mean?",correct:w.zh,ao:ao,opts:ao.map(function(o){return o.zh;}),ex:w.example_en||"",exzh:w.example_zh||""};
+    return{type:type,word:w.word,prompt:w.word,sub:w.phonetic||"",q:"這個單字的中文意思是？",correct:w.zh,ao:ao,opts:ao.map(function(o){return o.zh;}),ex:w.example_en||"",exzh:w.example_zh||""};
   }
   if(type==="zh2en"){
     var lw2=lp.slice(0,2).map(function(x){return{word:x.word,zh:x.zh,inLib:true};});
     var ao2=buildOpts({word:w.word,zh:w.zh,inLib:true},lw2);
-    return{type:type,word:w.word,prompt:w.zh,sub:w.en_def||"",q:"Which English word matches?",correct:w.word,ao:ao2,opts:ao2.map(function(o){return o.word;}),ex:w.example_en||"",exzh:w.example_zh||""};
+    return{type:type,word:w.word,prompt:w.zh,sub:w.en_def||"",q:"哪個英文單字符合這個意思？",correct:w.word,ao:ao2,opts:ao2.map(function(o){return o.word;}),ex:w.example_en||"",exzh:w.example_zh||""};
   }
   var blank=(w.example_en||"").replace(new RegExp(w.word,"gi"),"_____");
   var lw3=lp.slice(0,2).map(function(x){return{word:x.word,zh:x.zh,inLib:true};});
   var ao3=buildOpts({word:w.word,zh:w.zh,inLib:true},lw3);
-  return{type:type,word:w.word,prompt:blank,sub:w.example_zh||"",q:"Fill in the blank:",correct:w.word,ao:ao3,opts:ao3.map(function(o){return o.word;}),ex:w.example_en||"",exzh:w.example_zh||""};
+  return{type:type,word:w.word,prompt:blank,sub:w.example_zh||"",q:"填入正確的單字：",correct:w.word,ao:ao3,opts:ao3.map(function(o){return o.word;}),ex:w.example_en||"",exzh:w.example_zh||""};
 }
 
 function renderQuiz(){
@@ -519,8 +479,8 @@ function renderQuiz(){
   var pool=getPool();
   if(pool.length<4){
     var emp=document.createElement("div");emp.className="empty";
-    emp.innerHTML="<div style='font-size:48px'>📚</div><div style='font-size:18px;font-weight:700'>Not enough words</div><div style='font-size:14px'>Need 4+. Have "+LIB.length+".</div>";
-    var ab=document.createElement("button");ab.className="btn-p";ab.textContent="Add Words";ab.style.marginTop="12px";ab.onclick=function(){goTab("add");};
+    emp.innerHTML="<div style='font-size:48px'>📚</div><div style='font-size:18px;font-weight:700'>Not enough 個單字</div><div style='font-size:14px'>至少需要 4 個。目前有 "+LIB.length+".</div>";
+    var ab=document.createElement("button");ab.className="btn-p";ab.textContent="新增單字";ab.style.marginTop="12px";ab.onclick=function(){goTab("add");};
     emp.appendChild(ab);qc.appendChild(emp);return;
   }
   QST.qs=pool.map(function(w){return makeQ(w);}).filter(Boolean);
@@ -532,7 +492,7 @@ function renderQ(){
   var q=QST.qs[QST.idx];if(!q){renderScore();return;}
   var pct=(QST.idx/QST.qs.length)*100;
   var tc=q.type==="en2zh"?"var(--al)":q.type==="zh2en"?"var(--blue)":"var(--purple)";
-  var tl=q.type==="en2zh"?"EN -> Meaning":q.type==="zh2en"?"Meaning -> EN":"Fill Blank";
+  var tl=q.type==="en2zh"?"英文→中文":q.type==="zh2en"?"中文→英文":"例句填空";
   var fs=q.type==="example"?"17px":"34px";
 
   var prog=document.createElement("div");prog.className="qprog";
@@ -558,7 +518,7 @@ function renderQ(){
 
   var fb=document.createElement("div");fb.id="qfb";fb.style.display="none";
   var nxt=document.createElement("div");nxt.id="qnxt";nxt.style.display="none";
-  var nb=document.createElement("button");nb.className="btn-nq";nb.textContent=QST.idx+1<QST.qs.length?"Next ->":"See Results";nb.onclick=function(){QST.idx++;QST.ans=false;renderQ();};
+  var nb=document.createElement("button");nb.className="btn-nq";nb.textContent=QST.idx+1<QST.qs.length?"下一題 →":"查看結果 🎯";nb.onclick=function(){QST.idx++;QST.ans=false;renderQ();};
   nxt.appendChild(nb);
 
   qc.appendChild(prog);qc.appendChild(info);qc.appendChild(card);qc.appendChild(opts);qc.appendChild(fb);qc.appendChild(nxt);
@@ -574,14 +534,14 @@ function ansQ(btn,chosen,q){
   var wObj=LIB.find(function(x){return x.word===q.word;})||{};
   var lv=getSRS(wObj).level;
   var lc=ok?"var(--green)":"var(--red)";
-  var lt=(ok?"Correct +1":"Wrong -2")+" (Lv."+lv+")";
+  var lt=(ok?"✅ 熟悉度 +1":"❌ 熟悉度 -2")+" (Lv."+lv+")";
 
   var fb=document.getElementById("qfb");fb.style.display="block";
   var expl=document.createElement("div");expl.className="expl";
 
   var lvDiv=document.createElement("div");lvDiv.style.cssText="font-size:12px;font-weight:600;margin-bottom:10px;color:"+lc;lvDiv.textContent=lt;expl.appendChild(lvDiv);
 
-  var allLabel=document.createElement("div");allLabel.style.cssText="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:8px";allLabel.textContent="All Options";expl.appendChild(allLabel);
+  var allLabel=document.createElement("div");allLabel.style.cssText="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:8px";allLabel.textContent="所有選項";expl.appendChild(allLabel);
 
   QST.opts.forEach(function(opt,i){
     var ic=(q.type==="en2zh")?opt.zh===q.correct:opt.word===q.correct;
@@ -591,10 +551,10 @@ function ansQ(btn,chosen,q){
     var wspan=document.createElement("span");wspan.style.cssText="font-family:serif;font-size:16px;color:"+(ic?"var(--green)":"var(--text)");wspan.textContent=opt.word;
     var zspan=document.createElement("span");zspan.style.cssText="font-size:12px;color:var(--muted);margin-left:8px";zspan.textContent=opt.zh;
     info.appendChild(wspan);info.appendChild(zspan);
-    if(!inLib){var nb=document.createElement("span");nb.style.cssText="font-size:10px;color:var(--blue);background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:10px;padding:1px 6px;margin-left:5px";nb.textContent="New";info.appendChild(nb);}
+    if(!inLib){var nb=document.createElement("span");nb.style.cssText="font-size:10px;color:var(--blue);background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:10px;padding:1px 6px;margin-left:5px";nb.textContent="新";info.appendChild(nb);}
     row.appendChild(info);
     if(!inLib){
-      var ab=document.createElement("button");ab.style.cssText="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;white-space:nowrap;flex-shrink:0;cursor:pointer";ab.textContent="+ Add";
+      var ab=document.createElement("button");ab.style.cssText="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;white-space:nowrap;flex-shrink:0;cursor:pointer";ab.textContent="＋加入";
       (function(idx,b){b.onclick=function(){quickAdd(idx,b);};})(i,ab);
       row.appendChild(ab);
     }
@@ -604,7 +564,7 @@ function ansQ(btn,chosen,q){
   if(q.ex){var exb=document.createElement("div");exb.style.cssText="background:var(--s2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 12px;margin-top:8px";var exen=document.createElement("div");exen.style.cssText="font-style:italic;font-size:14px";exen.textContent=q.ex;var exzh=document.createElement("div");exzh.style.cssText="font-size:12px;color:var(--muted);margin-top:4px";exzh.textContent=q.exzh;exb.appendChild(exen);exb.appendChild(exzh);expl.appendChild(exb);}
 
   var freqRow=document.createElement("div");freqRow.style.cssText="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap";
-  var freqBtns=[["Boost","boost","rgba(217,119,6,.15)","var(--al)"],["Reduce","reduce","var(--s2)","var(--muted2)"],["Pause","skip","rgba(239,68,68,.08)","var(--red)"]];
+  var freqBtns=[["🔥 加強複習","boost","rgba(217,119,6,.15)","var(--al)"],["😌 減少出現","reduce","var(--s2)","var(--muted2)"],["⏸️ 不再出題","skip","rgba(239,68,68,.08)","var(--red)"]];
   freqBtns.forEach(function(f){
     var fb2=document.createElement("button");fb2.style.cssText="background:"+f[2]+";border:1px solid var(--border2);color:"+f[3]+";border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer";
     fb2.textContent=f[0];
@@ -619,19 +579,19 @@ function ansQ(btn,chosen,q){
 
 function quickAdd(idx,btn){
   var opt=QST.opts[idx];if(!opt)return;
-  if(LIB.some(function(l){return l.word.toLowerCase()===opt.word.toLowerCase();})){toast("Already in library");return;}
+  if(LIB.some(function(l){return l.word.toLowerCase()===opt.word.toLowerCase();})){toast("已在單字庫中");return;}
   checkDay();
   LIB.push({word:opt.word,phonetic:"",pos:"",zh:opt.zh,en_def:"",example_en:"",example_zh:"",roots:[],root_tip:"",family_words:[],memory_tip:"",level:"",source:"quiz",addedAt:Date.now()});
   ST.today++;saveData();saveSt();
-  btn.textContent="Done!";btn.style.background="var(--green)";btn.disabled=true;
-  toast("Added: "+opt.word+"\nGo to Add tab for full analysis");
+  btn.textContent="✅";btn.style.background="var(--green)";btn.disabled=true;
+  toast("已加入："+opt.word+"\nGo to Add tab for full analysis");
 }
 
 function renderScore(){
   ST.quiz++;saveSt();
   var total=QST.qs.length;var pct=Math.round((QST.score/total)*100);
   var emoji=pct>=80?"🏆":pct>=60?"💪":"📚";
-  var msg=pct>=80?"Excellent!":pct>=60?"Good job!":"Keep practising!";
+  var msg=pct>=80?"太棒了！繼續保持！":pct>=60?"不錯！繼續加油！":"答錯的單字會優先出現！";
   var dn=LIB.filter(function(w){return!getSRS(w).skip&&getSRS(w).due<=Date.now();}).length;
   var dt=LIB.filter(function(w){var s=getSRS(w);return!s.skip&&s.due>Date.now()&&s.due<=Date.now()+86400000;}).length;
   var qc=document.getElementById("qc");qc.innerHTML="";
@@ -641,15 +601,15 @@ function renderScore(){
   var ss=document.createElement("div");ss.style.cssText="font-size:15px;color:var(--muted)";ss.textContent=QST.score+" / "+total+" correct";
   var sm=document.createElement("div");sm.style.cssText="font-size:17px;font-weight:700";sm.textContent=msg;
   sc.appendChild(em);sc.appendChild(sn);sc.appendChild(ss);
-  if(QST.wrong.length){var wr=document.createElement("div");wr.style.cssText="font-size:13px;color:var(--red)";wr.textContent="Wrong: "+QST.wrong.join(", ");sc.appendChild(wr);}
+  if(QST.wrong.length){var wr=document.createElement("div");wr.style.cssText="font-size:13px;color:var(--red)";wr.textContent="答錯："+QST.wrong.join(", ");sc.appendChild(wr);}
   sc.appendChild(sm);
   var sbox=document.createElement("div");sbox.className="sched-box";
-  var slbl=document.createElement("div");slbl.style.cssText="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase";slbl.textContent="Review Schedule";
-  var s1=document.createElement("div");s1.style.fontSize="14px";s1.textContent="🔴 Due now: "+dn;
-  var s2=document.createElement("div");s2.style.cssText="font-size:14px;margin-top:4px";s2.textContent="🟡 Due today: "+dt;
-  var s3=document.createElement("div");s3.style.cssText="font-size:14px;margin-top:4px";s3.textContent="📚 Active: "+LIB.filter(function(w){return!getSRS(w).skip;}).length;
+  var slbl=document.createElement("div");slbl.style.cssText="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase";slbl.textContent="複習排程";
+  var s1=document.createElement("div");s1.style.fontSize="14px";s1.textContent="🔴 現在待複習："+dn;
+  var s2=document.createElement("div");s2.style.cssText="font-size:14px;margin-top:4px";s2.textContent="🟡 今日內到期："+dt;
+  var s3=document.createElement("div");s3.style.cssText="font-size:14px;margin-top:4px";s3.textContent="📚 可測驗單字："+LIB.filter(function(w){return!getSRS(w).skip;}).length;
   sbox.appendChild(slbl);sbox.appendChild(s1);sbox.appendChild(s2);sbox.appendChild(s3);
-  var rb=document.createElement("button");rb.className="btn-retry";rb.textContent="Continue Quiz";rb.onclick=renderQuiz;
+  var rb=document.createElement("button");rb.className="btn-retry";rb.textContent="繼續測驗";rb.onclick=renderQuiz;
   sc.appendChild(sbox);sc.appendChild(rb);
   qc.appendChild(sc);renderHome();
 }
@@ -664,5 +624,6 @@ function startApp(){
 if(window._fbReady){startApp();}
 else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},3000);}
 </script>
-</body>
-</html>
+
+
+</body></html>
