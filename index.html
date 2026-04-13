@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_43.html -->
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_44.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -205,7 +205,7 @@ nav button.on{color:var(--al)}
     <div class="stats">
       <div class="stat"><div class="stn" id="ht">113</div><div class="stl">我的單字</div></div>
       <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">22</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="hq">23</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
     <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">wealth</div><div class="riz">財富</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">suppose</div><div class="riz">假設</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">environment</div><div class="riz">環境</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">constant</div><div class="riz">持續的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">neighborhood</div><div class="riz">鄰近地區</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">practical</div><div class="riz">實際的</div></div><span class="rib">手動</span></div></div>
@@ -487,12 +487,38 @@ function doWord(){
   var inp=document.getElementById("wi").value.trim();if(!inp)return;
   var ws=inp.split(/[,，、]+/).map(function(w){return w.trim();}).filter(Boolean);
   var btn=document.getElementById("biw");btn.disabled=true;btn.textContent="⏳ 分析中...";
-  setLoad("分析 "+ws.length+" 個單字...");
-  var p=ws.length===1?wprompt(ws[0]):pprompt(ws.join(", "));
-  callAI([{role:"system",content:SYS},{role:"user",content:p}])
-    .then(function(raw){showRes(parseAI(raw),"手動");})
-    .catch(function(e){var ra=document.getElementById("ra");ra.innerHTML="";ra.appendChild(mk("div","apil","❌ "+e.message));})
-    .finally(function(){btn.disabled=false;btn.textContent="🤖 AI 分析單字";});
+
+  // Batch: split into chunks of 15 to avoid token limit
+  var CHUNK=15;
+  var chunks=[];
+  for(var i=0;i<ws.length;i+=CHUNK)chunks.push(ws.slice(i,i+CHUNK));
+
+  var allWords=[];
+  var total=ws.length;
+  setLoad("分析 "+total+" 個單字（共 "+chunks.length+" 批）...");
+
+  function processChunk(idx){
+    if(idx>=chunks.length){
+      showRes(allWords,"手動");
+      btn.disabled=false;btn.textContent="🤖 AI 分析單字";
+      return;
+    }
+    var chunk=chunks[idx];
+    var p=chunk.length===1?wprompt(chunk[0]):bprompt(chunk);
+    setLoad("第 "+(idx+1)+" / "+chunks.length+" 批（"+chunk.join("、")+"）...");
+    callAI([{role:"system",content:SYS},{role:"user",content:p}])
+      .then(function(raw){
+        var ws2=parseAI(raw);
+        allWords=allWords.concat(ws2);
+        processChunk(idx+1);
+      })
+      .catch(function(e){
+        var ra=document.getElementById("ra");ra.innerHTML="";
+        ra.appendChild(mk("div","apil","❌ 第"+(idx+1)+"批失敗："+e.message));
+        btn.disabled=false;btn.textContent="🤖 AI 分析單字";
+      });
+  }
+  processChunk(0);
 }
 
 function doPass(){
@@ -871,6 +897,7 @@ function renderQ(){
   var opts=mk("div","opts");
   q.opts.forEach(function(o){
     var ob=mk("button","opt");ob.textContent=o;
+    ob.id="opt-"+o.replace(/[^a-zA-Z0-9]/g,"_");
     ob.onclick=function(){ansQ(ob,o,q);};
     opts.appendChild(ob);
   });
@@ -895,6 +922,21 @@ function ansQ(btn,chosen,q){
     QST.wrong.push(q.word);
   }
   setSRS(q.word,ok);speak(q.word);
+  // Reveal meaning under each option button
+  document.querySelectorAll(".opt").forEach(function(b){
+    var optTxt=b.textContent.trim();
+    var sub=mk("div","");sub.style.cssText="font-size:11px;color:var(--m2);margin-top:3px;line-height:1.4";
+    if(q.type==="en2zh"||q.type==="phonetic"){
+      // opts are zh meanings - find the word that has this zh
+      var match=LIB.find(function(x){return x.zh===optTxt;});
+      if(match)sub.textContent=match.word+(match.en_def?" - "+match.en_def:"");
+    } else {
+      // opts are English words - show zh meaning
+      var match2=LIB.find(function(x){return x.word===optTxt;});
+      if(match2)sub.textContent=match2.zh+(match2.en_def?" · "+match2.en_def:"");
+    }
+    if(sub.textContent)b.appendChild(sub);
+  });
   var wObj=LIB.find(function(x){return x.word===q.word;})||{};
   var lv=getSRS(wObj).level;
   var fb=document.getElementById("qfb");fb.innerHTML="";fb.style.display="block";
