@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_1.html -->
-<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="WordLens">
-<meta name="theme-color" content="#1a1a1a">
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="WordLens"/>
+<meta name="theme-color" content="#1a1a1a"/>
 <title>WordLens</title>
-<link href="./index_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,doc,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -167,17 +167,10 @@ nav button.on{color:var(--al)}
 .qword{font-family:"Playfair Display",serif;margin-bottom:5px}
 .qph{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--mu)}
 .opts{display:flex;flex-direction:column;gap:9px}
-.opt{background:var(--s1);border:1px solid var(--bd2);border-radius:14px;padding:13px 16px;font-size:15px;text-align:left;display:flex;flex-direction:column;gap:0}
+.opt{background:var(--s1);border:1px solid var(--bd2);border-radius:14px;padding:15px 16px;font-size:15px;text-align:left}
 .opt:active{transform:scale(.98)}
-.opt.ok{background:rgba(34,197,94,.12);border-color:var(--gn)}
-.opt.ok .opt-main{color:var(--gn);font-weight:700}
-.opt.no{background:rgba(239,68,68,.12);border-color:var(--rd)}
-.opt.no .opt-main{color:var(--rd);font-weight:700}
-.opt-main{font-size:15px;font-weight:600;color:var(--tx);line-height:1.3}
-.opt-sub{font-size:12px;color:var(--mu);margin-top:4px;line-height:1.4;display:none}
-.opt.ok .opt-sub,.opt.no .opt-sub{display:block;color:var(--m2)}
-.opt.ok .opt-sub{color:rgba(34,197,94,.85)}
-.opt.no .opt-sub{color:rgba(239,68,68,.75)}
+.opt.ok{background:rgba(34,197,94,.1);border-color:var(--gn);color:var(--gn)}
+.opt.no{background:rgba(239,68,68,.1);border-color:var(--rd);color:var(--rd)}
 .expl{background:var(--s2);border-radius:14px;padding:14px;font-size:14px;color:var(--m2);line-height:1.6;border-left:3px solid var(--gn)}
 .bnq{background:var(--ac);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%}
 .score{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
@@ -194,7 +187,7 @@ nav button.on{color:var(--al)}
 </style>
 </head>
 <body>
-<div id="fbld" style="display: none;">
+<div id="fbld">
   <div style="font-family:serif;font-size:36px;color:#f59e0b">Word<em>Lens</em></div>
   <div class="spin"></div>
   <div style="font-size:13px;color:#888">載入中...</div>
@@ -204,39 +197,39 @@ nav button.on{color:var(--al)}
     <div class="hero">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div class="app-name">Word<em>Lens</em></div>
-        <div class="sync-row"><span class="sdot" id="sdot" style="background: rgb(34, 197, 94);"></span><span class="stxt" id="stxt">已同步</span></div>
+        <div class="sync-row"><span class="sdot" id="sdot"></span><span class="stxt" id="stxt">載入中</span></div>
       </div>
       <div class="app-sub">拍照・AI字根字首・雲端同步・SRS測驗</div>
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">136</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">23</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">23</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="ht">0</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">flow</div><div class="riz">流</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">rush</div><div class="riz">衝</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">worth</div><div class="riz">價值</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">strength</div><div class="riz">力量</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">rate</div><div class="riz">速度；等級</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">sticky</div><div class="riz">黏的</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
-    <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"></div>
+    <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"/></div>
     <div class="lcnt" id="lcnt"></div>
     <div class="llist" id="llist"></div>
   </div>
   <div class="view" id="v-gram">
     <div class="gwrap">
-      <div class="gtb"><input class="gsrch" id="gsrch" placeholder="搜尋文法..." oninput="filterGram(this.value)"></div>
+      <div class="gtb"><input class="gsrch" id="gsrch" placeholder="搜尋文法..." oninput="filterGram(this.value)"/></div>
       <div class="gcats" id="gcats"></div>
       <div class="glist" id="glist"></div>
     </div>
   </div>
   <div class="view" id="v-quiz"><div class="qwrap" id="qc"></div></div>
   <nav>
-    <button class="on" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
-    <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
-    <button id="nb-lib" onclick="goTab(&#39;lib&#39;)"><span class="ni">📚</span>單字庫</button>
-    <button id="nb-gram" onclick="goTab(&#39;gram&#39;)"><span class="ni">📖</span>文法</button>
-    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)"><span class="ni">✏️</span>測驗</button>
+    <button class="on" id="nb-home" onclick="goTab('home')"><span class="ni">&#127968;</span>首頁</button>
+    <button id="nb-add" onclick="goTab('add')"><span class="ni">&#128247;</span>新增</button>
+    <button id="nb-lib" onclick="goTab('lib')"><span class="ni">&#128218;</span>單字庫</button>
+    <button id="nb-gram" onclick="goTab('gram')"><span class="ni">&#128214;</span>文法</button>
+    <button id="nb-quiz" onclick="goTab('quiz')"><span class="ni">&#9999;&#65039;</span>測驗</button>
   </nav>
 </div>
 <div class="mbg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
@@ -903,10 +896,7 @@ function renderQ(){
 
   var opts=mk("div","opts");
   q.opts.forEach(function(o){
-    var ob=mk("button","opt");
-    var mainSpan=mk("span","opt-main");mainSpan.textContent=o;
-    var subSpan=mk("span","opt-sub");subSpan.textContent="";
-    ob.appendChild(mainSpan);ob.appendChild(subSpan);
+    var ob=mk("button","opt");ob.textContent=o;
     ob.id="opt-"+o.replace(/[^a-zA-Z0-9]/g,"_");
     ob.onclick=function(){ansQ(ob,o,q);};
     opts.appendChild(ob);
@@ -928,36 +918,24 @@ function ansQ(btn,chosen,q){
   if(ok){btn.classList.add("ok");QST.sc++;}
   else{
     btn.classList.add("no");
-    document.querySelectorAll(".opt").forEach(function(b){
-      var mainEl=b.querySelector(".opt-main");
-      if(mainEl&&mainEl.textContent.trim()===q.correct)b.classList.add("ok");
-    });
+    document.querySelectorAll(".opt").forEach(function(b){if(b.textContent.trim()===q.correct)b.classList.add("ok");});
     QST.wrong.push(q.word);
   }
   setSRS(q.word,ok);speak(q.word);
   // Reveal meaning under each option button
   document.querySelectorAll(".opt").forEach(function(b){
-    var mainEl=b.querySelector(".opt-main");
-    var subEl=b.querySelector(".opt-sub");
-    if(!mainEl||!subEl)return;
-    var optTxt=mainEl.textContent.trim();
-    var hint="";
+    var optTxt=b.textContent.trim();
+    var sub=mk("div","");sub.style.cssText="font-size:11px;color:var(--m2);margin-top:3px;line-height:1.4";
     if(q.type==="en2zh"||q.type==="phonetic"){
-      // opts are zh meanings → show English word
+      // opts are zh meanings - find the word that has this zh
       var match=LIB.find(function(x){return x.zh===optTxt;});
-      if(match){
-        hint=match.word;
-        if(match.en_def)hint+="　"+match.en_def;
-      }
+      if(match)sub.textContent=match.word+(match.en_def?" - "+match.en_def:"");
     } else {
-      // opts are English words (zh2en / example) → show zh + en_def
+      // opts are English words - show zh meaning
       var match2=LIB.find(function(x){return x.word===optTxt;});
-      if(match2){
-        hint=match2.zh;
-        if(match2.en_def)hint+="　"+match2.en_def;
-      }
+      if(match2)sub.textContent=match2.zh+(match2.en_def?" · "+match2.en_def:"");
     }
-    subEl.textContent=hint;
+    if(sub.textContent)b.appendChild(sub);
   });
   var wObj=LIB.find(function(x){return x.word===q.word;})||{};
   var lv=getSRS(wObj).level;
@@ -1062,6 +1040,5 @@ function startApp(){
 if(window._fbReady){startApp();}
 else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},3000);}
 </script>
-
-
-</body></html>
+</body>
+</html>
