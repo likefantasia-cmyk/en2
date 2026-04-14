@@ -383,7 +383,7 @@ function renderHome(){
 }
 
 // API
-var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL: In roots, 'part' must be the ACTUAL morpheme letters (e.g. re-, dict, -tion), NOT the meaning in Chinese.";
+var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL: In roots, 'part' must be the ACTUAL morpheme letters (e.g. re-, dict, -tion), NOT the meaning in Chinese. IMPORTANT: 'root_tip' and 'memory_tip' fields MUST be written entirely in Traditional Chinese (繁體中文), not English.";
 function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
@@ -722,16 +722,21 @@ function filterLib(q){
   document.getElementById("lcnt").textContent="共 "+LIB.length+" 個單字"+(q?" · 顯示 "+list.length+" 個":"");
   var el=document.getElementById("llist");el.innerHTML="";
   if(!list.length){var e=mk("div","empty");e.textContent=LIB.length?"找不到符合的單字":"單字庫是空的";el.appendChild(e);return;}
-  list.slice().reverse().forEach(function(w){
+  // 顯示順序：由舊到新（按新增順序），最新的在最下面
+  var displayList=list.slice().reverse();
+  displayList.forEach(function(w,displayIdx){
+    // 計算在 LIB 中的真實 index（新增順序）
+    var libIdx=LIB.indexOf(w);
     var row=mk("div","li");
+    var num=mk("div","");num.style.cssText="font-size:11px;color:var(--mu);min-width:28px;text-align:right;flex-shrink:0";num.textContent=(libIdx+1)+"";
     var inf=mk("div","");inf.style.flex="1";
     inf.appendChild(mk("div","liw",w.word));
     inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+(w.source?" ("+w.source+")":"")));
     var act=mk("div","lact");act.onclick=function(e){e.stopPropagation();};
-    var bd=mk("button","bdel","🗑");bd.onclick=function(){delWord(w.word);};
-    var bs=mk("button","bspks","🔊");bs.onclick=function(){speak(w.word);};
-    act.appendChild(bd);act.appendChild(bs);row.appendChild(inf);row.appendChild(act);
-    row.onclick=function(){openModal(w.word);};
+    var bd=mk("button","bdel","🗑");bd.onclick=(function(word){return function(){delWord(word);};})(w.word);
+    var bs=mk("button","bspks","🔊");bs.onclick=(function(word){return function(){speak(word);};})(w.word);
+    act.appendChild(bd);act.appendChild(bs);row.appendChild(num);row.appendChild(inf);row.appendChild(act);
+    row.onclick=(function(word,idx){return function(){openModalFromLib(word,idx);};})(w.word,libIdx);
     el.appendChild(row);
   });
 }
@@ -741,10 +746,29 @@ function delWord(word){
   saveD();renderLib();renderHome();toast("🗑 已刪除「"+word+"」");
 }
 
-// Modal
-function openModal(word){
-  var w=LIB.find(function(x){return x.word===word;});if(!w)return;
+function openModalFromLib(word,libIdx){
+  // libIdx 是在 LIB 中的真實 index（新增順序）
   var mb=document.getElementById("mbody");mb.innerHTML="";
+  var w=LIB.find(function(x){return x.word===word;});if(!w)return;
+  // 導覽列：序號 + 上一個 + 下一個
+  var navRow=mk("div","");navRow.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:4px";
+  var idxLbl=mk("div","");idxLbl.style.cssText="font-size:12px;color:var(--mu);flex:1";idxLbl.textContent="第 "+(libIdx+1)+" / "+LIB.length+" 個";
+  var btnPrev=mk("button","bs","← 上一個");btnPrev.style.cssText="padding:8px 12px;font-size:13px;flex:1;background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:12px;font-weight:600";
+  var btnNext=mk("button","bs","下一個 →");btnNext.style.cssText="padding:8px 12px;font-size:13px;flex:1;background:var(--ac);border:none;color:#fff;border-radius:12px;font-weight:700";
+  if(libIdx<=0)btnPrev.disabled=true;
+  if(libIdx>=LIB.length-1)btnNext.disabled=true;
+  btnPrev.onclick=function(){if(libIdx>0)openModalFromLib(LIB[libIdx-1].word,libIdx-1);};
+  btnNext.onclick=function(){if(libIdx<LIB.length-1)openModalFromLib(LIB[libIdx+1].word,libIdx+1);};
+  navRow.appendChild(idxLbl);navRow.appendChild(btnPrev);navRow.appendChild(btnNext);
+  mb.appendChild(navRow);
+  _fillModalBody(mb,w);
+  document.getElementById("modal").style.display="flex";
+}
+function openModal(word){
+  var idx=LIB.findIndex(function(x){return x.word===word;});
+  if(idx>=0){openModalFromLib(word,idx);}
+}
+function _fillModalBody(mb,w){
   mb.appendChild(mk("div","mword",w.word));
   if(w.phonetic)mb.appendChild(mk("div","wph",w.phonetic));
   if(w.pos){var p=mk("div","wpos",w.pos);p.style.marginTop="10px";mb.appendChild(p);}
@@ -764,7 +788,6 @@ function openModal(word){
   var bs1=mk("button","bspk","🔊 朗讀單字");bs1.onclick=function(){speak(w.word);};sp.appendChild(bs1);
   if(w.example_en){var bs2=mk("button","bspk","🔊 朗讀例句");bs2.onclick=function(){speak(w.example_en);};sp.appendChild(bs2);}
   mb.appendChild(sp);
-  // Enrich button for words without full data
   if(!w.phonetic&&!w.en_def&&KEY){
     var eb2=mk("button","bp","🤖 AI 補充完整分析");eb2.onclick=function(){enrichWord(w.word,eb2);};mb.appendChild(eb2);
   }
@@ -778,7 +801,6 @@ function openModal(word){
   }
   if(w.memory_tip){var mtb=mk("div","tbox");mtb.appendChild(mk("div","tlbl","💡 記憶技巧"));mtb.appendChild(mk("div","ttxt",w.memory_tip));mb.appendChild(mtb);}
   var mc=mk("button","mclose","關閉");mc.onclick=closeModal;mb.appendChild(mc);
-  document.getElementById("modal").style.display="flex";
 }
 function closeModal(){document.getElementById("modal").style.display="none";}
 function enrichWord(word,btn){
