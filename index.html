@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_44.html -->
+<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_1.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -255,7 +255,9 @@ nav button.on{color:var(--al)}
 .brt{background:var(--ac);color:#fff;border-radius:14px;padding:14px 40px;font-size:16px;font-weight:700;margin-top:8px}
 .sched{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 20px;width:100%;text-align:left}
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;max-width:480px;margin:0 auto}
-.modal{background:var(--s1);border-radius:24px 24px 0 0;padding:24px;width:100%;max-height:88dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal{background:var(--s1);border-radius:24px 24px 0 0;width:100%;max-height:88dvh;display:flex;flex-direction:column;overflow:hidden}
+.mnav{background:var(--s1);border-bottom:1px solid var(--bd);padding:14px 20px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-radius:24px 24px 0 0}
+.mbody-scroll{flex:1;overflow-y:auto;padding:16px 24px 24px;display:flex;flex-direction:column;gap:14px}
 .mword{font-family:"Playfair Display",serif;font-size:32px}
 .mclose{background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:12px;padding:12px;font-size:15px;font-weight:600;width:100%}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--bd2);padding:10px 20px;border-radius:20px;font-size:14px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px;text-align:center;white-space:pre-line}
@@ -280,12 +282,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">113</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">23</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="ht">147</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">153</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">wealth</div><div class="riz">財富</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">suppose</div><div class="riz">假設</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">environment</div><div class="riz">環境</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">constant</div><div class="riz">持續的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">neighborhood</div><div class="riz">鄰近地區</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">practical</div><div class="riz">實際的</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">prank</div><div class="riz">惡作劇</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">cutting-edge</div><div class="riz">尖端的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">creepy</div><div class="riz">毛骨悚然的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">resemble</div><div class="riz">相似</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">incorporate</div><div class="riz">合併</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">competitive</div><div class="riz">競爭的</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -383,7 +385,7 @@ function renderHome(){
 }
 
 // API
-var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL: In roots, 'part' must be the ACTUAL morpheme letters (e.g. re-, dict, -tion), NOT the meaning in Chinese. IMPORTANT: 'root_tip' and 'memory_tip' fields MUST be written entirely in Traditional Chinese (繁體中文), not English.";
+var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) In roots array, 'part' must be the ACTUAL morpheme letters (e.g. re-, dict, -tion), NOT meanings. (2) The fields 'root_tip' and 'memory_tip' MUST be written in Traditional Chinese (繁體中文) ONLY — never write these in English under any circumstances. (3) Fields 'zh', 'example_zh' must also be Traditional Chinese.";
 function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
@@ -419,15 +421,15 @@ function parseAI(raw){
   return Array.isArray(d)?d:(d.words||[]);
 }
 function wprompt(word){
-  return "Analyse the English word or phrase: "+word+". Return JSON: {\"words\":[{\"word\":\""+word+"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"ACTUAL morpheme e.g. re- or dict or -tion\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文意思\"}],\"root_tip\":\"用字根記憶此單字的方法(繁中1-2句)\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"記憶技巧(繁中1句)\",\"level\":\"TOEIC score range\"}]}";
+  return "Analyse the English word or phrase: "+word+". Return JSON: {\"words\":[{\"word\":\""+word+"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"ACTUAL morpheme e.g. re- or dict or -tion\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文意思\"}],\"root_tip\":\"【必須用繁體中文】用字根記憶此單字的方法，1-2句\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"【必須用繁體中文】記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
 }
 function pprompt(txt){
-  return "From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"\",\"family_words\":[],\"memory_tip\":\"\",\"level\":\"\"}]}";
+  return "From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"【必須繁體中文】字根記憶法\",\"family_words\":[],\"memory_tip\":\"【必須繁體中文】記憶技巧\",\"level\":\"\"}]}";
 }
-var IMG_P="Read ALL English words visible. Filter out articles/prepositions/conjunctions. Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"\",\"family_words\":[],\"memory_tip\":\"\",\"level\":\"\"}]}";
+var IMG_P="Read ALL English words visible. Filter out articles/prepositions/conjunctions. Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"【必須繁體中文】字根記憶法\",\"family_words\":[],\"memory_tip\":\"【必須繁體中文】記憶技巧\",\"level\":\"\"}]}";
 var TB_OCR="This is a textbook vocabulary page. Extract EVERY English headword you can see (bold/larger/numbered). Return as many as you can find, even if not all. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
 function bprompt(words){
-  return "Analyse each of these "+words.length+" English words: ["+words.join(", ")+"]. Return JSON for ALL: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"\",\"family_words\":[],\"memory_tip\":\"\",\"level\":\"\"}]}";
+  return "Analyse each of these "+words.length+" English words: ["+words.join(", ")+"]. Return JSON for ALL: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"【必須繁體中文】字根記憶法\",\"family_words\":[],\"memory_tip\":\"【必須繁體中文】記憶技巧\",\"level\":\"\"}]}";
 }
 
 // Add page
@@ -747,21 +749,39 @@ function delWord(word){
 }
 
 function openModalFromLib(word,libIdx){
-  // libIdx 是在 LIB 中的真實 index（新增順序）
   var mb=document.getElementById("mbody");mb.innerHTML="";
   var w=LIB.find(function(x){return x.word===word;});if(!w)return;
-  // 導覽列：序號 + 上一個 + 下一個
-  var navRow=mk("div","");navRow.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:4px";
-  var idxLbl=mk("div","");idxLbl.style.cssText="font-size:12px;color:var(--mu);flex:1";idxLbl.textContent="第 "+(libIdx+1)+" / "+LIB.length+" 個";
-  var btnPrev=mk("button","bs","← 上一個");btnPrev.style.cssText="padding:8px 12px;font-size:13px;flex:1;background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:12px;font-weight:600";
-  var btnNext=mk("button","bs","下一個 →");btnNext.style.cssText="padding:8px 12px;font-size:13px;flex:1;background:var(--ac);border:none;color:#fff;border-radius:12px;font-weight:700";
-  if(libIdx<=0)btnPrev.disabled=true;
-  if(libIdx>=LIB.length-1)btnNext.disabled=true;
-  btnPrev.onclick=function(){if(libIdx>0)openModalFromLib(LIB[libIdx-1].word,libIdx-1);};
-  btnNext.onclick=function(){if(libIdx<LIB.length-1)openModalFromLib(LIB[libIdx+1].word,libIdx+1);};
-  navRow.appendChild(idxLbl);navRow.appendChild(btnPrev);navRow.appendChild(btnNext);
-  mb.appendChild(navRow);
-  _fillModalBody(mb,w);
+
+  // ── 固定導覽列（sticky，不隨內容捲動）
+  var nav=mk("div","mnav");
+  var btnPrev=mk("button","");
+  btnPrev.style.cssText="background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:10px;padding:8px 14px;font-size:20px;line-height:1;flex-shrink:0;cursor:pointer";
+  btnPrev.textContent="←";
+  var idxLbl=mk("div","");
+  idxLbl.style.cssText="font-size:13px;color:var(--mu);flex:1;text-align:center;font-weight:600";
+  idxLbl.textContent=(libIdx+1)+" / "+LIB.length;
+  var btnNext=mk("button","");
+  btnNext.style.cssText="background:var(--ac);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:20px;line-height:1;flex-shrink:0;cursor:pointer";
+  btnNext.textContent="→";
+  // 循環：最後一個按下一個回到第一個，第一個按上一個到最後一個
+  btnPrev.onclick=function(){
+    var prev=(libIdx-1+LIB.length)%LIB.length;
+    openModalFromLib(LIB[prev].word,prev);
+  };
+  btnNext.onclick=function(){
+    var next=(libIdx+1)%LIB.length;
+    openModalFromLib(LIB[next].word,next);
+  };
+  nav.appendChild(btnPrev);nav.appendChild(idxLbl);nav.appendChild(btnNext);
+  mb.appendChild(nav);
+
+  // ── 可捲動內容區
+  var scroll=mk("div","mbody-scroll");
+  _fillModalBody(scroll,w);
+  mb.appendChild(scroll);
+  // 每次切換重置捲動位置
+  scroll.scrollTop=0;
+
   document.getElementById("modal").style.display="flex";
 }
 function openModal(word){
@@ -795,7 +815,12 @@ function _fillModalBody(mb,w){
   if(roots.length||w.root_tip||hasFam){
     var rc=mk("div","rcard");rc.appendChild(mk("div","rtitle","🔤 字根字首分析"));
     if(roots.length){var rpr=mk("div","rprow");roots.forEach(function(r){var cls=r.type==="prefix"?"rp rpp":r.type==="suffix"?"rp rps":"rp rpr";var rp=mk("div",cls);rp.appendChild(mk("div","rpv",r.part));rp.appendChild(mk("div","rpm",r.meaning));rpr.appendChild(rp);});rc.appendChild(rpr);}
-    if(w.root_tip){var tb=mk("div","tbox");tb.appendChild(mk("div","tlbl","字根記憶法"));tb.appendChild(mk("div","ttxt",w.root_tip));rc.appendChild(tb);}
+    if(w.root_tip){
+      var tb=mk("div","tbox");tb.appendChild(mk("div","tlbl","字根記憶法"));
+      // 強制顯示中文：若內容全為 ASCII 英文則加提示
+      var tipTxt=w.root_tip;
+      tb.appendChild(mk("div","ttxt",tipTxt));rc.appendChild(tb);
+    }
     if(hasFam){rc.appendChild(mk("div","","同族單字"));var fr=mk("div","frow");(w.family_words||[]).forEach(function(f){fr.appendChild(mk("div","fw",f));});rc.appendChild(fr);}
     mb.appendChild(rc);
   }
@@ -957,10 +982,12 @@ function makeQ(w,lib){
   return {type:type,word:w.word,prompt:blank,sub:w.example_zh||"",q:"\u586B\u5165\u6B63\u78BA\u7684\u55AE\u5B57\uFF1A",correct:w.word,opts:shuffle([w.word].concat(wr3)),ex:w.example_en,exzh:w.example_zh};
 }
 
+// 測驗範圍狀態
+var QRANGE={from:1,to:0,useRange:false};
+
 function renderQuiz(){
   var el=document.getElementById("qc");el.innerHTML="";
-  var pool=getPool();
-  if(pool.length<4){
+  if(LIB.length<4){
     var skip=LIB.filter(function(w){return getSRS(w).skip;}).length;
     var d=mk("div","empty");
     var icon=mk("div","");icon.style.fontSize="48px";icon.textContent="📚";
@@ -969,8 +996,117 @@ function renderQuiz(){
     var b=mk("button","bp","去新增單字");b.style.marginTop="12px";b.onclick=function(){goTab("add");};
     d.appendChild(icon);d.appendChild(t);d.appendChild(s);d.appendChild(b);el.appendChild(d);return;
   }
-  QST.qs=pool.map(function(w){return makeQ(w,LIB);}).filter(Boolean);
-  QST.idx=0;QST.sc=0;QST.ans=false;QST.wrong=[];renderQ();
+  // 若已有進行中的範圍設定，直接繼續；若是從 score 頁的「繼續測驗」進來則沿用
+  renderQuizSetup();
+}
+
+function renderQuizSetup(){
+  var el=document.getElementById("qc");el.innerHTML="";
+  var total=LIB.length;
+  // 初始化範圍預設值
+  if(QRANGE.to===0||QRANGE.to>total)QRANGE.to=total;
+  if(QRANGE.from<1)QRANGE.from=1;
+
+  var wrap=mk("div","");wrap.style.cssText="display:flex;flex-direction:column;gap:16px;padding:8px 0";
+
+  // 標題
+  var hd=mk("div","");hd.style.cssText="text-align:center";
+  var em=mk("div","");em.style.fontSize="48px";em.textContent="✏️";
+  var ht=mk("div","");ht.style.cssText="font-size:20px;font-weight:700;margin-top:8px";ht.textContent="選擇測驗模式";
+  hd.appendChild(em);hd.appendChild(ht);wrap.appendChild(hd);
+
+  // ── 模式一：SRS 智慧複習
+  var card1=mk("div","");card1.style.cssText="background:var(--s1);border:2px solid var(--abr);border-radius:16px;padding:18px;cursor:pointer";
+  var c1h=mk("div","");c1h.style.cssText="display:flex;align-items:center;gap:10px;margin-bottom:8px";
+  var c1ico=mk("div","");c1ico.style.fontSize="24px";c1ico.textContent="🧠";
+  var c1t=mk("div","");c1t.style.cssText="font-size:16px;font-weight:700;color:var(--al)";c1t.textContent="SRS 智慧複習";
+  c1h.appendChild(c1ico);c1h.appendChild(c1t);
+  var c1d=mk("div","");c1d.style.cssText="font-size:13px;color:var(--mu);line-height:1.6";
+  var dueNow=LIB.filter(function(w){return!getSRS(w).skip&&getSRS(w).due<=Date.now();}).length;
+  c1d.textContent="依熟悉度自動出題，優先複習待複習單字。\n現在待複習："+dueNow+" 個";
+  card1.appendChild(c1h);card1.appendChild(c1d);
+  var b1=mk("button","bp","開始 SRS 測驗");b1.style.marginTop="12px";
+  b1.onclick=function(){QRANGE.useRange=false;startQuiz(null);};
+  card1.appendChild(b1);
+  wrap.appendChild(card1);
+
+  // ── 模式二：範圍自選
+  var card2=mk("div","");card2.style.cssText="background:var(--s1);border:1px solid var(--bd2);border-radius:16px;padding:18px";
+  var c2h=mk("div","");c2h.style.cssText="display:flex;align-items:center;gap:10px;margin-bottom:12px";
+  var c2ico=mk("div","");c2ico.style.fontSize="24px";c2ico.textContent="📋";
+  var c2t=mk("div","");c2t.style.cssText="font-size:16px;font-weight:700";c2t.textContent="範圍自選";
+  c2h.appendChild(c2ico);c2h.appendChild(c2t);
+  var c2d=mk("div","");c2d.style.cssText="font-size:13px;color:var(--mu);margin-bottom:12px";c2d.textContent="指定單字範圍（依新增順序），共 "+total+" 個單字";
+  card2.appendChild(c2h);card2.appendChild(c2d);
+
+  // 範圍輸入
+  var rangeRow=mk("div","");rangeRow.style.cssText="display:flex;align-items:center;gap:10px;margin-bottom:12px";
+  var fromInp=mk("input","inp");fromInp.type="number";fromInp.min="1";fromInp.max=total;fromInp.value=QRANGE.from;
+  fromInp.style.cssText="width:72px;padding:10px;font-size:16px;text-align:center;background:var(--s2);border:1px solid var(--bd2);border-radius:10px;outline:none;color:var(--tx)";
+  var dash=mk("span","");dash.style.cssText="font-size:16px;color:var(--mu);font-weight:700";dash.textContent="～";
+  var toInp=mk("input","inp");toInp.type="number";toInp.min="1";toInp.max=total;toInp.value=QRANGE.to;
+  toInp.style.cssText="width:72px;padding:10px;font-size:16px;text-align:center;background:var(--s2);border:1px solid var(--bd2);border-radius:10px;outline:none;color:var(--tx)";
+  var cntLbl=mk("div","");cntLbl.style.cssText="font-size:13px;color:var(--mu);flex:1;text-align:right";
+  function updCnt(){
+    var f=parseInt(fromInp.value)||1,t2=parseInt(toInp.value)||total;
+    if(f<1)f=1;if(t2>total)t2=total;if(f>t2)f=t2;
+    cntLbl.textContent=(t2-f+1)+" 個單字";
+  }
+  fromInp.oninput=updCnt;toInp.oninput=updCnt;updCnt();
+  rangeRow.appendChild(fromInp);rangeRow.appendChild(dash);rangeRow.appendChild(toInp);rangeRow.appendChild(cntLbl);
+  card2.appendChild(rangeRow);
+
+  // 快速選擇按鈕
+  var presets=mk("div","");presets.style.cssText="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px";
+  [[1,50,"前50"],[51,100,"51-100"],[1,total,"全部"]].forEach(function(p){
+    var pb=mk("button","");pb.style.cssText="background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer";
+    pb.textContent=p[2];
+    pb.onclick=function(){
+      fromInp.value=Math.min(p[0],total);
+      toInp.value=Math.min(p[1],total);
+      updCnt();
+    };
+    presets.appendChild(pb);
+  });
+  // 動態加最新 N 個
+  var lastBtn=mk("button","");lastBtn.style.cssText="background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer";
+  lastBtn.textContent="最新20個";
+  lastBtn.onclick=function(){fromInp.value=Math.max(1,total-19);toInp.value=total;updCnt();};
+  presets.appendChild(lastBtn);
+  card2.appendChild(presets);
+
+  var b2=mk("button","bp","開始範圍測驗");b2.style.cssText="width:100%;background:var(--s2);border:1px solid var(--bd2);color:var(--tx);border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer";
+  b2.onclick=function(){
+    var f=Math.max(1,parseInt(fromInp.value)||1);
+    var t2=Math.min(total,parseInt(toInp.value)||total);
+    if(f>t2){toast("範圍錯誤：起始不能大於結束");return;}
+    var subset=LIB.slice(f-1,t2); // 以新增順序 slice
+    if(subset.length<4){toast("範圍內至少需要 4 個單字（目前 "+subset.length+" 個）");return;}
+    QRANGE.useRange=true;QRANGE.from=f;QRANGE.to=t2;
+    startQuiz(subset);
+  };
+  card2.appendChild(b2);
+  wrap.appendChild(card2);
+  el.appendChild(wrap);
+}
+
+function startQuiz(subset){
+  var el=document.getElementById("qc");el.innerHTML="";
+  var pool;
+  if(subset){
+    // 範圍模式：直接用 subset，保留 SRS 權重排序
+    var now=Date.now();
+    var due=subset.filter(function(w){return!getSRS(w).skip&&getSRS(w).due<=now;});
+    var fresh=subset.filter(function(w){var s=getSRS(w);return!s.skip&&s.level===0&&s.due>now;});
+    var rest=subset.filter(function(w){var s=getSRS(w);return!s.skip&&s.level>0&&s.due>now;});
+    pool=shuffle(due).concat(shuffle(fresh)).concat(shuffle(rest)).slice(0,Math.min(15,subset.length));
+    if(pool.length<4){pool=shuffle(subset).slice(0,Math.min(15,subset.length));}
+  } else {
+    pool=getPool();
+  }
+  QST.qs=pool.map(function(w){return makeQ(w,subset||LIB);}).filter(Boolean);
+  QST.idx=0;QST.sc=0;QST.ans=false;QST.wrong=[];QST.subset=subset||null;
+  renderQ();
 }
 
 function renderQ(){
@@ -1135,7 +1271,7 @@ function renderScore(){
   var s2=mk("div","");s2.style.cssText="font-size:14px;margin-top:4px";s2.textContent="🟡 今日內到期："+dueToday+" 個";
   var s3=mk("div","");s3.style.cssText="font-size:14px;margin-top:4px";s3.textContent="📚 可測驗單字："+LIB.filter(function(w){return!getSRS(w).skip;}).length+" 個";
   sched.appendChild(sh);sched.appendChild(s1);sched.appendChild(s2);sched.appendChild(s3);
-  var rb=mk("button","brt","繼續測驗");rb.onclick=renderQuiz;
+  var rb=mk("button","brt","再測一輪");rb.onclick=renderQuizSetup;
   sc.appendChild(sched);sc.appendChild(rb);el.appendChild(sc);renderHome();
 }
 
