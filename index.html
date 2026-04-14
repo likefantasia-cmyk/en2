@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="WordLens"/>
-<meta name="theme-color" content="#1a1a1a"/>
+<!-- saved from url=(0049)file:///Users/kumori67/Downloads/wordlens_44.html -->
+<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WordLens">
+<meta name="theme-color" content="#1a1a1a">
 <title>WordLens</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link href="./index_files/css2" rel="stylesheet">
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,doc,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -15,11 +15,81 @@ const cfg={apiKey:"AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",authDomain:"kumoen.f
 const app=initializeApp(cfg);
 const db=getFirestore(app);
 const REF=doc(db,"users","kumo");
-async function fbLoad(){
-  try{const snap=await getDoc(REF);if(snap.exists()){const d=snap.data();window._lib=d.library||[];window._st=d.stats||{quiz:0,today:0,date:""};}}catch(e){console.warn("fbLoad",e);}
+
+// ── 第一層：localStorage 本機備份工具
+function lsBackup(lib,st){
+  try{
+    if(lib&&lib.length>0){localStorage.setItem("wl-lib-backup",JSON.stringify(lib));localStorage.setItem("wl-lib-count",lib.length);}
+    if(st)localStorage.setItem("wl-st-backup",JSON.stringify(st));
+  }catch(e){console.warn("lsBackup",e);}
 }
+function lsRestore(){
+  try{
+    var lib=JSON.parse(localStorage.getItem("wl-lib-backup")||"null");
+    var st=JSON.parse(localStorage.getItem("wl-st-backup")||"null");
+    return{lib:lib||[],st:st||{quiz:0,today:0,date:""}};
+  }catch(e){return{lib:[],st:{quiz:0,today:0,date:""}};}
+}
+
+async function fbLoad(){
+  try{
+    const snap=await getDoc(REF);
+    if(snap.exists()){
+      const d=snap.data();
+      const fbLib=d.library||[];
+      const fbSt=d.stats||{quiz:0,today:0,date:""};
+      // ── 第二層：比對本機備份，Firebase 資料筆數異常少時用本機救援
+      const local=lsRestore();
+      const knownCount=parseInt(localStorage.getItem("wl-lib-count")||"0");
+      if(fbLib.length===0&&local.lib.length>0){
+        // Firebase 是空的但本機有資料 → 用本機，並警告
+        console.warn("⚠️ Firebase 資料為空，使用本機備份（"+local.lib.length+" 筆）");
+        window._lib=local.lib;window._st=local.st;
+        window._dataWarning="Firebase 資料異常，已自動從本機備份還原 "+local.lib.length+" 個單字。請確認後手動同步。";
+      } else if(knownCount>0&&fbLib.length<knownCount*0.5){
+        // Firebase 筆數不到上次已知的一半 → 可能被洗掉，用本機
+        console.warn("⚠️ Firebase 筆數異常（"+fbLib.length+" vs 已知"+knownCount+"），使用本機備份");
+        window._lib=local.lib.length>fbLib.length?local.lib:fbLib;
+        window._st=fbSt;
+        window._dataWarning="偵測到雲端單字數量異常減少，已自動選用較多的版本（"+window._lib.length+" 個單字）。";
+      } else {
+        window._lib=fbLib;window._st=fbSt;
+        lsBackup(fbLib,fbSt); // 同步成功 → 更新本機備份
+      }
+    } else {
+      // Firebase 沒有文件 → 嘗試本機備份
+      const local=lsRestore();
+      if(local.lib.length>0){
+        window._lib=local.lib;window._st=local.st;
+        window._dataWarning="雲端無資料，已從本機備份還原 "+local.lib.length+" 個單字。";
+      }
+    }
+  }catch(e){
+    console.warn("fbLoad",e);
+    // Firebase 連線失敗 → 用本機備份
+    const local=lsRestore();
+    window._lib=local.lib;window._st=local.st;
+    if(local.lib.length>0)window._dataWarning="離線模式：顯示本機備份的 "+local.lib.length+" 個單字。";
+  }
+}
+
 async function fbSave(){
-  try{await setDoc(REF,{library:window._lib||[],stats:window._st||{}},{merge:true});}catch(e){console.warn("fbSave",e);}
+  try{
+    const lib=window._lib||[];
+    const st=window._st||{};
+    // ── 第三層：存檔前檢查，防止空資料覆蓋雲端
+    const knownCount=parseInt(localStorage.getItem("wl-lib-count")||"0");
+    if(knownCount>0&&lib.length===0){
+      console.warn("🛑 阻止危險存檔：LIB 為空但已知有 "+knownCount+" 筆資料");
+      return;
+    }
+    if(knownCount>4&&lib.length<knownCount*0.5){
+      console.warn("🛑 阻止危險存檔：單字數量從 "+knownCount+" 驟降至 "+lib.length);
+      return;
+    }
+    await setDoc(REF,{library:lib,stats:st},{merge:true});
+    lsBackup(lib,st); // 存檔成功 → 同步更新本機備份
+  }catch(e){console.warn("fbSave",e);}
 }
 window.fbSave=fbSave;
 fbLoad().then(()=>{window._fbReady=true;if(window._onFbReady)window._onFbReady();});
@@ -114,8 +184,8 @@ nav button.on{color:var(--al)}
 .rpr{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.35);color:var(--pu)}
 .rps{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.35);color:var(--bl)}
 .tbox{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);border-radius:12px;padding:12px 14px}
-.tlbl{font-size:11px;color:var(--al);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
-.ttxt{font-size:14px;color:var(--m2);line-height:1.6}
+.tlbl{font-size:11px;color:var(--al);font-weight:700;letter-spacing:.4px;margin-bottom:5px}
+.ttxt{font-size:14px;color:var(--tx);line-height:1.6}
 .frow{display:flex;flex-wrap:wrap;gap:6px}
 .fw{background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer}
 .fw:active{border-color:var(--pu)}
@@ -167,10 +237,16 @@ nav button.on{color:var(--al)}
 .qword{font-family:"Playfair Display",serif;margin-bottom:5px}
 .qph{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--mu)}
 .opts{display:flex;flex-direction:column;gap:9px}
-.opt{background:var(--s1);border:1px solid var(--bd2);border-radius:14px;padding:15px 16px;font-size:15px;text-align:left}
+.opt{background:var(--s1);border:1px solid var(--bd2);border-radius:14px;padding:13px 16px;font-size:15px;text-align:left;display:flex;flex-direction:column;gap:0}
 .opt:active{transform:scale(.98)}
-.opt.ok{background:rgba(34,197,94,.1);border-color:var(--gn);color:var(--gn)}
-.opt.no{background:rgba(239,68,68,.1);border-color:var(--rd);color:var(--rd)}
+.opt.ok{background:rgba(34,197,94,.12);border-color:var(--gn)}
+.opt.ok .opt-main{color:var(--gn);font-weight:700}
+.opt.no{background:rgba(239,68,68,.12);border-color:var(--rd)}
+.opt.no .opt-main{color:var(--rd);font-weight:700}
+.opt-main{font-size:15px;font-weight:600;color:var(--tx);line-height:1.3}
+.opt-sub{font-size:12px;color:var(--mu);margin-top:4px;line-height:1.4;display:none}
+.opt.ok .opt-sub{display:block;color:rgba(34,197,94,.9)}
+.opt.no .opt-sub{display:block;color:rgba(239,68,68,.8)}
 .expl{background:var(--s2);border-radius:14px;padding:14px;font-size:14px;color:var(--m2);line-height:1.6;border-left:3px solid var(--gn)}
 .bnq{background:var(--ac);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:700;width:100%}
 .score{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:14px}
@@ -187,7 +263,7 @@ nav button.on{color:var(--al)}
 </style>
 </head>
 <body>
-<div id="fbld">
+<div id="fbld" style="display: none;">
   <div style="font-family:serif;font-size:36px;color:#f59e0b">Word<em>Lens</em></div>
   <div class="spin"></div>
   <div style="font-size:13px;color:#888">載入中...</div>
@@ -197,39 +273,39 @@ nav button.on{color:var(--al)}
     <div class="hero">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div class="app-name">Word<em>Lens</em></div>
-        <div class="sync-row"><span class="sdot" id="sdot"></span><span class="stxt" id="stxt">載入中</span></div>
+        <div class="sync-row"><span class="sdot" id="sdot" style="background: rgb(34, 197, 94);"></span><span class="stxt" id="stxt">已同步</span></div>
       </div>
       <div class="app-sub">拍照・AI字根字首・雲端同步・SRS測驗</div>
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">0</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="ht">113</div><div class="stl">我的單字</div></div>
       <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="hq">23</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">wealth</div><div class="riz">財富</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">suppose</div><div class="riz">假設</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">environment</div><div class="riz">環境</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">constant</div><div class="riz">持續的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">neighborhood</div><div class="riz">鄰近地區</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">practical</div><div class="riz">實際的</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
-    <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"/></div>
+    <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"></div>
     <div class="lcnt" id="lcnt"></div>
     <div class="llist" id="llist"></div>
   </div>
   <div class="view" id="v-gram">
     <div class="gwrap">
-      <div class="gtb"><input class="gsrch" id="gsrch" placeholder="搜尋文法..." oninput="filterGram(this.value)"/></div>
+      <div class="gtb"><input class="gsrch" id="gsrch" placeholder="搜尋文法..." oninput="filterGram(this.value)"></div>
       <div class="gcats" id="gcats"></div>
       <div class="glist" id="glist"></div>
     </div>
   </div>
   <div class="view" id="v-quiz"><div class="qwrap" id="qc"></div></div>
   <nav>
-    <button class="on" id="nb-home" onclick="goTab('home')"><span class="ni">&#127968;</span>首頁</button>
-    <button id="nb-add" onclick="goTab('add')"><span class="ni">&#128247;</span>新增</button>
-    <button id="nb-lib" onclick="goTab('lib')"><span class="ni">&#128218;</span>單字庫</button>
-    <button id="nb-gram" onclick="goTab('gram')"><span class="ni">&#128214;</span>文法</button>
-    <button id="nb-quiz" onclick="goTab('quiz')"><span class="ni">&#9999;&#65039;</span>測驗</button>
+    <button class="on" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
+    <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
+    <button id="nb-lib" onclick="goTab(&#39;lib&#39;)"><span class="ni">📚</span>單字庫</button>
+    <button id="nb-gram" onclick="goTab(&#39;gram&#39;)"><span class="ni">📖</span>文法</button>
+    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)"><span class="ni">✏️</span>測驗</button>
   </nav>
 </div>
 <div class="mbg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
@@ -896,7 +972,10 @@ function renderQ(){
 
   var opts=mk("div","opts");
   q.opts.forEach(function(o){
-    var ob=mk("button","opt");ob.textContent=o;
+    var ob=mk("button","opt");
+    var mainSpan=mk("span","opt-main");mainSpan.textContent=o;
+    var subSpan=mk("span","opt-sub");subSpan.textContent="";
+    ob.appendChild(mainSpan);ob.appendChild(subSpan);
     ob.id="opt-"+o.replace(/[^a-zA-Z0-9]/g,"_");
     ob.onclick=function(){ansQ(ob,o,q);};
     opts.appendChild(ob);
@@ -918,10 +997,31 @@ function ansQ(btn,chosen,q){
   if(ok){btn.classList.add("ok");QST.sc++;}
   else{
     btn.classList.add("no");
-    document.querySelectorAll(".opt").forEach(function(b){if(b.textContent.trim()===q.correct)b.classList.add("ok");});
+    document.querySelectorAll(".opt").forEach(function(b){
+      var mainEl=b.querySelector(".opt-main");
+      if(mainEl&&mainEl.textContent.trim()===q.correct)b.classList.add("ok");
+    });
     QST.wrong.push(q.word);
   }
   setSRS(q.word,ok);speak(q.word);
+  // 揭曉每個選項的對應意思
+  document.querySelectorAll(".opt").forEach(function(b){
+    var mainEl=b.querySelector(".opt-main");
+    var subEl=b.querySelector(".opt-sub");
+    if(!mainEl||!subEl)return;
+    var optTxt=mainEl.textContent.trim();
+    var hint="";
+    if(q.type==="en2zh"){
+      // 選項是中文義 → 顯示對應英文單字
+      var match=LIB.find(function(x){return x.zh===optTxt;});
+      if(match){hint=match.word;if(match.en_def)hint+="　"+match.en_def;}
+    } else {
+      // 選項是英文單字 → 顯示中文義
+      var match2=LIB.find(function(x){return x.word===optTxt;});
+      if(match2){hint=match2.zh;if(match2.en_def)hint+="　"+match2.en_def;}
+    }
+    subEl.textContent=hint;
+  });
   // Reveal meaning under each option button
   document.querySelectorAll(".opt").forEach(function(b){
     var optTxt=b.textContent.trim();
@@ -1036,9 +1136,15 @@ function startApp(){
   if(window._st)ST=window._st;
   var ld=document.getElementById("fbld");if(ld)ld.style.display="none";
   syncUI(false);renderHome();
+  // 顯示資料異常警告
+  if(window._dataWarning){
+    setTimeout(function(){toast("⚠️ "+window._dataWarning,5000);},800);
+    window._dataWarning=null;
+  }
 }
 if(window._fbReady){startApp();}
 else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},3000);}
 </script>
-</body>
-</html>
+
+
+</body></html>
