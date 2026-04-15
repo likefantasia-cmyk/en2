@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_1.html -->
+<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_2.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -282,12 +282,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">147</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">153</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="ht">176</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">29</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="hq">3</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">prank</div><div class="riz">惡作劇</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">cutting-edge</div><div class="riz">尖端的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">creepy</div><div class="riz">毛骨悚然的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">resemble</div><div class="riz">相似</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">incorporate</div><div class="riz">合併</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">competitive</div><div class="riz">競爭的</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">hesitate</div><div class="riz">猶豫</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">weed</div><div class="riz">雜草</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">jungle</div><div class="riz">叢林</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">journey</div><div class="riz">旅程</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">governor</div><div class="riz">總督</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">clipping</div><div class="riz">片段</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -421,15 +421,15 @@ function parseAI(raw){
   return Array.isArray(d)?d:(d.words||[]);
 }
 function wprompt(word){
-  return "Analyse the English word or phrase: "+word+". Return JSON: {\"words\":[{\"word\":\""+word+"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"ACTUAL morpheme e.g. re- or dict or -tion\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文意思\"}],\"root_tip\":\"【必須用繁體中文】用字根記憶此單字的方法，1-2句\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"【必須用繁體中文】記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields under any circumstances. Analyse the English word or phrase: "+word+". Return JSON: {\"words\":[{\"word\":\""+word+"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"ACTUAL morpheme e.g. re- or dict or -tion\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文字根記憶法，1-2句，例：re-表再次，-dict來自拉丁語dicere說話，合起來是再次說的東西\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"繁體中文記憶技巧，1句，例：想像一個畫面幫助記憶\",\"level\":\"TOEIC score range\"}]}";
 }
 function pprompt(txt){
-  return "From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"【必須繁體中文】字根記憶法\",\"family_words\":[],\"memory_tip\":\"【必須繁體中文】記憶技巧\",\"level\":\"\"}]}";
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields under any circumstances. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
-var IMG_P="Read ALL English words visible. Filter out articles/prepositions/conjunctions. Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"【必須繁體中文】字根記憶法\",\"family_words\":[],\"memory_tip\":\"【必須繁體中文】記憶技巧\",\"level\":\"\"}]}";
+var IMG_P="CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields. Read ALL English words visible. Filter out articles/prepositions/conjunctions. Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 var TB_OCR="This is a textbook vocabulary page. Extract EVERY English headword you can see (bold/larger/numbered). Return as many as you can find, even if not all. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
 function bprompt(words){
-  return "Analyse each of these "+words.length+" English words: ["+words.join(", ")+"]. Return JSON for ALL: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"中文\"}],\"root_tip\":\"【必須繁體中文】字根記憶法\",\"family_words\":[],\"memory_tip\":\"【必須繁體中文】記憶技巧\",\"level\":\"\"}]}";
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields under any circumstances. Analyse each of these "+words.length+" English words: ["+words.join(", ")+"]. Return JSON for ALL: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
 
 // Add page
