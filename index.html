@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_2.html -->
+<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_3.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -282,12 +282,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">176</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">29</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">3</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="ht">223</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="hq">6</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">hesitate</div><div class="riz">猶豫</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">weed</div><div class="riz">雜草</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">jungle</div><div class="riz">叢林</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">journey</div><div class="riz">旅程</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">governor</div><div class="riz">總督</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">clipping</div><div class="riz">片段</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">generation</div><div class="riz">世代</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">transfer</div><div class="riz">轉移</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">communication</div><div class="riz">溝通</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">adjust</div><div class="riz">調整</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">input</div><div class="riz">輸入</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">fashionable</div><div class="riz">時尚的</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -390,7 +390,7 @@ function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+KEY},
-    body:JSON.stringify({model:"gpt-4o",max_tokens:3000,response_format:{type:"json_object"},messages:messages})
+    body:JSON.stringify({model:"gpt-4o",max_tokens:4000,response_format:{type:"json_object"},messages:messages})
   }).then(function(r){
     if(!r.ok)return r.json().then(function(e){throw new Error((e.error&&e.error.message)||"API error "+r.status);});
     return r.json();
@@ -429,7 +429,7 @@ function pprompt(txt){
 var IMG_P="CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields. Read ALL English words visible. Filter out articles/prepositions/conjunctions. Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 var TB_OCR="This is a textbook vocabulary page. Extract EVERY English headword you can see (bold/larger/numbered). Return as many as you can find, even if not all. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
 function bprompt(words){
-  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields under any circumstances. Analyse each of these "+words.length+" English words: ["+words.join(", ")+"]. Return JSON for ALL: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese (繁體中文). Do NOT use English for these two fields under any circumstances. You MUST analyse ALL "+words.length+" words and return EXACTLY "+words.length+" entries in the words array — one per input word, in the same order. Do not skip or omit any word. Analyse these words: ["+words.join(", ")+"]. Return JSON for ALL "+words.length+" words: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ACTUAL morpheme\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
 
 // Add page
@@ -567,8 +567,8 @@ function doWord(){
   var ws=inp.split(/[,，、]+/).map(function(w){return w.trim();}).filter(Boolean);
   var btn=document.getElementById("biw");btn.disabled=true;btn.textContent="⏳ 分析中...";
 
-  // Batch: split into chunks of 15 to avoid token limit
-  var CHUNK=15;
+  // Batch: split into chunks of 8 to avoid token limit
+  var CHUNK=8;
   var chunks=[];
   for(var i=0;i<ws.length;i+=CHUNK)chunks.push(ws.slice(i,i+CHUNK));
 
