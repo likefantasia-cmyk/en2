@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_8.html -->
+<!-- saved from url=(0125)file:///Users/kumori67/Downloads/%E8%8B%B1%E6%96%87app%E6%9C%80%E5%BE%8C%E7%89%88_%E4%BF%AE%E6%AD%A3%E5%AD%97%E6%A0%B9_3.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -255,7 +255,7 @@ nav button.on{color:var(--al)}
 .brt{background:var(--ac);color:#fff;border-radius:14px;padding:14px 40px;font-size:16px;font-weight:700;margin-top:8px}
 .sched{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 20px;width:100%;text-align:left}
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;max-width:480px;margin:0 auto}
-.modal{background:var(--s1);border-radius:24px 24px 0 0;width:100%;max-height:88dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.modal{background:var(--s1);border-radius:24px 24px 0 0;width:100%;max-height:88dvh;display:flex;flex-direction:column;overflow:hidden}
 .mnav{background:var(--s1);border-bottom:1px solid var(--bd);padding:14px 20px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;border-radius:24px 24px 0 0}
 .mbody-scroll{flex:1;overflow-y:auto;padding:16px 24px 24px;display:flex;flex-direction:column;gap:14px}
 .mword{font-family:"Playfair Display",serif;font-size:32px}
@@ -282,12 +282,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">535</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="ht">474</div><div class="stl">我的單字</div></div>
       <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">20</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="hq">18</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">shelter</div><div class="riz">庇護所</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">instead</div><div class="riz">反而</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">drop</div><div class="riz">掉落</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">currently</div><div class="riz">目前</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">dam</div><div class="riz">水壩</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">slave</div><div class="riz">奴隸</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">redistribute</div><div class="riz">重新分配</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">option</div><div class="riz">選項</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">allowance</div><div class="riz">津貼</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">devote</div><div class="riz">奉獻</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">delicate</div><div class="riz">精緻的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">enlarge</div><div class="riz">放大</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -783,27 +783,6 @@ function openModalFromLib(word,libIdx){
   scroll.scrollTop=0;
 
   document.getElementById("modal").style.display="flex";
-
-  // ── 點擊捲動區：上半部左側 → 上一個，上半部右側 → 下一個
-  // 排除點擊在互動元素上的情況
-  scroll.addEventListener("click",function(e){
-    var tag=e.target.tagName.toUpperCase();
-    if(tag==="BUTTON"||tag==="INPUT"||tag==="A"||tag==="TEXTAREA")return;
-    if(e.target.closest("button,input,a,textarea"))return;
-    var rect=scroll.getBoundingClientRect();
-    var relX=e.clientX-rect.left;
-    var relY=e.clientY-rect.top;
-    // 只有上半部才觸發
-    if(relY>rect.height/2)return;
-    var third=rect.width/3;
-    if(relX<third){
-      var prev=(libIdx-1+LIB.length)%LIB.length;
-      openModalFromLib(LIB[prev].word,prev);
-    } else if(relX>rect.width-third){
-      var next=(libIdx+1)%LIB.length;
-      openModalFromLib(LIB[next].word,next);
-    }
-  });
 }
 function openModal(word){
   var idx=LIB.findIndex(function(x){return x.word===word;});
