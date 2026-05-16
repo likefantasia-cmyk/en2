@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0043)file:///Users/kumori67/Downloads/index.html -->
+<!-- saved from url=(0045)file:///Users/kumori67/Downloads/index_9.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -282,12 +282,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">535</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="ht">536</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">1</div><div class="stl">今日新增</div></div>
       <div class="stat"><div class="stn" id="hq">20</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">shelter</div><div class="riz">庇護所</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">instead</div><div class="riz">反而</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">drop</div><div class="riz">掉落</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">currently</div><div class="riz">目前</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">dam</div><div class="riz">水壩</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">slave</div><div class="riz">奴隸</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">rude</div><div class="riz">粗魯的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">shelter</div><div class="riz">庇護所</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">instead</div><div class="riz">反而</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">drop</div><div class="riz">掉落</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">currently</div><div class="riz">目前</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">dam</div><div class="riz">水壩</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -314,7 +314,7 @@ nav button.on{color:var(--al)}
 <div class="mbg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="mbody"></div>
 </div>
-<div class="toast" id="toast">⚠️ null</div>
+<div class="toast" id="toast"></div>
 <script>
 var LIB=[],ST={quiz:0,today:0,date:""},KEY=localStorage.getItem("wl-key")||"";
 var PEND=[],QTMR=null;
@@ -377,7 +377,7 @@ function renderHome(){
     var wd=document.createElement("div");wd.className="riw";wd.textContent=w.word;
     var zh=document.createElement("div");zh.className="riz";zh.textContent=w.zh;
     inf.appendChild(wd);inf.appendChild(zh);
-    var bg=document.createElement("span");bg.className="rib";bg.textContent=(!w.source||w.source==="null")?"手動":w.source;
+    var bg=document.createElement("span");bg.className="rib";bg.textContent=w.source||"手動";
     row.appendChild(inf);row.appendChild(bg);
     row.onclick=function(){openModal(w.word);};
     el.appendChild(row);
@@ -423,6 +423,9 @@ function parseAI(raw){
 function wprompt(word){
   return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts). dictionary=dict-+-ion-+-ary (3 parts).\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素的意思及組合邏輯\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
 }
+function wprompt_noex(word){
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". DO NOT generate example_en or example_zh (leave them as empty string). Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts). dictionary=dict-+-ion-+-ary (3 parts).\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素的意思及組合邏輯\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
+}
 function pprompt(txt){
   return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts)\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素意思及組合邏輯\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
@@ -450,7 +453,7 @@ function renderAdd(){
   var rb=mk("button","","重設 Key");rb.style.cssText="font-size:12px;color:var(--mu);text-decoration:underline";rb.onclick=resetKey;hr.appendChild(rb);
 
   var tabs=mk("div","mtabs");
-  [["cam","📷 拍照/相簿"],["word","✍️ 單字"],["passage","📝 文章"]].forEach(function(m,i){
+  [["cam","📷 拍照/相簿"],["word","✍️ 單字"],["passage","📝 文章"],["manual","📖 課本"]].forEach(function(m,i){
     var t=mk("button","mtab"+(i===0?" on":""),m[1]);t.id="mt-"+m[0];t.onclick=function(){switchMode(m[0]);};tabs.appendChild(t);
   });
 
@@ -493,7 +496,67 @@ function renderAdd(){
   mp.appendChild(pi2);mp.appendChild(bip);
 
   var ra=mk("div","");ra.id="ra";
-  w.appendChild(hr);w.appendChild(tabs);w.appendChild(mc);w.appendChild(mw);w.appendChild(mp);w.appendChild(ra);
+  w.appendChild(hr);w.appendChild(tabs);w.appendChild(mc);w.appendChild(mw);w.appendChild(mp);
+
+  // Manual mode (課本例句模式)
+  var mm=mk("div","");mm.id="m-manual";mm.style.cssText="display:none;flex-direction:column;gap:10px";
+  var mmlbl=mk("div","apil","輸入單字後 AI 生成音標、字根、中文（不生成例句），再手動填入課本例句。");mmlbl.style.cssText="font-size:12px;color:var(--mu);line-height:1.6";
+  var mwi=mk("input","inp");mwi.id="mwi";mwi.placeholder="輸入英文單字";
+  mwi.oninput=function(){document.getElementById("bmw").disabled=!this.value.trim();};
+  var bmw=mk("button","bp","🤖 AI 分析（不含例句）");bmw.id="bmw";bmw.disabled=true;
+  var mexbox=mk("div","");mexbox.id="mexbox";mexbox.style.cssText="display:none;flex-direction:column;gap:8px";
+  var mexlbl=mk("div","");mexlbl.style.cssText="font-size:11px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;font-weight:700";mexlbl.textContent="課本例句（選填）";
+  var mexen=mk("input","inp");mexen.id="mexen";mexen.placeholder="例句英文（可直接貼上課本）";
+  var mexzh=mk("input","inp");mexzh.id="mexzh";mexzh.placeholder="例句中文翻譯（選填）";
+  var bmsave=mk("button","bp","＋ 加入單字庫");bmsave.id="bmsave";bmsave.style.display="none";
+  mexbox.appendChild(mexlbl);mexbox.appendChild(mexen);mexbox.appendChild(mexzh);
+  mm.appendChild(mmlbl);mm.appendChild(mwi);mm.appendChild(bmw);mm.appendChild(mexbox);mm.appendChild(bmsave);
+
+  bmw.onclick=function(){
+    var word=document.getElementById("mwi").value.trim();if(!word)return;
+    bmw.disabled=true;bmw.textContent="⏳ 分析中...";
+    document.getElementById("mexbox").style.display="none";
+    document.getElementById("bmsave").style.display="none";
+    callAI([{role:"system",content:SYS},{role:"user",content:wprompt_noex(word)}])
+      .then(function(raw){
+        var ws=parseAI(raw);if(!ws||!ws.length)throw new Error("解析失敗");
+        var wobj=ws[0];
+        wobj.source="課本";
+        // 暫存解析結果
+        mm._pending=wobj;
+        document.getElementById("mexbox").style.display="flex";
+        document.getElementById("bmsave").style.display="block";
+        bmw.disabled=false;bmw.textContent="🤖 AI 分析（不含例句）";
+        toast("✅ 分析完成，請填入例句後儲存");
+      })
+      .catch(function(e){
+        toast("❌ "+e.message);
+        bmw.disabled=false;bmw.textContent="🤖 AI 分析（不含例句）";
+      });
+  };
+
+  bmsave.onclick=function(){
+    var wobj=mm._pending;if(!wobj)return;
+    var exen=document.getElementById("mexen").value.trim();
+    var exzh=document.getElementById("mexzh").value.trim();
+    if(exen)wobj.example_en=exen;
+    if(exzh)wobj.example_zh=exzh;
+    var dup=LIB.some(function(l){return l.word.toLowerCase()===wobj.word.toLowerCase();});
+    if(dup){toast("⚠️ 單字庫已有「"+wobj.word+"」");return;}
+    LIB.push(wobj);ST.today++;saveD();saveST();
+    toast("✅ 已加入："+wobj.word);
+    // 重置
+    document.getElementById("mwi").value="";
+    document.getElementById("mexen").value="";
+    document.getElementById("mexzh").value="";
+    document.getElementById("mexbox").style.display="none";
+    bmsave.style.display="none";
+    bmw.disabled=true;
+    mm._pending=null;
+  };
+
+  w.appendChild(mm);
+  w.appendChild(ra);
   PF=null;
 }
 
@@ -509,7 +572,7 @@ function updTog(){
   t.style.background=c.checked?"var(--ac)":"var(--bd2)";h.style.left=c.checked?"23px":"3px";
 }
 function switchMode(m){
-  ["cam","word","passage"].forEach(function(x){
+  ["cam","word","passage","manual"].forEach(function(x){
     var el=document.getElementById("m-"+x);if(el)el.style.display=x===m?"flex":"none";
     var t=document.getElementById("mt-"+x);if(t)t.classList.toggle("on",x===m);
   });
@@ -733,7 +796,7 @@ function filterLib(q){
     var num=mk("div","");num.style.cssText="font-size:11px;color:var(--mu);min-width:28px;text-align:right;flex-shrink:0";num.textContent=(libIdx+1)+"";
     var inf=mk("div","");inf.style.flex="1";
     inf.appendChild(mk("div","liw",w.word));
-    inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+((!w.source||w.source==="null")?"":" ("+w.source+")")));
+    inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+(w.source?" ("+w.source+")":"")));
     var act=mk("div","lact");act.onclick=function(e){e.stopPropagation();};
     var bd=mk("button","bdel","🗑");bd.onclick=(function(word){return function(){delWord(word);};})(w.word);
     var bs=mk("button","bspks","🔊");bs.onclick=(function(word){return function(){speak(word);};})(w.word);
@@ -783,23 +846,6 @@ function openModalFromLib(word,libIdx){
   scroll.scrollTop=0;
 
   document.getElementById("modal").style.display="flex";
-
-  // ── 點擊捲動區上半部：左側1/3 → 上一個，右側1/3 → 下一個
-  scroll.addEventListener("click",function(e){
-    if(e.target.closest("button,input,a,textarea"))return;
-    var rect=scroll.getBoundingClientRect();
-    var relX=e.clientX-rect.left;
-    var relY=e.clientY-rect.top;
-    if(relY>rect.height/2)return;
-    var third=rect.width/3;
-    if(relX<third){
-      var prev=(libIdx-1+LIB.length)%LIB.length;
-      openModalFromLib(LIB[prev].word,prev);
-    } else if(relX>rect.width-third){
-      var next=(libIdx+1)%LIB.length;
-      openModalFromLib(LIB[next].word,next);
-    }
-  });
 }
 function openModal(word){
   var idx=LIB.findIndex(function(x){return x.word===word;});
@@ -1305,7 +1351,7 @@ function startApp(){
   }
 }
 if(window._fbReady){startApp();}
-else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},8000);}
+else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},3000);}
 </script>
 
 
