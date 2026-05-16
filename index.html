@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_17.html -->
+<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_18.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -839,9 +839,11 @@ function pushLib(w){
   var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()};
   LIB.push(wobj);
   ST.today++;
-  lsBackup(LIB,ST);
+  window._lib=LIB;
+  if(window.lsBackup)window.lsBackup(LIB,ST);
   if(window.fbSaveWord)window.fbSaveWord(wobj);
   if(window.fbSaveSt)window.fbSaveSt(ST);
+  renderHome();
 }
 function lookupWord(word){
   var ra=document.getElementById("ra");ra.innerHTML="";
