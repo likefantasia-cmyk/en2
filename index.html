@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0043)file:///Users/kumori67/Downloads/index.html -->
+<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_15.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -38,23 +38,25 @@ async function fbLoad(){
       const d=snap.data();
       const fbLib=d.library||[];
       const fbSt=d.stats||{quiz:0,today:0,date:""};
-      // ── 第二層：比對本機備份，Firebase 資料筆數異常少時用本機救援
+      console.log("Firebase 回傳筆數："+fbLib.length);
       const local=lsRestore();
       const knownCount=parseInt(localStorage.getItem("wl-lib-count")||"0");
-      if(fbLib.length===0&&local.lib.length>0){
-        // Firebase 是空的但本機有資料 → 用本機，並警告
-        console.warn("⚠️ Firebase 資料為空，使用本機備份（"+local.lib.length+" 筆）");
-        window._lib=local.lib;window._st=local.st;
-        window._dataWarning="Firebase 資料異常，已自動從本機備份還原 "+local.lib.length+" 個單字。請確認後手動同步。";
+      if(fbLib.length===0){
+        if(local.lib.length>0){
+          console.warn("⚠️ Firebase 資料為空，使用本機備份（"+local.lib.length+" 筆）");
+          window._lib=local.lib;window._st=local.st;
+          window._dataWarning="Firebase 資料異常，已自動從本機備份還原 "+local.lib.length+" 個單字。請確認後手動同步。";
+        } else {
+          window._lib=[];window._st=fbSt;
+        }
       } else if(knownCount>0&&fbLib.length<knownCount*0.5){
-        // Firebase 筆數不到上次已知的一半 → 可能被洗掉，用本機
         console.warn("⚠️ Firebase 筆數異常（"+fbLib.length+" vs 已知"+knownCount+"），使用本機備份");
         window._lib=local.lib.length>fbLib.length?local.lib:fbLib;
         window._st=fbSt;
         window._dataWarning="偵測到雲端單字數量異常減少，已自動選用較多的版本（"+window._lib.length+" 個單字）。";
       } else {
         window._lib=fbLib;window._st=fbSt;
-        lsBackup(fbLib,fbSt); // 同步成功 → 更新本機備份
+        lsBackup(fbLib,fbSt);
       }
     } else {
       // Firebase 沒有文件 → 嘗試本機備份
@@ -282,12 +284,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">535</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="ht">536</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">1</div><div class="stl">今日新增</div></div>
       <div class="stat"><div class="stn" id="hq">20</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">shelter</div><div class="riz">庇護所</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">instead</div><div class="riz">反而</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">drop</div><div class="riz">掉落</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">currently</div><div class="riz">目前</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">dam</div><div class="riz">水壩</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">slave</div><div class="riz">奴隸</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">rude</div><div class="riz">粗魯的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">shelter</div><div class="riz">庇護所</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">instead</div><div class="riz">反而</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">drop</div><div class="riz">掉落</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">currently</div><div class="riz">目前</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">dam</div><div class="riz">水壩</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -377,7 +379,7 @@ function renderHome(){
     var wd=document.createElement("div");wd.className="riw";wd.textContent=w.word;
     var zh=document.createElement("div");zh.className="riz";zh.textContent=w.zh;
     inf.appendChild(wd);inf.appendChild(zh);
-    var bg=document.createElement("span");bg.className="rib";bg.textContent=(!w.source||w.source==="null")?"手動":w.source;
+    var bg=document.createElement("span");bg.className="rib";bg.textContent=w.source||"手動";
     row.appendChild(inf);row.appendChild(bg);
     row.onclick=function(){openModal(w.word);};
     el.appendChild(row);
@@ -733,7 +735,7 @@ function filterLib(q){
     var num=mk("div","");num.style.cssText="font-size:11px;color:var(--mu);min-width:28px;text-align:right;flex-shrink:0";num.textContent=(libIdx+1)+"";
     var inf=mk("div","");inf.style.flex="1";
     inf.appendChild(mk("div","liw",w.word));
-    inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+((!w.source||w.source==="null")?"":" ("+w.source+")")));
+    inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+(w.source?" ("+w.source+")":"")));
     var act=mk("div","lact");act.onclick=function(e){e.stopPropagation();};
     var bd=mk("button","bdel","🗑");bd.onclick=(function(word){return function(){delWord(word);};})(w.word);
     var bs=mk("button","bspks","🔊");bs.onclick=(function(word){return function(){speak(word);};})(w.word);
@@ -783,23 +785,6 @@ function openModalFromLib(word,libIdx){
   scroll.scrollTop=0;
 
   document.getElementById("modal").style.display="flex";
-
-  // ── 點擊捲動區上半部：左側1/3 → 上一個，右側1/3 → 下一個
-  scroll.addEventListener("click",function(e){
-    if(e.target.closest("button,input,a,textarea"))return;
-    var rect=scroll.getBoundingClientRect();
-    var relX=e.clientX-rect.left;
-    var relY=e.clientY-rect.top;
-    if(relY>rect.height/2)return;
-    var third=rect.width/3;
-    if(relX<third){
-      var prev=(libIdx-1+LIB.length)%LIB.length;
-      openModalFromLib(LIB[prev].word,prev);
-    } else if(relX>rect.width-third){
-      var next=(libIdx+1)%LIB.length;
-      openModalFromLib(LIB[next].word,next);
-    }
-  });
 }
 function openModal(word){
   var idx=LIB.findIndex(function(x){return x.word===word;});
@@ -1305,7 +1290,7 @@ function startApp(){
   }
 }
 if(window._fbReady){startApp();}
-else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},8000);}
+else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},3000);}
 </script>
 
 
