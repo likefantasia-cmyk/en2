@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_10.html -->
+<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_11.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -377,7 +377,7 @@ function renderHome(){
     var wd=document.createElement("div");wd.className="riw";wd.textContent=w.word;
     var zh=document.createElement("div");zh.className="riz";zh.textContent=w.zh;
     inf.appendChild(wd);inf.appendChild(zh);
-    var bg=document.createElement("span");bg.className="rib";bg.textContent=w.source||"手動";
+    var bg=document.createElement("span");bg.className="rib";bg.textContent=(!w.source||w.source==="null")?"手動":w.source;
     row.appendChild(inf);row.appendChild(bg);
     row.onclick=function(){openModal(w.word);};
     el.appendChild(row);
@@ -796,7 +796,7 @@ function filterLib(q){
     var num=mk("div","");num.style.cssText="font-size:11px;color:var(--mu);min-width:28px;text-align:right;flex-shrink:0";num.textContent=(libIdx+1)+"";
     var inf=mk("div","");inf.style.flex="1";
     inf.appendChild(mk("div","liw",w.word));
-    inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+(w.source?" ("+w.source+")":"")));
+    inf.appendChild(mk("div","lii",(w.phonetic||"")+" · "+w.zh+((!w.source||w.source==="null")?"":" ("+w.source+")")));
     var act=mk("div","lact");act.onclick=function(e){e.stopPropagation();};
     var bd=mk("button","bdel","🗑");bd.onclick=(function(word){return function(){delWord(word);};})(w.word);
     var bs=mk("button","bspks","🔊");bs.onclick=(function(word){return function(){speak(word);};})(w.word);
