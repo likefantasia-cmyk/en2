@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_15.html -->
+<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_16.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -10,91 +10,171 @@
 <link href="./index_files/css2" rel="stylesheet">
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,doc,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,setDoc,getDoc,getDocs,deleteDoc,collection,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const cfg={apiKey:"AIzaSyCCl-dmOTiB3FMoavkaA6m_ZAHTPJgxNAs",authDomain:"kumoen.firebaseapp.com",projectId:"kumoen",storageBucket:"kumoen.firebasestorage.app",messagingSenderId:"407042193066",appId:"1:407042193066:web:f48c1b9ce10019437c42d3"};
 const app=initializeApp(cfg);
 const db=getFirestore(app);
-const REF=doc(db,"users","kumo");
+const UREF=doc(db,"users","kumo");
+const WCOL=collection(db,"users","kumo","words");
 
-// ── 第一層：localStorage 本機備份工具
+// ── localStorage 工具
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function lsBackup(lib,st){
-  try{
-    if(lib&&lib.length>0){localStorage.setItem("wl-lib-backup",JSON.stringify(lib));localStorage.setItem("wl-lib-count",lib.length);}
-    if(st)localStorage.setItem("wl-st-backup",JSON.stringify(st));
-  }catch(e){console.warn("lsBackup",e);}
+  if(lib&&lib.length>0){lsSet("wl-lib-backup",lib);lsSet("wl-lib-count",lib.length);}
+  if(st)lsSet("wl-st-backup",st);
 }
 function lsRestore(){
-  try{
-    var lib=JSON.parse(localStorage.getItem("wl-lib-backup")||"null");
-    var st=JSON.parse(localStorage.getItem("wl-st-backup")||"null");
-    return{lib:lib||[],st:st||{quiz:0,today:0,date:""}};
-  }catch(e){return{lib:[],st:{quiz:0,today:0,date:""}};}
+  return{lib:lsGet("wl-lib-backup")||[],st:lsGet("wl-st-backup")||{quiz:0,today:0,date:""}};
+}
+
+function wordKey(word){return word.toLowerCase().replace(/[^a-z0-9]/g,"_");}
+
+// ── 快速啟動：先用 localStorage，不等 Firebase
+function quickStart(){
+  const local=lsRestore();
+  window._lib=local.lib;
+  window._st=local.st;
+  window._fbReady=true;
+  if(window._onFbReady)window._onFbReady();
 }
 
 async function fbLoad(){
   try{
-    const snap=await getDoc(REF);
-    if(snap.exists()){
-      const d=snap.data();
-      const fbLib=d.library||[];
-      const fbSt=d.stats||{quiz:0,today:0,date:""};
-      console.log("Firebase 回傳筆數："+fbLib.length);
-      const local=lsRestore();
-      const knownCount=parseInt(localStorage.getItem("wl-lib-count")||"0");
-      if(fbLib.length===0){
-        if(local.lib.length>0){
-          console.warn("⚠️ Firebase 資料為空，使用本機備份（"+local.lib.length+" 筆）");
-          window._lib=local.lib;window._st=local.st;
-          window._dataWarning="Firebase 資料異常，已自動從本機備份還原 "+local.lib.length+" 個單字。請確認後手動同步。";
-        } else {
-          window._lib=[];window._st=fbSt;
-        }
-      } else if(knownCount>0&&fbLib.length<knownCount*0.5){
-        console.warn("⚠️ Firebase 筆數異常（"+fbLib.length+" vs 已知"+knownCount+"），使用本機備份");
-        window._lib=local.lib.length>fbLib.length?local.lib:fbLib;
-        window._st=fbSt;
-        window._dataWarning="偵測到雲端單字數量異常減少，已自動選用較多的版本（"+window._lib.length+" 個單字）。";
-      } else {
-        window._lib=fbLib;window._st=fbSt;
-        lsBackup(fbLib,fbSt);
-      }
-    } else {
-      // Firebase 沒有文件 → 嘗試本機備份
+    // 1. 先快速啟動（localStorage）
+    quickStart();
+
+    // 2. 背景讀 stats（1次讀取）比對 lastSaved
+    const usnap=await getDoc(UREF);
+    if(!usnap.exists()){
+      // 全新用戶或舊結構未遷移
       const local=lsRestore();
       if(local.lib.length>0){
-        window._lib=local.lib;window._st=local.st;
-        window._dataWarning="雲端無資料，已從本機備份還原 "+local.lib.length+" 個單字。";
+        // 有本機資料但 Firebase 無主文件 → 可能是全新的 subcollection 架構還沒建立
+        // 嘗試讀 subcollection
+        const wsnap=await getDocs(WCOL);
+        if(wsnap.empty){
+          // subcollection 也是空的 → 把本機資料推上去
+          console.log("全新遷移：推送本機資料到 Firebase");
+          await migrateToSubcollection(local.lib,local.st);
+        }
       }
+      return;
+    }
+
+    const d=usnap.data();
+    const fbSt=d.stats||{quiz:0,today:0,date:""};
+    const fbLastSaved=d.lastSaved||0;
+    const localLastSaved=lsGet("wl-lastSaved")||0;
+
+    // 3. 偵測舊結構（library 陣列在主文件）→ 自動遷移
+    if(d.library&&d.library.length>0){
+      console.log("偵測到舊結構，開始遷移 "+d.library.length+" 筆...");
+      window._lib=d.library;window._st=fbSt;
+      lsBackup(d.library,fbSt);
+      if(window._onFbReady)window._onFbReady(); // 已在 quickStart 呼叫，這裡只是確保
+      migrateToSubcollection(d.library,fbSt).then(function(){
+        console.log("遷移完成！");
+      });
+      return;
+    }
+
+    // 4. 比對 lastSaved：一樣 → 用快取，不同 → 重新讀
+    if(fbLastSaved&&fbLastSaved===localLastSaved){
+      console.log("快取命中，不需重新讀取（lastSaved="+fbLastSaved+"）");
+      // stats 可能有更新（quiz次數等）
+      window._st=fbSt;lsSet("wl-st-backup",fbSt);
+      if(window._onFbReady){}; // 已啟動
+      return;
+    }
+
+    // 5. lastSaved 不同 → 讀 subcollection（資料有變動）
+    console.log("快取過期，重新讀取 subcollection...");
+    const wsnap=await getDocs(WCOL);
+    const fbLib=[];
+    wsnap.forEach(function(d){if(d.data().word)fbLib.push(d.data());});
+    fbLib.sort(function(a,b){return(a.addedAt||0)-(b.addedAt||0);});
+    console.log("Firebase 回傳筆數："+fbLib.length);
+
+    if(fbLib.length>0){
+      window._lib=fbLib;window._st=fbSt;
+      lsBackup(fbLib,fbSt);
+      lsSet("wl-lastSaved",fbLastSaved);
+      // 更新畫面（已啟動後同步）
+      if(window.refreshApp)window.refreshApp();
     }
   }catch(e){
-    console.warn("fbLoad",e);
-    // Firebase 連線失敗 → 用本機備份
-    const local=lsRestore();
-    window._lib=local.lib;window._st=local.st;
-    if(local.lib.length>0)window._dataWarning="離線模式：顯示本機備份的 "+local.lib.length+" 個單字。";
+    console.warn("fbLoad error",e);
   }
 }
 
+// ── 遷移舊結構到 subcollection
+async function migrateToSubcollection(oldLib,fbSt){
+  try{
+    const ts=Date.now();
+    var b=writeBatch(db);var cnt=0;var batches=[];
+    oldLib.forEach(function(w){
+      if(!w.word)return;
+      b.set(doc(WCOL,wordKey(w.word)),w);cnt++;
+      if(cnt%400===0){batches.push(b);b=writeBatch(db);}
+    });
+    batches.push(b);
+    for(var i=0;i<batches.length;i++){await batches[i].commit();}
+    await setDoc(UREF,{stats:fbSt,lastSaved:ts,migrated:true},{merge:true});
+    lsSet("wl-lastSaved",ts);
+    // 清除舊的 library 陣列
+    await setDoc(UREF,{library:[]},{merge:true});
+    lsBackup(oldLib,fbSt);
+  }catch(e){console.warn("遷移失敗",e);}
+}
+
+// ── 新增/更新單一單字
+async function fbSaveWord(w){
+  if(!w||!w.word)return;
+  try{
+    const ts=Date.now();
+    await setDoc(doc(WCOL,wordKey(w.word)),w);
+    await setDoc(UREF,{lastSaved:ts},{merge:true});
+    lsSet("wl-lastSaved",ts);
+    lsBackup(window._lib||[],window._st||{});
+    syncUI&&syncUI(false);
+  }catch(e){console.warn("fbSaveWord",e);}
+}
+
+// ── 刪除單一單字
+async function fbDeleteWord(word){
+  if(!word)return;
+  try{
+    const ts=Date.now();
+    await deleteDoc(doc(WCOL,wordKey(word)));
+    await setDoc(UREF,{lastSaved:ts},{merge:true});
+    lsSet("wl-lastSaved",ts);
+    lsBackup(window._lib||[],window._st||{});
+  }catch(e){console.warn("fbDeleteWord",e);}
+}
+
+// ── 儲存 stats
+async function fbSaveSt(st){
+  try{
+    await setDoc(UREF,{stats:st},{merge:true});
+    lsSet("wl-st-backup",st);
+  }catch(e){console.warn("fbSaveSt",e);}
+}
+
+// ── 相容舊介面
 async function fbSave(){
   try{
-    const lib=window._lib||[];
     const st=window._st||{};
-    // ── 第三層：存檔前檢查，防止空資料覆蓋雲端
-    const knownCount=parseInt(localStorage.getItem("wl-lib-count")||"0");
-    if(knownCount>0&&lib.length===0){
-      console.warn("🛑 阻止危險存檔：LIB 為空但已知有 "+knownCount+" 筆資料");
-      return;
-    }
-    if(knownCount>4&&lib.length<knownCount*0.5){
-      console.warn("🛑 阻止危險存檔：單字數量從 "+knownCount+" 驟降至 "+lib.length);
-      return;
-    }
-    await setDoc(REF,{library:lib,stats:st},{merge:true});
-    lsBackup(lib,st); // 存檔成功 → 同步更新本機備份
+    await setDoc(UREF,{stats:st},{merge:true});
+    lsBackup(window._lib||[],st);
   }catch(e){console.warn("fbSave",e);}
 }
+
 window.fbSave=fbSave;
-fbLoad().then(()=>{window._fbReady=true;if(window._onFbReady)window._onFbReady();});
+window.fbSaveWord=fbSaveWord;
+window.fbDeleteWord=fbDeleteWord;
+window.fbSaveSt=fbSaveSt;
+fbLoad();
 </script>
 <style>
 :root{--bg:#1a1a1a;--s1:#222;--s2:#2a2a2a;--bd:#3a3a3a;--bd2:#444;--ac:#d97706;--al:#f59e0b;--abg:rgba(217,119,6,.1);--abr:rgba(217,119,6,.3);--gn:#22c55e;--rd:#ef4444;--bl:#60a5fa;--pu:#a78bfa;--tx:#f5f0eb;--mu:#888;--m2:#aaa;}
@@ -316,7 +396,7 @@ nav button.on{color:var(--al)}
 <div class="mbg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="mbody"></div>
 </div>
-<div class="toast" id="toast">⚠️ null</div>
+<div class="toast" id="toast"></div>
 <script>
 var LIB=[],ST={quiz:0,today:0,date:""},KEY=localStorage.getItem("wl-key")||"";
 var PEND=[],QTMR=null;
@@ -708,8 +788,12 @@ function saveAll(){
 }
 function pushLib(w){
   chkDay();
-  LIB.push({word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()});
-  ST.today++;saveD();saveST();
+  var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()};
+  LIB.push(wobj);
+  ST.today++;
+  lsBackup(LIB,ST);
+  if(window.fbSaveWord)window.fbSaveWord(wobj);
+  if(window.fbSaveSt)window.fbSaveSt(ST);
 }
 function lookupWord(word){
   var ra=document.getElementById("ra");ra.innerHTML="";
@@ -745,9 +829,12 @@ function filterLib(q){
   });
 }
 function delWord(word){
+  if(!word||word==="null"){toast("⚠️ 無效單字，略過");return;}
   if(!confirm("確定刪除「"+word+"」？"))return;
   LIB=LIB.filter(function(w){return w.word!==word;});
-  saveD();renderLib();renderHome();toast("🗑 已刪除「"+word+"」");
+  lsBackup(LIB,ST);
+  if(window.fbDeleteWord)window.fbDeleteWord(word);
+  renderLib();renderHome();toast("🗑 已刪除「"+word+"」");
 }
 
 function openModalFromLib(word,libIdx){
@@ -837,7 +924,9 @@ function enrichWord(word,btn){
       var ws=parseAI(raw);var r=ws[0];if(!r)throw new Error("失敗");
       var w=LIB.find(function(x){return x.word===word;});if(!w)return;
       Object.assign(w,{phonetic:r.phonetic||"",pos:r.pos||"",conjugation:r.conjugation||null,en_def:r.en_def||"",example_en:r.example_en||"",example_zh:r.example_zh||"",roots:r.roots||[],root_tip:r.root_tip||"",family_words:r.family_words||[],memory_tip:r.memory_tip||"",level:r.level||""});
-      saveD();toast("✅ 分析完成："+word);openModal(word);
+      lsBackup(LIB,ST);
+      if(window.fbSaveWord)window.fbSaveWord(w);
+      toast("✅ 分析完成："+word);openModal(word);
     })
     .catch(function(e){btn.disabled=false;btn.textContent="🤖 AI 補充完整分析";toast("❌ "+e.message);});
 }
@@ -1283,14 +1372,22 @@ function startApp(){
   if(window._st)ST=window._st;
   var ld=document.getElementById("fbld");if(ld)ld.style.display="none";
   syncUI(false);renderHome();
-  // 顯示資料異常警告
   if(window._dataWarning){
     setTimeout(function(){toast("⚠️ "+window._dataWarning,5000);},800);
     window._dataWarning=null;
   }
 }
+// 背景同步完成後更新畫面
+window.refreshApp=function(){
+  if(window._lib)LIB=window._lib;
+  if(window._st)ST=window._st;
+  renderHome();
+  var curLib=document.getElementById("v-lib");
+  if(curLib&&curLib.classList.contains("show"))renderLib();
+  syncUI(false);
+};
 if(window._fbReady){startApp();}
-else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},3000);}
+else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},15000);}
 </script>
 
 
