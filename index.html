@@ -122,11 +122,25 @@ async function migrateToSubcollection(oldLib,fbSt){
     for(var i=0;i<batches.length;i++){await batches[i].commit();}
     await setDoc(UREF,{stats:fbSt,lastSaved:ts,migrated:true},{merge:true});
     lsSet("wl-lastSaved",ts);
-    // 清除舊的 library 陣列
-    await setDoc(UREF,{library:[]},{merge:true});
+    // 保留舊 library 陣列，讓舊版 app 也能讀到資料。
+    await setDoc(UREF,{library:oldLib},{merge:true});
     lsBackup(oldLib,fbSt);
   }catch(e){console.warn("遷移失敗",e);}
 }
+
+async function restoreLegacyLibrary(){
+  try{
+    const wsnap=await getDocs(WCOL);
+    const fbLib=[];
+    wsnap.forEach(function(d){if(d.data().word)fbLib.push(d.data());});
+    fbLib.sort(function(a,b){return(a.addedAt||0)-(b.addedAt||0);});
+    if(!fbLib.length){toast("Firebase words 子集合沒有資料可還原");return;}
+    await setDoc(UREF,{library:fbLib,stats:ST,lastSaved:Date.now(),legacyRestored:true},{merge:true});
+    LIB=fbLib;window._lib=LIB;lsBackup(LIB,ST);renderHome();renderLib();
+    toast("已把 "+fbLib.length+" 個單字還原到舊版 library");
+  }catch(e){toast("還原失敗："+e.message,5000);}
+}
+window.restoreLegacyLibrary=restoreLegacyLibrary;
 
 // ── 新增/更新單一單字
 async function fbSaveWord(w){
@@ -623,7 +637,13 @@ function renderAdd(){
   var impbtn=mk("button","bp","📤 匯入 JSON");
   impbtn.style.cssText="background:var(--s2);border:1px solid var(--bd2);color:var(--m2);flex:1";
   impbtn.onclick=function(){impinput.click();};
+  var restoreBtn=mk("button","bp","🛟 還原舊版相容");
+  restoreBtn.style.cssText="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.28);color:var(--bl);flex:1";
+  restoreBtn.onclick=function(){
+    if(confirm("這會把 Firebase words 子集合中的單字寫回舊版 library，讓舊版 app 也看得到。要執行嗎？"))restoreLegacyLibrary();
+  };
   expdiv.appendChild(expbtn);expdiv.appendChild(impbtn);expdiv.appendChild(impinput);
+  expdiv.appendChild(restoreBtn);
 
   w.appendChild(hr);w.appendChild(tabs);w.appendChild(mc);w.appendChild(mw);w.appendChild(mp);w.appendChild(expdiv);w.appendChild(ra);
   PF=null;
