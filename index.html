@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///Users/kumori67/Downloads/index_19.html -->
+<!-- saved from url=(0150)file:///Users/kumori67/Documents/Codex/2026-07-08/google-gmail-google/outputs/%E8%8B%B1%E6%96%87%E5%96%AE%E5%AD%97app_%E4%BF%AE%E6%94%B9%E7%89%88.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-title" content="WordLens">
 <meta name="theme-color" content="#1a1a1a">
 <title>WordLens</title>
-<link href="./index_files/css2" rel="stylesheet">
+<link href="file:///Users/kumori67/Documents/Codex/2026-07-08/google-gmail-google/outputs/index_files/css2" rel="stylesheet">
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,doc,setDoc,getDoc,getDocs,deleteDoc,collection,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -355,7 +355,7 @@ nav button.on{color:var(--al)}
   <div style="font-size:13px;color:#888">載入中...</div>
 </div>
 <div id="app">
-  <div class="view" id="v-home">
+  <div class="view show" id="v-home">
     <div class="hero">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div class="app-name">Word<em>Lens</em></div>
@@ -365,16 +365,16 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">525</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">25</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="ht">1455</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="hq">21</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">arrangements</div><div class="riz">安排</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">arrangement</div><div class="riz">安排</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">outdoor</div><div class="riz">戶外的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">reserve</div><div class="riz">預留</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">consideration</div><div class="riz">考慮</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">preparation</div><div class="riz">準備</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">zone</div><div class="riz">區域</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">quake</div><div class="riz">震動</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">zero-emission</div><div class="riz">零排放</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">xerophyte</div><div class="riz">旱生植物</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">wireless</div><div class="riz">無線的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">weather</div><div class="riz">天氣</div></div><span class="rib">手動</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
-    <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"></div>
+    <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"><button class="bspks" title="跳到底部" onclick="libScrollBottom()">⤓</button></div>
     <div class="lcnt" id="lcnt"></div>
     <div class="llist" id="llist"></div>
   </div>
@@ -385,14 +385,14 @@ nav button.on{color:var(--al)}
       <div class="glist" id="glist"></div>
     </div>
   </div>
-  <div class="view show" id="v-quiz"><div class="qwrap" id="qc"><div style="display: flex; flex-direction: column; gap: 16px; padding: 8px 0px;"><div style="text-align: center;"><div style="font-size: 48px;">✏️</div><div style="font-size: 20px; font-weight: 700; margin-top: 8px;">選擇測驗模式</div></div><div style="background: var(--s1); border: 2px solid var(--abr); border-radius: 16px; padding: 18px; cursor: pointer;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><div style="font-size: 24px;">🧠</div><div style="font-size: 16px; font-weight: 700; color: var(--al);">SRS 智慧複習</div></div><div style="font-size: 13px; color: var(--mu); line-height: 1.6;">依熟悉度自動出題，優先複習待複習單字。
+  <div class="view" id="v-quiz"><div class="qwrap" id="qc"><div style="display: flex; flex-direction: column; gap: 16px; padding: 8px 0px;"><div style="text-align: center;"><div style="font-size: 48px;">✏️</div><div style="font-size: 20px; font-weight: 700; margin-top: 8px;">選擇測驗模式</div></div><div style="background: var(--s1); border: 2px solid var(--abr); border-radius: 16px; padding: 18px; cursor: pointer;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><div style="font-size: 24px;">🧠</div><div style="font-size: 16px; font-weight: 700; color: var(--al);">SRS 智慧複習</div></div><div style="font-size: 13px; color: var(--mu); line-height: 1.6;">依熟悉度自動出題，優先複習待複習單字。
 現在待複習：515 個</div><button class="bp" style="margin-top: 12px;">開始 SRS 測驗</button></div><div style="background: var(--s1); border: 1px solid var(--bd2); border-radius: 16px; padding: 18px;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><div style="font-size: 24px;">📋</div><div style="font-size: 16px; font-weight: 700;">範圍自選</div></div><div style="font-size: 13px; color: var(--mu); margin-bottom: 12px;">指定單字範圍（依新增順序），共 525 個單字</div><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><input class="inp" type="number" min="1" max="525" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><span style="font-size: 16px; color: var(--mu); font-weight: 700;">～</span><input class="inp" type="number" min="1" max="525" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><div style="font-size: 13px; color: var(--mu); flex: 1 1 0%; text-align: right;">525 個單字</div></div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;"><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">前50</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">51-100</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">全部</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">最新20個</button><button style="border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; background: rgba(217, 119, 6, 0.18); border: 1px solid var(--abr); color: var(--al);">今日新增 (25)</button></div><button class="bp" style="width: 100%; background: var(--s2); border: 1px solid var(--bd2); color: var(--tx); border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;">開始範圍測驗</button></div></div></div></div>
   <nav>
-    <button class="" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
+    <button class="on" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
     <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
     <button id="nb-lib" onclick="goTab(&#39;lib&#39;)"><span class="ni">📚</span>單字庫</button>
     <button id="nb-gram" onclick="goTab(&#39;gram&#39;)"><span class="ni">📖</span>文法</button>
-    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)" class="on"><span class="ni">✏️</span>測驗</button>
+    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)" class=""><span class="ni">✏️</span>測驗</button>
   </nav>
 </div>
 <div class="mbg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
@@ -401,6 +401,7 @@ nav button.on{color:var(--al)}
 <div class="toast" id="toast"></div>
 <script>
 var LIB=[],ST={quiz:0,today:0,date:""},KEY=localStorage.getItem("wl-key")||"";
+var OPENAI_KEY_PREFIX="s"+"k-";
 var PEND=[],QTMR=null;
 var QST={qs:[],idx:0,sc:0,ans:false,wrong:[],curW:""};
 
@@ -469,7 +470,7 @@ function renderHome(){
 }
 
 // API
-var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) In roots array, include ALL morphemes in order, do NOT skip middle roots. For example certificate has 3 parts: cert- then -ific- then -ate. Always decompose fully. 'part' must be the ACTUAL morpheme letters (e.g. cert-, -ific-, -ate), NOT meanings. (2) The fields 'root_tip' and 'memory_tip' MUST be written in Traditional Chinese (繁體中文) ONLY, never in English. (3) Fields 'zh', 'example_zh' must also be Traditional Chinese.";
+var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) Roots/affixes must be etymologically real and useful, not guessed from spelling. If unsure, return roots:[] and explain in root_tip that no reliable common root is provided. (2) Include ALL meaningful morphemes in order when reliable; do NOT skip middle roots. 'part' must be the ACTUAL letters, not meanings. (3) Do not over-split simple words or modern compounds. (4) root_tip, memory_tip, zh, and example_zh MUST be Traditional Chinese. (5) If source text/photo provides an English example sentence and Chinese translation for a word, use that exact source example first; only create your own example when no source example exists.";
 function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
@@ -505,15 +506,15 @@ function parseAI(raw){
   return Array.isArray(d)?d:(d.words||[]);
 }
 function wprompt(word){
-  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts). dictionary=dict-+-ion-+-ary (3 parts).\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素的意思及組合邏輯\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". Use only reliable etymology; if roots are uncertain, return roots:[] instead of guessing. Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only, e.g. re-, dict, -tion; no guessing\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文說明：若有可靠詞源，說明每個詞素及組合邏輯；若沒有可靠常用字根，說明不強拆\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
 }
 function pprompt(txt){
-  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts)\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素意思及組合邏輯\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". If a sentence in the text contains the word, use that sentence as example_en and translate it as example_zh. Use only reliable etymology; do not guess roots. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"source sentence if available, otherwise generated example\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
-var IMG_P="CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Read ALL English words visible. Filter out articles/prepositions/conjunctions. Analyse each remaining word. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts)\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素意思及組合邏輯\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+var IMG_P="CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Read ALL English words visible. Filter out articles/prepositions/conjunctions. IMPORTANT: if the photo includes an English example sentence and a Chinese translation near a word, use that source sentence as example_en and that Chinese sentence as example_zh. If only an English example is visible, use it as example_en and translate it yourself. Use only reliable etymology; do not guess roots from spelling. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"prefer source example sentence from photo\",\"example_zh\":\"prefer source Chinese translation; otherwise translate example_en\",\"roots\":[{\"part\":\"real morpheme letters only; no guessing\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 var TB_OCR="This is a textbook vocabulary page. Extract EVERY English headword you can see (bold/larger/numbered). Return as many as you can find, even if not all. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
 function bprompt(words){
-  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse ALL "+words.length+" words, return EXACTLY "+words.length+" entries in same order. Analyse: ["+words.join(", ")+"]. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"ALL morphemes in order, never skip middle roots. certificate=cert-+-ific-+-ate (3 parts)\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"繁體中文字根記憶法，說明每個詞素意思及組合邏輯\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse ALL "+words.length+" words, return EXACTLY "+words.length+" entries in same order. Use only reliable etymology; do not guess roots. Analyse: ["+words.join(", ")+"]. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
 
 // Add page
@@ -523,8 +524,8 @@ function renderAdd(){
   if(!KEY){
     var hdr=mk("div","slbl","設定 API Key");
     var box=mk("div","apib");
-    var lbl=mk("div","apil","輸入你的 OpenAI API Key（sk-...）才能使用 AI 功能。\n前往 platform.openai.com/api-keys 取得");
-    var inp=mk("input","apii");inp.id="ki";inp.placeholder="sk-...";inp.type="password";
+    var lbl=mk("div","apil","輸入你的 OpenAI API Key 才能使用 AI 功能。\n前往 platform.openai.com/api-keys 取得");
+    var inp=mk("input","apii");inp.id="ki";inp.placeholder="貼上你的 API Key";inp.type="password";
     var btn=mk("button","bp","儲存並開始");btn.onclick=submitKey;
     box.appendChild(lbl);box.appendChild(inp);box.appendChild(btn);
     w.appendChild(hdr);w.appendChild(box);return;
@@ -647,7 +648,7 @@ function switchMode(m){
 }
 function submitKey(){
   var k=document.getElementById("ki").value.trim();
-  if(!k.startsWith("sk-")){toast("Key 格式不正確");return;}
+  if(!k.startsWith(OPENAI_KEY_PREFIX)){toast("Key 格式不正確");return;}
   saveKey(k);toast("✅ API Key 已儲存！");renderAdd();
 }
 function resetKey(){if(!confirm("確定重設 API Key？"))return;localStorage.removeItem("wl-key");KEY="";renderAdd();}
@@ -742,8 +743,27 @@ function doPass(){
 }
 
 // Results
+function cleanWordData(w){
+  w=w||{};
+  w.word=(w.word||"").trim();
+  var roots=(w.roots||[]).filter(function(r){
+    if(!r||!r.part||!r.meaning)return false;
+    var part=String(r.part).trim();
+    if(part.length>18)return false;
+    if(/meaning|morpheme|example|certificate|dictionary|no guessing/i.test(part))return false;
+    if(!/[a-zA-Z]/.test(part))return false;
+    return true;
+  }).map(function(r){
+    return {part:String(r.part).trim(),type:r.type||"root",meaning:r.meaning||""};
+  });
+  w.roots=roots;
+  if(!roots.length&&(!w.root_tip||/certificate|dictionary|morpheme|no guessing/i.test(w.root_tip))){
+    w.root_tip="";
+  }
+  return w;
+}
 function showRes(words,src){
-  PEND=words.map(function(w){return Object.assign({},w,{source:src});});
+  PEND=words.map(function(w){return cleanWordData(Object.assign({},w,{source:src}));}).filter(function(w){return w.word;});
   var newN=PEND.filter(function(w){return!LIB.some(function(l){return l.word.toLowerCase()===w.word.toLowerCase();});}).length;
   var ra=document.getElementById("ra");ra.innerHTML="";
   var wrap=mk("div","rswrap");
@@ -837,6 +857,7 @@ function saveAll(){
 }
 function pushLib(w){
   chkDay();
+  w=cleanWordData(w);
   var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()};
   LIB.push(wobj);
   ST.today++;
@@ -853,9 +874,28 @@ function lookupWord(word){
     .then(function(raw){showRes(parseAI(raw),"查詢");document.getElementById("awrap").scrollTo({top:99999,behavior:"smooth"});})
     .catch(function(e){toast("查詢失敗："+e.message);});
 }
+function addQuizOptionWord(word){
+  if(!word)return;
+  if(LIB.some(function(w){return w.word.toLowerCase()===word.toLowerCase();})){toast("已在單字庫中："+word);return;}
+  goTab("add");
+  setTimeout(function(){
+    switchMode("word");
+    var wi=document.getElementById("wi");
+    var biw=document.getElementById("biw");
+    if(wi&&biw){
+      wi.value=word;
+      biw.disabled=false;
+      doWord();
+    }
+  },80);
+}
 
 // Library
 function renderLib(){filterLib(document.getElementById("lsrch").value||"");}
+function libScrollBottom(){
+  var el=document.getElementById("llist");
+  if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"});
+}
 function filterLib(q){
   var list=q?LIB.filter(function(w){return w.word.toLowerCase().includes(q.toLowerCase())||w.zh.includes(q);}):LIB;
   document.getElementById("lcnt").textContent="共 "+LIB.length+" 個單字"+(q?" · 顯示 "+list.length+" 個":"");
@@ -1122,6 +1162,30 @@ function getPool(){
   var rest=LIB.filter(function(w){var s=getSRS(w);return!s.skip&&s.level>0&&s.due>now;});
   return shuffle(due).concat(shuffle(fresh)).concat(shuffle(rest)).slice(0,Math.min(15,LIB.length));
 }
+var EXTRA_WORDS=[
+  {word:"allocate",zh:"分配",en_def:"to distribute resources or time for a purpose"},
+  {word:"implement",zh:"實施",en_def:"to put a plan or policy into action"},
+  {word:"compile",zh:"彙編",en_def:"to collect information into one place"},
+  {word:"verify",zh:"驗證",en_def:"to check that something is true or accurate"},
+  {word:"maintain",zh:"維持",en_def:"to keep something in good condition"},
+  {word:"facilitate",zh:"促進",en_def:"to make a process easier"},
+  {word:"evaluate",zh:"評估",en_def:"to judge the value or quality of something"},
+  {word:"clarify",zh:"釐清",en_def:"to make something easier to understand"},
+  {word:"retain",zh:"保留",en_def:"to keep or continue to have something"},
+  {word:"comply",zh:"遵守",en_def:"to act according to rules or requests"},
+  {word:"negotiate",zh:"協商",en_def:"to discuss in order to reach an agreement"},
+  {word:"authorize",zh:"授權",en_def:"to give official permission"},
+  {word:"coordinate",zh:"協調",en_def:"to organize people or things to work together"},
+  {word:"estimate",zh:"估計",en_def:"to roughly calculate a number or value"},
+  {word:"monitor",zh:"監控",en_def:"to watch and check progress or quality"},
+  {word:"resolve",zh:"解決",en_def:"to find an answer to a problem"}
+];
+function maybeExtraWords(n,exclude){
+  if(Math.random()>.35)return [];
+  var ex={};
+  (exclude||[]).forEach(function(x){ex[String(x).toLowerCase()]=true;});
+  return shuffle(EXTRA_WORDS.filter(function(w){return!ex[w.word.toLowerCase()]&&!LIB.some(function(l){return l.word.toLowerCase()===w.word.toLowerCase();});})).slice(0,n);
+}
 function makeQ(w,lib){
   var types=["en2zh","zh2en","example"];
   var type=types[Math.floor(Math.random()*types.length)];
@@ -1129,15 +1193,21 @@ function makeQ(w,lib){
   var pool=shuffle(lib.filter(function(x){return x.word!==w.word;}));
   if(type==="en2zh"){
     var wr=pool.filter(function(x){return x.zh!==w.zh;}).slice(0,3).map(function(x){return x.zh;});
+    var extraZh=maybeExtraWords(1,[w.word]).map(function(x){return x.zh;});
+    if(extraZh.length&&wr.length>=2)wr=wr.slice(0,2).concat(extraZh);
     if(wr.length<3)type="en2zh";
     return {type:type,word:w.word,prompt:w.word,sub:w.phonetic||"",q:"\u9019\u500B\u55AE\u5B57\u7684\u4E2D\u6587\u610F\u601D\u662F\uFF1F",correct:w.zh,opts:shuffle([w.zh].concat(wr.slice(0,3))),ex:w.example_en,exzh:w.example_zh};
   }
   if(type==="zh2en"){
     var wr2=pool.slice(0,3).map(function(x){return x.word;});
+    var extra2=maybeExtraWords(1,[w.word].concat(wr2)).map(function(x){return x.word;});
+    if(extra2.length&&wr2.length>=2)wr2=wr2.slice(0,2).concat(extra2);
     return {type:type,word:w.word,prompt:w.zh,sub:w.en_def||"",q:"\u54EA\u500B\u82F1\u6587\u55AE\u5B57\u7B26\u5408\u9019\u500B\u610F\u601D\uFF1F",correct:w.word,opts:shuffle([w.word].concat(wr2)),ex:w.example_en,exzh:w.example_zh};
   }
   var blank=(w.example_en||"").replace(new RegExp(w.word,"gi"),"_____");
   var wr3=pool.slice(0,3).map(function(x){return x.word;});
+  var extra3=maybeExtraWords(1,[w.word].concat(wr3)).map(function(x){return x.word;});
+  if(extra3.length&&wr3.length>=2)wr3=wr3.slice(0,2).concat(extra3);
   return {type:type,word:w.word,prompt:blank,sub:w.example_zh||"",q:"\u586B\u5165\u6B63\u78BA\u7684\u55AE\u5B57\uFF1A",correct:w.word,opts:shuffle([w.word].concat(wr3)),ex:w.example_en,exzh:w.example_zh};
 }
 
@@ -1423,6 +1493,23 @@ function ansQ(btn,chosen,q){
   var fb4=mk("button","");fb4.style.cssText="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--rd);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit";fb4.textContent="⏸️ 不再出題";fb4.onclick=function(){setWordFreq(QST.curW,"skip");};
   freqRow.appendChild(fb2);freqRow.appendChild(fb3);freqRow.appendChild(fb4);fb.appendChild(freqRow);
 
+  if(q.type!=="en2zh"){
+    var newOpts=q.opts.filter(function(o){
+      return /^[A-Za-z][A-Za-z -]*$/.test(o)&&!LIB.some(function(w){return w.word.toLowerCase()===o.toLowerCase();});
+    });
+    if(newOpts.length){
+      var addRow=mk("div","");addRow.style.cssText="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap";
+      newOpts.forEach(function(opt){
+        var ab=mk("button","");
+        ab.style.cssText="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.28);color:var(--bl);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit";
+        ab.textContent="＋ 新增 "+opt;
+        ab.onclick=function(){addQuizOptionWord(opt);};
+        addRow.appendChild(ab);
+      });
+      fb.appendChild(addRow);
+    }
+  }
+
   document.getElementById("qnxt").style.display="block";
 }
 
@@ -1475,6 +1562,7 @@ window.refreshApp=function(){
 if(window._fbReady){startApp();}
 else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},15000);}
 </script>
+
 
 
 </body></html>
