@@ -379,12 +379,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">1455</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
-      <div class="stat"><div class="stn" id="hq">21</div><div class="stl">測驗次數</div></div>
+      <div class="stat"><div class="stn" id="ht">1471</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">16</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">zone</div><div class="riz">區域</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">quake</div><div class="riz">震動</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">zero-emission</div><div class="riz">零排放</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">xerophyte</div><div class="riz">旱生植物</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">wireless</div><div class="riz">無線的</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">weather</div><div class="riz">天氣</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">characterize</div><div class="riz">描繪...特性；以...為特徵</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">censorship</div><div class="riz">審查（制度）；檢查（制度）</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">burden</div><div class="riz">重擔</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">bribery</div><div class="riz">行賄；受賄</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">bribe</div><div class="riz">行賄；收買</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">staff</div><div class="riz">員工</div></div><span class="rib">拍照</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -501,11 +501,17 @@ function fileToB64(file){
     reader.onload=function(e){
       var img=new Image();
       img.onload=function(){
-        var MAX=2048,w=img.width,h=img.height;
-        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        var MAX=2600,w=img.width,h=img.height;
+        if(w>MAX||h>MAX){
+          var sc=Math.min(MAX/w,MAX/h);
+          w=Math.round(w*sc);h=Math.round(h*sc);
+        }
         var c=document.createElement("canvas");c.width=w;c.height=h;
-        c.getContext("2d").drawImage(img,0,0,w,h);
-        res(c.toDataURL("image/jpeg",0.95).split(",")[1]);
+        var ctx=c.getContext("2d");
+        ctx.imageSmoothingEnabled=true;
+        ctx.imageSmoothingQuality="high";
+        ctx.drawImage(img,0,0,w,h);
+        res(c.toDataURL("image/jpeg",0.98).split(",")[1]);
       };
       img.onerror=rej;img.src=e.target.result;
     };
@@ -527,8 +533,30 @@ function pprompt(txt){
 }
 var IMG_P="CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Read ALL English words visible. Filter out articles/prepositions/conjunctions. IMPORTANT: if the photo includes an English example sentence and a Chinese translation near a word, use that source sentence as example_en and that Chinese sentence as example_zh. If only an English example is visible, use it as example_en and translate it yourself. Use only reliable etymology; do not guess roots from spelling. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"prefer source example sentence from photo\",\"example_zh\":\"prefer source Chinese translation; otherwise translate example_en\",\"roots\":[{\"part\":\"real morpheme letters only; no guessing\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 var TB_OCR="This is a textbook vocabulary page. Extract EVERY English headword you can see (bold/larger/numbered). Return as many as you can find, even if not all. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
+var PHOTO_OCR="You are an OCR expert for English vocabulary textbook photos. Read the image carefully. Extract every vocabulary headword or important English word/phrase visible. For each item, also capture the nearest English example sentence if visible, and the nearest Chinese translation if visible. Do not analyse etymology here. Do not invent. Return JSON only: {\"items\":[{\"word\":\"headword or phrase\",\"example_en\":\"source English sentence if visible, otherwise empty\",\"example_zh\":\"source Chinese translation if visible, otherwise empty\"}]}";
 function bprompt(words){
   return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse ALL "+words.length+" words, return EXACTLY "+words.length+" entries in same order. Use only reliable etymology; do not guess roots. Analyse: ["+words.join(", ")+"]. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+}
+function photoAnalysisPrompt(items){
+  var compact=items.map(function(it){return{word:it.word,example_en:it.example_en||"",example_zh:it.example_zh||""};});
+  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse these OCR items. Return EXACTLY "+compact.length+" word entries in the same order. IMPORTANT: if example_en/example_zh are provided from OCR, preserve them and use them in the final JSON; if example_en exists but example_zh is empty, translate example_en into Traditional Chinese. Use only reliable etymology; do not guess roots from spelling. OCR items: "+JSON.stringify(compact)+". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"one English definition\",\"example_en\":\"prefer OCR source example_en\",\"example_zh\":\"prefer OCR source example_zh or translated Traditional Chinese\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+}
+function parsePhotoItems(raw){
+  var s=raw.trim();
+  var fence=String.fromCharCode(96,96,96);
+  if(s.indexOf(fence)>=0){s=s.split(fence+"json").join("").split(fence).join("").trim();}
+  var d=JSON.parse(s);
+  var arr=Array.isArray(d)?d:(d.items||d.detected_words||[]);
+  var seen={};
+  return arr.map(function(x){
+    if(typeof x==="string")return{word:x,example_en:"",example_zh:""};
+    return{word:(x.word||"").trim(),example_en:x.example_en||"",example_zh:x.example_zh||""};
+  }).filter(function(x){
+    var k=x.word.toLowerCase();
+    if(!x.word||seen[k])return false;
+    seen[k]=true;
+    return /^[A-Za-z][A-Za-z '-]{1,40}$/.test(x.word);
+  }).slice(0,18);
 }
 
 // Add page
@@ -701,11 +729,16 @@ function doImg(){
         return callAI([{role:"system",content:SYS},{role:"user",content:bprompt(words)}]);
       }).then(function(raw){showRes(parseAI(raw),"課本");});
     } else {
-      setLoad("AI 辨識圖片單字...");
+      setLoad("第1步：完整 OCR 辨識單字與例句...");
       return callAI([
-        {role:"system",content:SYS},
-        {role:"user",content:[{type:"image_url",image_url:{url:"data:image/jpeg;base64,"+b64}},{type:"text",text:IMG_P}]}
-      ]).then(function(raw){showRes(parseAI(raw),"拍照");});
+        {role:"system",content:"You are a careful OCR engine. Extract text from the image before doing any vocabulary analysis. Respond only with valid JSON."},
+        {role:"user",content:[{type:"image_url",image_url:{url:"data:image/jpeg;base64,"+b64}},{type:"text",text:PHOTO_OCR}]}
+      ]).then(function(raw){
+        var items=parsePhotoItems(raw);
+        if(!items.length)throw new Error("OCR 沒抓到單字，請試試課本單字頁模式或換一張更清楚的照片");
+        setLoad("第2步：分析 "+items.length+" 個單字...");
+        return callAI([{role:"system",content:SYS},{role:"user",content:photoAnalysisPrompt(items)}]);
+      }).then(function(raw){showRes(parseAI(raw),"拍照");});
     }
   }).catch(function(e){
     var ra=document.getElementById("ra");ra.innerHTML="";
