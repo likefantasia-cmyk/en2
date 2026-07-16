@@ -369,7 +369,7 @@ nav button.on{color:var(--al)}
   <div style="font-size:13px;color:#888">載入中...</div>
 </div>
 <div id="app">
-  <div class="view show" id="v-home">
+  <div class="view" id="v-home">
     <div class="hero">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div class="app-name">Word<em>Lens</em></div>
@@ -379,12 +379,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">1471</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">16</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="ht">1473</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
       <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">characterize</div><div class="riz">描繪...特性；以...為特徵</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">censorship</div><div class="riz">審查（制度）；檢查（制度）</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">burden</div><div class="riz">重擔</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">bribery</div><div class="riz">行賄；受賄</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">bribe</div><div class="riz">行賄；收買</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">staff</div><div class="riz">員工</div></div><span class="rib">拍照</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">authorize</div><div class="riz">授權</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">clarify</div><div class="riz">澄清</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">characterize</div><div class="riz">描繪...特性；以...為特徵</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">censorship</div><div class="riz">審查（制度）；檢查（制度）</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">burden</div><div class="riz">重擔</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">bribery</div><div class="riz">行賄；受賄</div></div><span class="rib">拍照</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -399,14 +399,14 @@ nav button.on{color:var(--al)}
       <div class="glist" id="glist"></div>
     </div>
   </div>
-  <div class="view" id="v-quiz"><div class="qwrap" id="qc"><div style="display: flex; flex-direction: column; gap: 16px; padding: 8px 0px;"><div style="text-align: center;"><div style="font-size: 48px;">✏️</div><div style="font-size: 20px; font-weight: 700; margin-top: 8px;">選擇測驗模式</div></div><div style="background: var(--s1); border: 2px solid var(--abr); border-radius: 16px; padding: 18px; cursor: pointer;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><div style="font-size: 24px;">🧠</div><div style="font-size: 16px; font-weight: 700; color: var(--al);">SRS 智慧複習</div></div><div style="font-size: 13px; color: var(--mu); line-height: 1.6;">依熟悉度自動出題，優先複習待複習單字。
+  <div class="view show" id="v-quiz"><div class="qwrap" id="qc"><div style="display: flex; flex-direction: column; gap: 16px; padding: 8px 0px;"><div style="text-align: center;"><div style="font-size: 48px;">✏️</div><div style="font-size: 20px; font-weight: 700; margin-top: 8px;">選擇測驗模式</div></div><div style="background: var(--s1); border: 2px solid var(--abr); border-radius: 16px; padding: 18px; cursor: pointer;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><div style="font-size: 24px;">🧠</div><div style="font-size: 16px; font-weight: 700; color: var(--al);">SRS 智慧複習</div></div><div style="font-size: 13px; color: var(--mu); line-height: 1.6;">依熟悉度自動出題，優先複習待複習單字。
 現在待複習：515 個</div><button class="bp" style="margin-top: 12px;">開始 SRS 測驗</button></div><div style="background: var(--s1); border: 1px solid var(--bd2); border-radius: 16px; padding: 18px;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><div style="font-size: 24px;">📋</div><div style="font-size: 16px; font-weight: 700;">範圍自選</div></div><div style="font-size: 13px; color: var(--mu); margin-bottom: 12px;">指定單字範圍（依新增順序），共 525 個單字</div><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><input class="inp" type="number" min="1" max="525" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><span style="font-size: 16px; color: var(--mu); font-weight: 700;">～</span><input class="inp" type="number" min="1" max="525" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><div style="font-size: 13px; color: var(--mu); flex: 1 1 0%; text-align: right;">525 個單字</div></div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;"><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">前50</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">51-100</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">全部</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">最新20個</button><button style="border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; background: rgba(217, 119, 6, 0.18); border: 1px solid var(--abr); color: var(--al);">今日新增 (25)</button></div><button class="bp" style="width: 100%; background: var(--s2); border: 1px solid var(--bd2); color: var(--tx); border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;">開始範圍測驗</button></div></div></div></div>
   <nav>
-    <button class="on" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
+    <button class="" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
     <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
     <button id="nb-lib" onclick="goTab(&#39;lib&#39;)"><span class="ni">📚</span>單字庫</button>
     <button id="nb-gram" onclick="goTab(&#39;gram&#39;)"><span class="ni">📖</span>文法</button>
-    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)" class=""><span class="ni">✏️</span>測驗</button>
+    <button id="nb-quiz" onclick="goTab(&#39;quiz&#39;)" class="on"><span class="ni">✏️</span>測驗</button>
   </nav>
 </div>
 <div class="mbg" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
@@ -489,7 +489,7 @@ function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+KEY},
-    body:JSON.stringify({model:"gpt-4o",max_tokens:4000,response_format:{type:"json_object"},messages:messages})
+    body:JSON.stringify({model:"gpt-4o",max_tokens:6500,response_format:{type:"json_object"},messages:messages})
   }).then(function(r){
     if(!r.ok)return r.json().then(function(e){throw new Error((e.error&&e.error.message)||"API error "+r.status);});
     return r.json();
@@ -532,8 +532,8 @@ function pprompt(txt){
   return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". If a sentence in the text contains the word, use that sentence as example_en and translate it as example_zh. Use only reliable etymology; do not guess roots. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"source sentence if available, otherwise generated example\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
 var IMG_P="CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Read ALL English words visible. Filter out articles/prepositions/conjunctions. IMPORTANT: if the photo includes an English example sentence and a Chinese translation near a word, use that source sentence as example_en and that Chinese sentence as example_zh. If only an English example is visible, use it as example_en and translate it yourself. Use only reliable etymology; do not guess roots from spelling. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"prefer source example sentence from photo\",\"example_zh\":\"prefer source Chinese translation; otherwise translate example_en\",\"roots\":[{\"part\":\"real morpheme letters only; no guessing\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
-var TB_OCR="This is a textbook vocabulary page. Extract EVERY English headword you can see (bold/larger/numbered). Return as many as you can find, even if not all. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
-var PHOTO_OCR="You are an OCR expert for English vocabulary textbook photos. Read the image carefully. Extract every vocabulary headword or important English word/phrase visible. For each item, also capture the nearest English example sentence if visible, and the nearest Chinese translation if visible. Do not analyse etymology here. Do not invent. Return JSON only: {\"items\":[{\"word\":\"headword or phrase\",\"example_en\":\"source English sentence if visible, otherwise empty\",\"example_zh\":\"source Chinese translation if visible, otherwise empty\"}]}";
+var TB_OCR="This is a textbook vocabulary page. Carefully scan the ENTIRE image from top to bottom and left to right. Extract EVERY English vocabulary item visible: bold/larger/numbered headwords, highlighted vocabulary, phrases, and labeled word-list entries. Do not stop after a few items. Preserve the printed form and return up to 60 distinct items. Do not return articles, pronouns, conjunctions, or ordinary words that only occur inside example sentences. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
+var PHOTO_OCR="You are an OCR expert for English vocabulary textbook photos. Carefully scan the ENTIRE image from top to bottom and left to right. Extract every distinct vocabulary headword, highlighted/bold word, word-list entry, and meaningful English phrase visible (up to 60 items). Do not stop after a few items. Exclude articles, pronouns, conjunctions, and ordinary running-text words unless they are visibly highlighted or listed as vocabulary. For each item, capture the nearest English example sentence and Chinese translation if visible. Do not analyse etymology and do not invent. Return JSON only: {\"items\":[{\"word\":\"headword or phrase\",\"example_en\":\"source English sentence if visible, otherwise empty\",\"example_zh\":\"source Chinese translation if visible, otherwise empty\"}]}";
 function bprompt(words){
   return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse ALL "+words.length+" words, return EXACTLY "+words.length+" entries in same order. Use only reliable etymology; do not guess roots. Analyse: ["+words.join(", ")+"]. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
@@ -556,7 +556,32 @@ function parsePhotoItems(raw){
     if(!x.word||seen[k])return false;
     seen[k]=true;
     return /^[A-Za-z][A-Za-z '-]{1,40}$/.test(x.word);
-  }).slice(0,18);
+  }).slice(0,60);
+}
+function parseDetectedWords(raw){
+  var s=raw.trim(),fence=String.fromCharCode(96,96,96);
+  if(s.indexOf(fence)>=0)s=s.split(fence+"json").join("").split(fence).join("").trim();
+  var d=JSON.parse(s),arr=Array.isArray(d)?d:(d.detected_words||d.words||[]),seen={};
+  return arr.map(function(x){return String(typeof x==="string"?x:(x.word||"")).trim();}).filter(function(word){
+    var k=word.toLowerCase();
+    if(!word||seen[k]||!/^[A-Za-z][A-Za-z '-]{1,60}$/.test(word))return false;
+    seen[k]=true;return true;
+  }).slice(0,60);
+}
+function analyseInBatches(items,source){
+  var CHUNK=10,chunks=[],all=[];
+  for(var i=0;i<items.length;i+=CHUNK)chunks.push(items.slice(i,i+CHUNK));
+  var chain=Promise.resolve();
+  chunks.forEach(function(chunk,index){
+    chain=chain.then(function(){
+      setLoad("第2步：分析 "+items.length+" 個單字（第 "+(index+1)+"/"+chunks.length+" 批）...");
+      var prompt=typeof chunk[0]==="string"?bprompt(chunk):photoAnalysisPrompt(chunk);
+      return callAI([{role:"system",content:SYS},{role:"user",content:prompt}]).then(function(raw){
+        all=all.concat(parseAI(raw));
+      });
+    });
+  });
+  return chain.then(function(){showRes(all,source);});
 }
 
 // Add page
@@ -597,7 +622,7 @@ function renderAdd(){
   var tbr=mk("div","");tbr.style.cssText="background:var(--s2);border:1px solid var(--bd2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px";
   var tbi=mk("div","");
   tbi.appendChild(mk("div","","📚 課本單字頁模式"));
-  var ts=mk("div","");ts.style.cssText="font-size:11px;color:var(--mu);margin-top:2px";ts.textContent="掃描所有粗體單字（辨識到幾個算幾個）";tbi.appendChild(ts);
+  var ts=mk("div","");ts.style.cssText="font-size:11px;color:var(--mu);margin-top:2px";ts.textContent="完整掃描粗體、標示與片語（最多 60 個）";tbi.appendChild(ts);
   var tbl=mk("label","");tbl.style.cssText="position:relative;width:44px;height:24px;flex-shrink:0";
   var tbc=mk("input","");tbc.type="checkbox";tbc.id="tbm";tbc.style.cssText="opacity:0;width:0;height:0";tbc.onchange=updTog;
   var tbt=mk("span","");tbt.id="tgt";tbt.style.cssText="position:absolute;inset:0;background:var(--bd2);border-radius:12px;transition:.2s;cursor:pointer";
@@ -723,11 +748,10 @@ function doImg(){
         {role:"system",content:"You are an OCR expert."},
         {role:"user",content:[{type:"image_url",image_url:{url:"data:image/jpeg;base64,"+b64}},{type:"text",text:TB_OCR}]}
       ]).then(function(raw){
-        var d=parseAI(raw);var words=Array.isArray(d)?d:(d.detected_words||[]);
+        var words=parseDetectedWords(raw);
         if(!words.length)throw new Error("找不到任何單字，請確認圖片清晰");
-        setLoad("第2步：分析 "+words.length+" 個單字...");
-        return callAI([{role:"system",content:SYS},{role:"user",content:bprompt(words)}]);
-      }).then(function(raw){showRes(parseAI(raw),"課本");});
+        return analyseInBatches(words,"課本");
+      });
     } else {
       setLoad("第1步：完整 OCR 辨識單字與例句...");
       return callAI([
@@ -736,9 +760,8 @@ function doImg(){
       ]).then(function(raw){
         var items=parsePhotoItems(raw);
         if(!items.length)throw new Error("OCR 沒抓到單字，請試試課本單字頁模式或換一張更清楚的照片");
-        setLoad("第2步：分析 "+items.length+" 個單字...");
-        return callAI([{role:"system",content:SYS},{role:"user",content:photoAnalysisPrompt(items)}]);
-      }).then(function(raw){showRes(parseAI(raw),"拍照");});
+        return analyseInBatches(items,"拍照");
+      });
     }
   }).catch(function(e){
     var ra=document.getElementById("ra");ra.innerHTML="";
