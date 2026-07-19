@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0102)file:///private/var/folders/y7/r1v16sws6zdc8kq8qxgvk16w0000gn/T/codex-file-preview-ah5XBr/preview.html -->
+<!-- saved from url=(0102)file:///private/var/folders/y7/r1v16sws6zdc8kq8qxgvk16w0000gn/T/codex-file-preview-TEd1yc/preview.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -379,12 +379,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">1487</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="ht">1510</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">8</div><div class="stl">今日新增</div></div>
       <div class="stat"><div class="stn" id="hq">0</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">abstract</div><div class="riz">摘要；抽象的</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">abortion</div><div class="riz">墮胎，流產</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">abbreviate</div><div class="riz">縮寫</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">professor</div><div class="riz">教授</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">behind</div><div class="riz">後面</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">am about to</div><div class="riz">即將</div></div><span class="rib">拍照</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">implement</div><div class="riz">實施</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">comply</div><div class="riz">遵從</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">launch</div><div class="riz">發射</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">determined</div><div class="riz">堅決的</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">weapon</div><div class="riz">武器</div></div><span class="rib">拍照</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">drown</div><div class="riz">溺水</div></div><span class="rib">拍照</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -484,7 +484,7 @@ function renderHome(){
 }
 
 // API
-var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) Roots/affixes must be etymologically real and useful, not guessed from spelling. If unsure, return roots:[] and explain in root_tip that no reliable common root is provided. (2) Include ALL meaningful morphemes in order when reliable; do NOT skip middle roots. 'part' must be the ACTUAL letters, not meanings. (3) Do not over-split simple words or modern compounds. (4) root_tip, memory_tip, zh, and example_zh MUST be Traditional Chinese. (5) If source text/photo provides roots, affixes, root meanings, or a root explanation, treat that source information as authoritative and preserve it before adding only necessary reliable clarification. (6) Preserve every source example supplied for a word; never reduce multiple source examples to one.";
+var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) Roots/affixes must be etymologically real and useful, not guessed from spelling. If unsure, return roots:[] and explain in root_tip that no reliable common root is provided. (2) Include ALL meaningful morphemes in order when reliable; do NOT skip middle roots. 'part' must be the ACTUAL letters, not meanings. (3) Do not over-split simple words or modern compounds. (4) root_tip, memory_tip, zh, and example_zh MUST be Traditional Chinese. (5) Source textbook material is authoritative: preserve every source example, phrase, grammar pattern, collocation, common-mistake note, root and explanation exactly; never replace or duplicate it. (6) Only add missing HIGH-FREQUENCY modern English useful for TOEIC, TOEFL, IELTS, university English or common native usage. Never add archaic, literary, regional, obscure, or low-confidence information. (7) Maximum AI additions per word: phrases 2, grammar 1, collocations 2, common_errors 1. Empty arrays are correct when nothing important is missing.";
 function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
@@ -525,21 +525,23 @@ function parseAI(raw){
   var d=JSON.parse(s);
   return Array.isArray(d)?d:(d.words||[]);
 }
+function learningFieldsSchema(){return "\"phrases\":[{\"en\":\"high-frequency phrase\",\"zh\":\"繁體中文\"}],\"grammar\":[{\"pattern\":\"common grammar pattern\",\"meaning\":\"繁體中文\",\"example_en\":\"\",\"example_zh\":\"\"}],\"collocations\":[{\"en\":\"common collocation\",\"zh\":\"繁體中文\"}],\"common_errors\":[{\"wrong\":\"common incorrect form\",\"correct\":\"correct form\",\"note\":\"繁體中文簡短說明\"}]";}
+function learningFieldsRules(){return " Add only missing high-frequency information: at most 2 phrases, 1 grammar, 2 collocations and 1 common error. If no useful addition exists, return empty arrays. Do not invent, repeat, or include rare usages.";}
 function wprompt(word){
-  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". Use only reliable etymology; if roots are uncertain, return roots:[] instead of guessing. Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only, e.g. re-, dict, -tion; no guessing\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文說明：若有可靠詞源，說明每個詞素及組合邏輯；若沒有可靠常用字根，說明不強拆\",\"family_words\":[\"related1\",\"related2\",\"related3\",\"related4\"],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\"}]}";
+  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". Use only reliable etymology; if roots are uncertain, return roots:[] instead of guessing."+learningFieldsRules()+" Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文說明\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\","+learningFieldsSchema()+"}]}";
 }
 function pprompt(txt){
   return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". If a sentence in the text contains the word, use that sentence as example_en and translate it as example_zh. Use only reliable etymology; do not guess roots. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"source sentence if available, otherwise generated example\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 }
 var IMG_P="CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Read ALL English words visible. Filter out articles/prepositions/conjunctions. IMPORTANT: if the photo includes an English example sentence and a Chinese translation near a word, use that source sentence as example_en and that Chinese sentence as example_zh. If only an English example is visible, use it as example_en and translate it yourself. Use only reliable etymology; do not guess roots from spelling. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"prefer source example sentence from photo\",\"example_zh\":\"prefer source Chinese translation; otherwise translate example_en\",\"roots\":[{\"part\":\"real morpheme letters only; no guessing\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
 var TB_OCR="This is a textbook vocabulary page. Carefully scan the ENTIRE image from top to bottom and left to right. Extract EVERY English vocabulary item visible: bold/larger/numbered headwords, highlighted vocabulary, phrases, and labeled word-list entries. Do not stop after a few items. Preserve the printed form and return up to 60 distinct items. Do not return articles, pronouns, conjunctions, or ordinary words that only occur inside example sentences. Return JSON: {\"detected_words\":[\"word1\",\"word2\"]}";
-var PHOTO_OCR="You are an OCR expert for English vocabulary textbook photos. Carefully scan the ENTIRE image from top to bottom and left to right. Extract every distinct vocabulary headword, highlighted/bold word, word-list entry, and meaningful English phrase visible (up to 60 items). Do not stop after a few items. Exclude articles, pronouns, conjunctions, and ordinary running-text words unless they are visibly highlighted or listed as vocabulary. For each item, capture EVERY related English example sentence and its Chinese translation if visible (not only the nearest one). Also capture any source-provided roots, prefixes, suffixes, root meanings, or root explanation printed near the word. Do not analyse etymology and do not invent. Return JSON only: {\"items\":[{\"word\":\"headword or phrase\",\"examples\":[{\"en\":\"source English example\",\"zh\":\"source Chinese translation\"}],\"source_roots\":[{\"part\":\"letters printed in source\",\"type\":\"prefix/root/suffix if shown, otherwise root\",\"meaning\":\"source meaning\"}],\"source_root_tip\":\"source root explanation if visible\"}]}";
+var PHOTO_OCR="You are an OCR expert for English vocabulary textbook photos. Carefully scan the ENTIRE image from top to bottom and left to right. Extract every distinct vocabulary headword, highlighted/bold word, word-list entry, and meaningful English phrase visible (up to 60 items). Do not stop after a few items. Exclude articles, pronouns, conjunctions, and ordinary running-text words unless visibly highlighted or listed as vocabulary. For EACH item, copy ALL source material exactly as visible: every related English example and Chinese translation, phrases/idioms, grammar patterns, collocations, common-error notes, and roots/prefixes/suffixes/root explanations. Do not analyse, normalize, add, or invent anything. Return JSON only: {\"items\":[{\"word\":\"headword or phrase\",\"examples\":[{\"en\":\"source English example\",\"zh\":\"source Chinese translation\"}],\"phrases\":[{\"en\":\"source phrase\",\"zh\":\"source translation\"}],\"grammar\":[{\"pattern\":\"source grammar pattern\",\"meaning\":\"source meaning\",\"example_en\":\"\",\"example_zh\":\"\"}],\"collocations\":[{\"en\":\"source collocation\",\"zh\":\"source translation\"}],\"common_errors\":[{\"wrong\":\"source incorrect form\",\"correct\":\"source correction\",\"note\":\"source note\"}],\"source_roots\":[{\"part\":\"letters printed in source\",\"type\":\"prefix/root/suffix if shown, otherwise root\",\"meaning\":\"source meaning\"}],\"source_root_tip\":\"source root explanation if visible\"}]}";
 function bprompt(words){
-  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse ALL "+words.length+" words, return EXACTLY "+words.length+" entries in same order. Use only reliable etymology; do not guess roots. Analyse: ["+words.join(", ")+"]. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse ALL "+words.length+" words, return EXACTLY "+words.length+" entries in same order. Use only reliable etymology; do not guess roots."+learningFieldsRules()+" Analyse: ["+words.join(", ")+"]. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"\",\"example_zh\":\"\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\","+learningFieldsSchema()+"}]}";
 }
 function photoAnalysisPrompt(items){
-  var compact=items.map(function(it){return{word:it.word,examples:it.examples||[],source_roots:it.source_roots||[],source_root_tip:it.source_root_tip||""};});
-  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse these OCR items. Return EXACTLY "+compact.length+" word entries in the same order. IMPORTANT: preserve EVERY OCR examples entry in examples; translate only entries whose zh is empty. If source_roots or source_root_tip are provided, use them as the primary roots/root_tip exactly as source information, and do not replace them with a different inferred split. Use only reliable etymology for anything added. OCR items: "+JSON.stringify(compact)+". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"one English definition\",\"examples\":[{\"en\":\"preserve every OCR English example\",\"zh\":\"preserve/translate its Traditional Chinese\"}],\"roots\":[{\"part\":\"source root letters when supplied\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"source explanation first, otherwise reliable explanation\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
+  var compact=items.map(function(it){return{word:it.word,examples:it.examples||[],phrases:it.phrases||[],grammar:it.grammar||[],collocations:it.collocations||[],common_errors:it.common_errors||[],source_roots:it.source_roots||[],source_root_tip:it.source_root_tip||""};});
+  return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. Analyse these OCR items. Return EXACTLY "+compact.length+" word entries in the same order. Preserve EVERY OCR example, phrase, grammar pattern, collocation and common-error entry. Never rewrite or duplicate source material. Translate only source fields whose Chinese translation is empty. If source_roots or source_root_tip are provided, use them as the primary roots/root_tip exactly as source information. Only add missing high-frequency content (TOEIC, TOEFL, IELTS, university English or modern native use): max 2 phrases, 1 grammar, 2 collocations and 1 common error; use empty arrays when nothing is missing. OCR items: "+JSON.stringify(compact)+". Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"one English definition\",\"examples\":[{\"en\":\"preserve every OCR English example\",\"zh\":\"preserve/translate its Traditional Chinese\"}],\"roots\":[{\"part\":\"source root letters when supplied\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"source explanation first, otherwise reliable explanation\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\","+learningFieldsSchema()+"}]}";
 }
 function parsePhotoItems(raw){
   var s=raw.trim();
@@ -549,10 +551,10 @@ function parsePhotoItems(raw){
   var arr=Array.isArray(d)?d:(d.items||d.detected_words||[]);
   var seen={};
   return arr.map(function(x){
-    if(typeof x==="string")return{word:x,examples:[],source_roots:[],source_root_tip:""};
+    if(typeof x==="string")return{word:x,examples:[],phrases:[],grammar:[],collocations:[],common_errors:[],source_roots:[],source_root_tip:""};
     var examples=Array.isArray(x.examples)?x.examples:[];
     if(x.example_en)examples.unshift({en:x.example_en,zh:x.example_zh||""});
-    return{word:(x.word||"").trim(),examples:examples,source_roots:x.source_roots||[],source_root_tip:x.source_root_tip||""};
+    return{word:(x.word||"").trim(),examples:examples,phrases:x.phrases||[],grammar:x.grammar||[],collocations:x.collocations||[],common_errors:x.common_errors||x.common_mistakes||[],source_roots:x.source_roots||[],source_root_tip:x.source_root_tip||""};
   }).filter(function(x){
     var k=x.word.toLowerCase();
     if(!x.word||seen[k])return false;
@@ -590,11 +592,15 @@ function analyseInBatches(items,source){
 
 function mergePhotoSource(word,item){
   word=word||{};item=item||{};
-  // 照片上的教材標註優先，避免 AI 用推測字根覆蓋來源資料。
+  // 教材內容優先，並與 AI 補充去重合併。
   if((item.source_roots||[]).length)word.roots=item.source_roots;
   if(item.source_root_tip)word.root_tip=item.source_root_tip;
-  if((item.examples||[]).length)word.examples=item.examples;
-  return word;
+  word.examples=mergeEntries(item.examples,word.examples,"en");
+  word.phrases=mergeEntries(item.phrases,word.phrases,"en");
+  word.grammar=mergeEntries(item.grammar,word.grammar,"pattern");
+  word.collocations=mergeEntries(item.collocations,word.collocations,"en");
+  word.common_errors=mergeEntries(item.common_errors,word.common_errors,"wrong");
+  return cleanWordData(word);
 }
 
 // Add page
@@ -857,7 +863,29 @@ function cleanWordData(w){
   });
   // 保留舊欄位，讓既有測驗功能仍以第一句例句出題。
   if(w.examples.length){w.example_en=w.examples[0].en;w.example_zh=w.examples[0].zh;}
+  w.phrases=cleanPairEntries(w.phrases);
+  w.collocations=cleanPairEntries(w.collocations);
+  w.grammar=cleanGrammarEntries(w.grammar);
+  w.common_errors=cleanErrorEntries(w.common_errors||w.common_mistakes);
   return w;
+}
+function mergeEntries(source,added,key){
+  var all=(Array.isArray(source)?source:[]).concat(Array.isArray(added)?added:[]),seen={};
+  return all.filter(function(x){
+    if(!x)return false;
+    var value=String(typeof x==="string"?x:(x[key]||x.en||x.wrong||"")).trim();
+    var k=value.toLowerCase().replace(/\s+/g," ");
+    if(!value||seen[k])return false;seen[k]=true;return true;
+  });
+}
+function cleanPairEntries(entries){
+  return mergeEntries(entries,[],"en").map(function(x){return{en:String(typeof x==="string"?x:x.en||"").trim(),zh:String((x&&x.zh)||"").trim()};});
+}
+function cleanGrammarEntries(entries){
+  return mergeEntries(entries,[],"pattern").map(function(x){return{pattern:String((x&&x.pattern)||"").trim(),meaning:String((x&&x.meaning)||"").trim(),example_en:String((x&&x.example_en)||"").trim(),example_zh:String((x&&x.example_zh)||"").trim()};});
+}
+function cleanErrorEntries(entries){
+  return mergeEntries(entries,[],"wrong").map(function(x){return{wrong:String((x&&x.wrong)||"").trim(),correct:String((x&&x.correct)||"").trim(),note:String((x&&x.note)||"").trim()};}).filter(function(x){return x.wrong||x.correct;});
 }
 function appendExamples(parent,w){
   var examples=(w.examples&&w.examples.length)?w.examples:(w.example_en?[{en:w.example_en,zh:w.example_zh||""}]:[]);
@@ -866,6 +894,29 @@ function appendExamples(parent,w){
     if(examples.length>1)eb.appendChild(mk("div","tlbl","例句 "+(i+1)));
     eb.appendChild(mk("div","exen",ex.en));eb.appendChild(mk("div","exzh",ex.zh||""));parent.appendChild(eb);
   });
+}
+function appendLearningSection(parent,title,entries,kind){
+  if(!entries||!entries.length)return;
+  var box=mk("div","tbox");box.style.marginTop="10px";
+  box.appendChild(mk("div","tlbl",title));
+  entries.forEach(function(item){
+    var row=mk("div","");row.style.cssText="padding:7px 0;border-top:1px solid var(--bd2);line-height:1.55";
+    if(kind==="grammar"){
+      row.appendChild(mk("div","exen",item.pattern));
+      if(item.meaning)row.appendChild(mk("div","exzh",item.meaning));
+      if(item.example_en)row.appendChild(mk("div","exen",item.example_en));
+      if(item.example_zh)row.appendChild(mk("div","exzh",item.example_zh));
+    }else if(kind==="error"){
+      if(item.wrong)row.appendChild(mk("div","exen","✕ "+item.wrong));
+      if(item.correct)row.appendChild(mk("div","exen","✓ "+item.correct));
+      if(item.note)row.appendChild(mk("div","exzh",item.note));
+    }else{
+      row.appendChild(mk("div","exen",item.en));
+      if(item.zh)row.appendChild(mk("div","exzh",item.zh));
+    }
+    box.appendChild(row);
+  });
+  parent.appendChild(box);
 }
 function showRes(words,src){
   PEND=words.map(function(w){return cleanWordData(Object.assign({},w,{source:src}));}).filter(function(w){return w.word;});
@@ -907,12 +958,16 @@ function buildWCard(w,idx){
   card.appendChild(mk("div","wzh",w.zh));
   if(w.en_def)card.appendChild(mk("div","wen",w.en_def));
   appendExamples(card,w);
+  appendLearningSection(card,"⭐ 高頻片語",w.phrases,"pair");
+  appendLearningSection(card,"📚 文法重點",w.grammar,"grammar");
+  appendLearningSection(card,"🔗 常見搭配詞",w.collocations,"pair");
+  appendLearningSection(card,"⚠️ 常見錯誤",w.common_errors,"error");
   var sp=mk("div","sprow");
   var bs1=mk("button","bspk","🔊 單字");bs1.onclick=function(){speak(w.word);};sp.appendChild(bs1);
   if(w.example_en){var bs2=mk("button","bspk","🔊 例句");bs2.onclick=function(){speak(w.example_en);};sp.appendChild(bs2);}
   card.appendChild(sp);
   var sr=mk("div","srow");sr.id="sr-"+idx;
-  if(dup){sr.appendChild(mk("div","svd","✅ 已在單字庫"));}
+  if(dup){var mbg=mk("button","bsav","🔄 合併教材內容");mbg.onclick=function(){saveOne(idx);};sr.appendChild(mbg);}
   else{var sb=mk("button","bsav","＋ 加入單字庫");sb.onclick=function(){saveOne(idx);};sr.appendChild(sb);}
   card.appendChild(sr);
   var roots=w.roots||[];var hasFam=(w.family_words||[]).length>0;
@@ -942,7 +997,8 @@ function buildWCard(w,idx){
 
 function saveOne(idx){
   var w=PEND[idx];if(!w)return;
-  if(LIB.some(function(l){return l.word.toLowerCase()===w.word.toLowerCase();})){toast("已在單字庫中");return;}
+  var existing=LIB.find(function(l){return l.word.toLowerCase()===w.word.toLowerCase();});
+  if(existing){mergeSavedWord(existing,w);toast("✅ 已合併教材內容："+w.word);return;}
   pushLib(w);
   var sr=document.getElementById("sr-"+idx);
   if(sr){sr.innerHTML="";sr.appendChild(mk("div","svd","✅ 已儲存！"));}
@@ -951,7 +1007,8 @@ function saveOne(idx){
 function saveAll(){
   chkDay();var added=0,skipped=[];
   PEND.forEach(function(w,i){
-    if(LIB.some(function(l){return l.word.toLowerCase()===w.word.toLowerCase();})){skipped.push(w.word);}
+    var existing=LIB.find(function(l){return l.word.toLowerCase()===w.word.toLowerCase();});
+    if(existing){mergeSavedWord(existing,w);skipped.push(w.word);}
     else{pushLib(w);added++;}
     var sr=document.getElementById("sr-"+i);
     if(sr){sr.innerHTML="";sr.appendChild(mk("div","svd","✅ 已儲存"));}
@@ -960,10 +1017,24 @@ function saveAll(){
   if(skipped.length)msg+="\n⚠️ 跳過重複："+skipped.join("、");
   toast(msg,3500);renderHome();
 }
+function mergeSavedWord(existing,incoming){
+  existing=cleanWordData(existing);incoming=cleanWordData(incoming);
+  ["phonetic","pos","zh","en_def","root_tip","memory_tip","level","source"].forEach(function(k){if(!existing[k]&&incoming[k])existing[k]=incoming[k];});
+  if(!existing.conjugation&&incoming.conjugation)existing.conjugation=incoming.conjugation;
+  existing.examples=mergeEntries(existing.examples,incoming.examples,"en");
+  existing.phrases=mergeEntries(existing.phrases,incoming.phrases,"en");
+  existing.grammar=mergeEntries(existing.grammar,incoming.grammar,"pattern");
+  existing.collocations=mergeEntries(existing.collocations,incoming.collocations,"en");
+  existing.common_errors=mergeEntries(existing.common_errors,incoming.common_errors,"wrong");
+  if(!(existing.roots||[]).length&&(incoming.roots||[]).length)existing.roots=incoming.roots;
+  cleanWordData(existing);window._lib=LIB;
+  if(window.lsBackup)window.lsBackup(LIB,ST);
+  if(window.fbSaveWord)window.fbSaveWord(existing);
+}
 function pushLib(w){
   chkDay();
   w=cleanWordData(w);
-  var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",examples:w.examples||[],roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()};
+  var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",examples:w.examples||[],phrases:w.phrases||[],grammar:w.grammar||[],collocations:w.collocations||[],common_errors:w.common_errors||[],roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()};
   LIB.push(wobj);
   ST.today++;
   window._lib=LIB;
@@ -979,20 +1050,20 @@ function lookupWord(word){
     .then(function(raw){showRes(parseAI(raw),"查詢");document.getElementById("awrap").scrollTo({top:99999,behavior:"smooth"});})
     .catch(function(e){toast("查詢失敗："+e.message);});
 }
-function addQuizOptionWord(word){
+function addQuizOptionWord(word,btn){
   if(!word)return;
   if(LIB.some(function(w){return w.word.toLowerCase()===word.toLowerCase();})){toast("已在單字庫中："+word);return;}
-  goTab("add");
-  setTimeout(function(){
-    switchMode("word");
-    var wi=document.getElementById("wi");
-    var biw=document.getElementById("biw");
-    if(wi&&biw){
-      wi.value=word;
-      biw.disabled=false;
-      doWord();
-    }
-  },80);
+  if(!KEY){toast("請先在新增頁設定 API Key");return;}
+  if(btn){btn.disabled=true;btn.textContent="⏳ 加入中...";}
+  // 保持 QST 與目前題目不變：在背景完成分析、儲存與 Firebase 同步。
+  callAI([{role:"system",content:SYS},{role:"user",content:wprompt(word)}])
+    .then(function(raw){
+      var result=parseAI(raw)[0];if(!result)throw new Error("找不到單字資料");
+      result.source="測驗";pushLib(result);
+      if(btn){btn.textContent="✅ 已加入";}
+      toast("✅ 已加入單字庫："+word);
+    })
+    .catch(function(e){if(btn){btn.disabled=false;btn.textContent="＋ 新增 "+word;}toast("新增失敗："+e.message);});
 }
 
 // Library
@@ -1106,6 +1177,10 @@ function _fillModalBody(mb,w){
   mb.appendChild(mk("div","wzh",w.zh));
   if(w.en_def)mb.appendChild(mk("div","wen",w.en_def));
   appendExamples(mb,w);
+  appendLearningSection(mb,"⭐ 高頻片語",w.phrases,"pair");
+  appendLearningSection(mb,"📚 文法重點",w.grammar,"grammar");
+  appendLearningSection(mb,"🔗 常見搭配詞",w.collocations,"pair");
+  appendLearningSection(mb,"⚠️ 常見錯誤",w.common_errors,"error");
   var sp=mk("div","sprow");
   var bs1=mk("button","bspk","🔊 朗讀單字");bs1.onclick=function(){speak(w.word);};sp.appendChild(bs1);
   if(w.example_en){var bs2=mk("button","bspk","🔊 朗讀例句");bs2.onclick=function(){speak(w.example_en);};sp.appendChild(bs2);}
@@ -1136,7 +1211,7 @@ function enrichWord(word,btn){
     .then(function(raw){
       var ws=parseAI(raw);var r=ws[0];if(!r)throw new Error("失敗");
       var w=LIB.find(function(x){return x.word===word;});if(!w)return;
-      Object.assign(w,{phonetic:r.phonetic||"",pos:r.pos||"",conjugation:r.conjugation||null,en_def:r.en_def||"",example_en:r.example_en||w.example_en||"",example_zh:r.example_zh||w.example_zh||"",examples:(w.examples&&w.examples.length)?w.examples:(r.examples||[]),roots:(w.roots&&w.roots.length)?w.roots:(r.roots||[]),root_tip:w.root_tip||r.root_tip||"",family_words:r.family_words||[],memory_tip:r.memory_tip||"",level:r.level||""});
+      Object.assign(w,{phonetic:r.phonetic||"",pos:r.pos||"",conjugation:r.conjugation||null,en_def:r.en_def||"",example_en:r.example_en||w.example_en||"",example_zh:r.example_zh||w.example_zh||"",examples:mergeEntries(w.examples,r.examples,"en"),phrases:mergeEntries(w.phrases,r.phrases,"en"),grammar:mergeEntries(w.grammar,r.grammar,"pattern"),collocations:mergeEntries(w.collocations,r.collocations,"en"),common_errors:mergeEntries(w.common_errors,r.common_errors,"wrong"),roots:(w.roots&&w.roots.length)?w.roots:(r.roots||[]),root_tip:w.root_tip||r.root_tip||"",family_words:r.family_words||[],memory_tip:r.memory_tip||"",level:r.level||""});
       cleanWordData(w);
       lsBackup(LIB,ST);
       if(window.fbSaveWord)window.fbSaveWord(w);
@@ -1609,7 +1684,7 @@ function ansQ(btn,chosen,q){
         var ab=mk("button","");
         ab.style.cssText="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.28);color:var(--bl);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit";
         ab.textContent="＋ 新增 "+opt;
-        ab.onclick=function(){addQuizOptionWord(opt);};
+        ab.onclick=function(){addQuizOptionWord(opt,ab);};
         addRow.appendChild(ab);
       });
       fb.appendChild(addRow);
