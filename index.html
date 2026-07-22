@@ -260,9 +260,9 @@ nav button.on{color:var(--al)}
 .wpos{font-size:12px;color:var(--al);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
 .crow{display:flex;gap:6px;flex-wrap:wrap}
 .ctag{background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:4px 10px;font-size:12px;font-family:"JetBrains Mono",monospace}
-.wzh{font-size:24px;font-weight:700}
-.wen{font-size:14px;color:var(--m2);line-height:1.5}
-.exb{background:var(--s2);border-left:3px solid var(--ac);border-radius:0 10px 10px 0;padding:12px 14px}
+.wzh{font-size:24px;font-weight:700;min-height:64px;display:flex;align-items:center}
+.wen{font-size:14px;color:var(--m2);line-height:1.5;min-height:42px}
+.exb{background:var(--s2);border-left:3px solid var(--ac);border-radius:0 10px 10px 0;padding:12px 14px;min-height:82px}
 .exen{font-size:15px;font-style:italic;line-height:1.6}
 .exzh{font-size:13px;color:var(--mu);margin-top:4px}
 .sprow{display:flex;gap:8px}
@@ -287,6 +287,10 @@ nav button.on{color:var(--al)}
 .fw{background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer}
 .fw:active{border-color:var(--pu)}
 .ltb{padding:16px 24px 8px;display:flex;gap:10px}
+.lranges{display:flex;gap:6px;overflow-x:auto;padding:0 24px 10px;scrollbar-width:none;flex-shrink:0}
+.lranges::-webkit-scrollbar{display:none}
+.lrange{background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:20px;padding:7px 12px;font-size:12px;white-space:nowrap;flex-shrink:0}
+.lrange.on{background:var(--abg);border-color:var(--ac);color:var(--al);font-weight:700}
 .srch{flex:1;background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 14px;font-size:14px;outline:none}
 .srch:focus{border-color:var(--ac)}
 .lcnt{font-size:12px;color:var(--mu);padding:0 24px 10px}
@@ -389,6 +393,7 @@ nav button.on{color:var(--al)}
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
     <div class="ltb"><input class="srch" id="lsrch" placeholder="搜尋單字..." oninput="filterLib(this.value)"><button class="bspks" title="跳到底部" onclick="libScrollBottom()">⤓</button></div>
+    <div class="lranges" id="lranges"></div>
     <div class="lcnt" id="lcnt"></div>
     <div class="llist" id="llist"></div>
   </div>
@@ -484,7 +489,7 @@ function renderHome(){
 }
 
 // API
-var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) Roots/affixes must be etymologically real and useful, not guessed from spelling. If unsure, return roots:[] and explain in root_tip that no reliable common root is provided. (2) Include ALL meaningful morphemes in order when reliable; do NOT skip middle roots. 'part' must be the ACTUAL letters, not meanings. (3) Do not over-split simple words or modern compounds. (4) root_tip, memory_tip, zh, and example_zh MUST be Traditional Chinese. (5) Source textbook material is authoritative: preserve every source example, phrase, grammar pattern, collocation, common-mistake note, root and explanation exactly; never replace or duplicate it. (6) Only add missing HIGH-FREQUENCY modern English useful for TOEIC, TOEFL, IELTS, university English or common native usage. Never add archaic, literary, regional, obscure, or low-confidence information. (7) Maximum AI additions per word: phrases 2, grammar 1, collocations 2, common_errors 1. Empty arrays are correct when nothing important is missing.";
+var SYS="You are an English vocabulary and etymology expert. Respond ONLY with valid JSON, no markdown. CRITICAL RULES: (1) Roots/affixes must be etymologically real and useful, not guessed from spelling. If unsure, return roots:[] and explain in root_tip that no reliable common root is provided. (2) Include ALL meaningful morphemes in order when reliable; do NOT skip middle roots. 'part' must be the ACTUAL letters, not meanings. (3) Do not over-split simple words or modern compounds. (4) root_tip, memory_tip, zh, example_zh, AND EVERY roots[].meaning MUST be Traditional Chinese. Never leave roots[].meaning empty or in English; if no reliable Traditional Chinese gloss exists, omit that root instead. (5) Source textbook material is authoritative: preserve every source example, phrase, grammar pattern, collocation, common-mistake note, root and explanation exactly; never replace or duplicate it. (6) Only add missing HIGH-FREQUENCY modern English useful for TOEIC, TOEFL, IELTS, university English or common native usage. Never add archaic, literary, regional, obscure, or low-confidence information. (7) Maximum AI additions per word: phrases 2, grammar 1, collocations 2, common_errors 1. Empty arrays are correct when nothing important is missing.";
 function callAI(messages){
   return fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
@@ -528,7 +533,7 @@ function parseAI(raw){
 function learningFieldsSchema(){return "\"phrases\":[{\"en\":\"high-frequency phrase\",\"zh\":\"繁體中文\"}],\"grammar\":[{\"pattern\":\"common grammar pattern\",\"meaning\":\"繁體中文\",\"example_en\":\"\",\"example_zh\":\"\"}],\"collocations\":[{\"en\":\"common collocation\",\"zh\":\"繁體中文\"}],\"common_errors\":[{\"wrong\":\"common incorrect form\",\"correct\":\"correct form\",\"note\":\"繁體中文簡短說明\"}]";}
 function learningFieldsRules(){return " Add only missing high-frequency information: at most 2 phrases, 1 grammar, 2 collocations and 1 common error. If no useful addition exists, return empty arrays. Do not invent, repeat, or include rare usages.";}
 function wprompt(word){
-  return "CRITICAL: root_tip and memory_tip fields MUST be written in Traditional Chinese. Analyse the English word: "+word+". Use only reliable etymology; if roots are uncertain, return roots:[] instead of guessing."+learningFieldsRules()+" Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文說明\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\","+learningFieldsSchema()+"}]}";
+  return "CRITICAL: root_tip, memory_tip, and EVERY roots[].meaning MUST be written in Traditional Chinese. Analyse the English word: "+word+". Use only reliable etymology; if roots are uncertain, return roots:[] instead of guessing. Never return an English-only or empty root meaning; omit that root instead."+learningFieldsRules()+" Return JSON: {\"words\":[{\"word\":\"\"+word+\"\",\"phonetic\":\"IPA\",\"pos\":\"part of speech\",\"conjugation\":{\"present\":\"base or null\",\"past\":\"past tense or null\",\"pp\":\"past participle or null\",\"ing\":\"present participle or null\"},\"zh\":\"繁體中文意思2-5字\",\"en_def\":\"one English definition\",\"example_en\":\"TOEIC example sentence\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文意思\"}],\"root_tip\":\"繁體中文說明\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧，1句\",\"level\":\"TOEIC score range\","+learningFieldsSchema()+"}]}";
 }
 function pprompt(txt){
   return "CRITICAL: root_tip and memory_tip MUST be in Traditional Chinese. From this text, extract vocabulary worth learning (TOEIC 800 level, max 10 words): \""+txt+"\". If a sentence in the text contains the word, use that sentence as example_en and translate it as example_zh. Use only reliable etymology; do not guess roots. Return JSON: {\"words\":[{\"word\":\"\",\"phonetic\":\"\",\"pos\":\"\",\"conjugation\":{\"present\":null,\"past\":null,\"pp\":null,\"ing\":null},\"zh\":\"繁中\",\"en_def\":\"\",\"example_en\":\"source sentence if available, otherwise generated example\",\"example_zh\":\"繁體中文翻譯\",\"roots\":[{\"part\":\"real morpheme letters only\",\"type\":\"prefix or root or suffix\",\"meaning\":\"繁體中文\"}],\"root_tip\":\"可靠字根說明；不可靠則說明不強拆\",\"family_words\":[],\"memory_tip\":\"繁體中文記憶技巧\",\"level\":\"\"}]}";
@@ -849,11 +854,14 @@ function cleanWordData(w){
     if(!/[a-zA-Z]/.test(part))return false;
     return true;
   }).map(function(r){
-    return {part:String(r.part).trim(),type:r.type||"root",meaning:r.meaning||""};
+    var meaning=String(r.meaning||"").trim();
+    // 讓舊資料與偶發的 AI 英文回覆仍有可讀的安全提示，不會留下空白翻譯。
+    if(!/[\u3400-\u9fff]/.test(meaning))meaning="（待補充中文翻譯）";
+    return {part:String(r.part).trim(),type:r.type||"root",meaning:meaning};
   });
   w.roots=roots;
   if(!roots.length&&(!w.root_tip||/certificate|dictionary|morpheme|no guessing/i.test(w.root_tip))){
-    w.root_tip="";
+    w.root_tip="暫無可靠的常用字根拆解，不強行拆字。";
   }
   var examples=Array.isArray(w.examples)?w.examples:[];
   if(w.example_en)examples.unshift({en:w.example_en,zh:w.example_zh||""});
@@ -1034,7 +1042,8 @@ function mergeSavedWord(existing,incoming){
 function pushLib(w){
   chkDay();
   w=cleanWordData(w);
-  var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",examples:w.examples||[],phrases:w.phrases||[],grammar:w.grammar||[],collocations:w.collocations||[],common_errors:w.common_errors||[],roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now()};
+  // 新加入的字先排隊；完成每 30 題後，才會由 SRS 放行一批新字。
+  var wobj={word:w.word,phonetic:w.phonetic||"",pos:w.pos||"",conjugation:w.conjugation||null,zh:w.zh,en_def:w.en_def||"",example_en:w.example_en||"",example_zh:w.example_zh||"",examples:w.examples||[],phrases:w.phrases||[],grammar:w.grammar||[],collocations:w.collocations||[],common_errors:w.common_errors||[],roots:w.roots||[],root_tip:w.root_tip||"",family_words:w.family_words||[],memory_tip:w.memory_tip||"",level:w.level||"",source:w.source,addedAt:Date.now(),srs:{level:0,due:0,skip:false,introduced:false}};
   LIB.push(wobj);
   ST.today++;
   window._lib=LIB;
@@ -1067,14 +1076,31 @@ function addQuizOptionWord(word,btn){
 }
 
 // Library
-function renderLib(){filterLib(document.getElementById("lsrch").value||"");}
+var LIB_RANGE="all";
+function rollingRanges(total){
+  var specs=[{id:"all",label:"全部",from:1,to:total},{id:"latest",label:"最新20",from:Math.max(1,total-19),to:total}];
+  [[21,40],[41,60],[61,80],[81,100]].forEach(function(pair){
+    if(total>=pair[0])specs.push({id:"r"+pair[0],label:pair[0]+"–"+Math.min(pair[1],total),from:Math.max(1,total-pair[1]+1),to:total-pair[0]+1});
+  });
+  return specs;
+}
+function renderLibRanges(){
+  var box=document.getElementById("lranges");if(!box)return;box.innerHTML="";
+  rollingRanges(LIB.length).forEach(function(r){
+    var b=mk("button","lrange"+(LIB_RANGE===r.id?" on":""),r.label);
+    b.onclick=function(){LIB_RANGE=r.id;renderLib();};box.appendChild(b);
+  });
+}
+function getLibraryRange(){return rollingRanges(LIB.length).find(function(r){return r.id===LIB_RANGE;})||rollingRanges(LIB.length)[0];}
+function renderLib(){renderLibRanges();filterLib(document.getElementById("lsrch").value||"");}
 function libScrollBottom(){
   var el=document.getElementById("llist");
   if(el)el.scrollTo({top:el.scrollHeight,behavior:"smooth"});
 }
 function filterLib(q){
-  var list=q?LIB.filter(function(w){return w.word.toLowerCase().includes(q.toLowerCase())||w.zh.includes(q);}):LIB;
-  document.getElementById("lcnt").textContent="共 "+LIB.length+" 個單字"+(q?" · 顯示 "+list.length+" 個":"");
+  var range=getLibraryRange(),base=LIB.slice(range.from-1,range.to);
+  var list=q?base.filter(function(w){return w.word.toLowerCase().includes(q.toLowerCase())||w.zh.includes(q);}):base;
+  document.getElementById("lcnt").textContent="共 "+LIB.length+" 個單字 · "+range.label+" 顯示 "+list.length+" 個"+(q?"（搜尋結果）":"");
   var el=document.getElementById("llist");el.innerHTML="";
   if(!list.length){var e=mk("div","empty");e.textContent=LIB.length?"找不到符合的單字":"單字庫是空的";el.appendChild(e);return;}
   // 顯示順序：由舊到新（按新增順序），最新的在最下面
@@ -1320,9 +1346,28 @@ function renderGList(){
 
 // SRS Quiz
 function getSRS(w){return w.srs||{level:0,due:0,skip:false};}
+function isIntroduced(w){return !w.srs||w.srs.introduced!==false;}
+function unlockQueuedWords(){
+  var answered=ST.srsQuestions||0,allowed=Math.floor(answered/30)*10;
+  var queued=LIB.filter(function(w){return w.srs&&w.srs.introduced===false;});
+  var introduced=LIB.filter(isIntroduced).length,legacyCount=LIB.length-queued.length;
+  // 全新字庫沒有舊字可複習時，先提供第一批，之後仍每 30 題才解鎖下一批。
+  if(legacyCount===0&&introduced===0)allowed=Math.max(10,allowed);
+  // 舊資料沒有 introduced 欄位，視為已在複習池，避免升級後整個字庫被鎖住。
+  var canUnlock=Math.max(0,allowed-Math.max(0,introduced-legacyCount));
+  var opening=queued.slice(0,canUnlock);
+  opening.forEach(function(w){w.srs.introduced=true;});
+  if(opening.length)saveD();
+  return queued.length>canUnlock?queued.length-canUnlock:0;
+}
+function srsProgressText(){
+  var n=ST.srsQuestions||0,remain=30-(n%30||30),queued=LIB.filter(function(w){return w.srs&&w.srs.introduced===false;}).length;
+  return queued?"已完成 "+n+" 題；再答 "+remain+" 題解鎖下一批新單字（待解鎖 "+queued+" 個）。":"目前沒有待解鎖的新單字。";
+}
 function setSRS(word,ok){
   var w=LIB.find(function(x){return x.word===word;});if(!w)return;
   if(!w.srs)w.srs={level:0,due:0,skip:false};
+  w.srs.introduced=true;
   var gaps=[0,3600,28800,86400,259200,604800,1209600,2592000,7776000];
   if(ok){w.srs.level=Math.min(w.srs.level+1,8);w.srs.due=Date.now()+(gaps[w.srs.level]||86400)*1000;}
   else{w.srs.level=Math.max(0,w.srs.level-2);w.srs.due=Date.now()+300000;}
@@ -1337,10 +1382,11 @@ function setWordFreq(word,action){
   saveD();
 }
 function getPool(){
+  unlockQueuedWords();
   var now=Date.now();
-  var due=LIB.filter(function(w){return!getSRS(w).skip&&getSRS(w).due<=now;});
-  var fresh=LIB.filter(function(w){var s=getSRS(w);return!s.skip&&s.level===0&&s.due>now;});
-  var rest=LIB.filter(function(w){var s=getSRS(w);return!s.skip&&s.level>0&&s.due>now;});
+  var due=LIB.filter(function(w){return isIntroduced(w)&&!getSRS(w).skip&&getSRS(w).due<=now;});
+  var fresh=LIB.filter(function(w){var s=getSRS(w);return isIntroduced(w)&&!s.skip&&s.level===0&&s.due>now;});
+  var rest=LIB.filter(function(w){var s=getSRS(w);return isIntroduced(w)&&!s.skip&&s.level>0&&s.due>now;});
   return shuffle(due).concat(shuffle(fresh)).concat(shuffle(rest)).slice(0,Math.min(15,LIB.length));
 }
 var EXTRA_WORDS=[
@@ -1433,7 +1479,7 @@ function renderQuizSetup(){
   c1h.appendChild(c1ico);c1h.appendChild(c1t);
   var c1d=mk("div","");c1d.style.cssText="font-size:13px;color:var(--mu);line-height:1.6";
   var dueNow=LIB.filter(function(w){return!getSRS(w).skip&&getSRS(w).due<=Date.now();}).length;
-  c1d.textContent="依熟悉度自動出題，優先複習待複習單字。\n現在待複習："+dueNow+" 個";
+  c1d.textContent="依熟悉度自動出題，優先複習待複習單字。\n現在待複習："+dueNow+" 個\n"+srsProgressText();
   card1.appendChild(c1h);card1.appendChild(c1d);
   var b1=mk("button","bp","開始 SRS 測驗");b1.style.marginTop="12px";
   b1.onclick=function(){QRANGE.useRange=false;startQuiz(null);};
@@ -1468,7 +1514,8 @@ function renderQuizSetup(){
 
   // 快速選擇按鈕
   var presets=mk("div","");presets.style.cssText="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px";
-  [[1,50,"前50"],[51,100,"51-100"],[1,total,"全部"]].forEach(function(p){
+  rollingRanges(total).forEach(function(range){
+    var p=[range.from,range.to,range.label];
     var pb=mk("button","");pb.style.cssText="background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer";
     pb.textContent=p[2];
     pb.onclick=function(){
@@ -1478,12 +1525,6 @@ function renderQuizSetup(){
     };
     presets.appendChild(pb);
   });
-  // 動態加最新 N 個
-  var lastBtn=mk("button","");lastBtn.style.cssText="background:var(--s2);border:1px solid var(--bd2);color:var(--m2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer";
-  lastBtn.textContent="最新20個";
-  lastBtn.onclick=function(){fromInp.value=Math.max(1,total-19);toInp.value=total;updCnt();};
-  presets.appendChild(lastBtn);
-
   // 今日新增按鈕
   var todayCnt=ST.today||0;
   var todayBtn=mk("button","");
@@ -1522,13 +1563,14 @@ function startQuiz(subset){
   var el=document.getElementById("qc");el.innerHTML="";
   var pool;
   if(subset){
+    unlockQueuedWords();
     // 範圍模式：直接用 subset，保留 SRS 權重排序
     var now=Date.now();
-    var due=subset.filter(function(w){return!getSRS(w).skip&&getSRS(w).due<=now;});
-    var fresh=subset.filter(function(w){var s=getSRS(w);return!s.skip&&s.level===0&&s.due>now;});
-    var rest=subset.filter(function(w){var s=getSRS(w);return!s.skip&&s.level>0&&s.due>now;});
+    var due=subset.filter(function(w){return isIntroduced(w)&&!getSRS(w).skip&&getSRS(w).due<=now;});
+    var fresh=subset.filter(function(w){var s=getSRS(w);return isIntroduced(w)&&!s.skip&&s.level===0&&s.due>now;});
+    var rest=subset.filter(function(w){var s=getSRS(w);return isIntroduced(w)&&!s.skip&&s.level>0&&s.due>now;});
     pool=shuffle(due).concat(shuffle(fresh)).concat(shuffle(rest)).slice(0,Math.min(15,subset.length));
-    if(pool.length<4){pool=shuffle(subset).slice(0,Math.min(15,subset.length));}
+    if(pool.length<4){pool=shuffle(subset.filter(isIntroduced)).slice(0,Math.min(15,subset.length));}
   } else {
     pool=getPool();
   }
@@ -1590,7 +1632,7 @@ function ansQ(btn,chosen,q){
     });
     QST.wrong.push(q.word);
   }
-  setSRS(q.word,ok);speak(q.word);
+  setSRS(q.word,ok);ST.srsQuestions=(ST.srsQuestions||0)+1;saveST();speak(q.word);
   // 揭曉每個選項的對應意思
   document.querySelectorAll(".opt").forEach(function(b){
     var mainEl=b.querySelector(".opt-main");
@@ -1674,21 +1716,23 @@ function ansQ(btn,chosen,q){
   var fb4=mk("button","");fb4.style.cssText="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--rd);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit";fb4.textContent="⏸️ 不再出題";fb4.onclick=function(){setWordFreq(QST.curW,"skip");};
   freqRow.appendChild(fb2);freqRow.appendChild(fb3);freqRow.appendChild(fb4);fb.appendChild(freqRow);
 
-  if(q.type!=="en2zh"){
-    var newOpts=q.opts.filter(function(o){
-      return /^[A-Za-z][A-Za-z -]*$/.test(o)&&!LIB.some(function(w){return w.word.toLowerCase()===o.toLowerCase();});
+  // 測驗中的加單字功能：所有可辨識的英文選項都保留按鈕，已加入會清楚標示。
+  var quizWords=[];
+  if(/^[A-Za-z][A-Za-z -]*$/.test(q.word))quizWords.push(q.word);
+  if(q.type!=="en2zh")q.opts.forEach(function(o){if(/^[A-Za-z][A-Za-z -]*$/.test(o)&&quizWords.indexOf(o)<0)quizWords.push(o);});
+  if(quizWords.length){
+    var addRow=mk("div","");addRow.style.cssText="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap";
+    quizWords.forEach(function(opt){
+      var already=LIB.some(function(w){return w.word.toLowerCase()===opt.toLowerCase();});
+      var ab=mk("button","");
+      ab.style.cssText="border-radius:8px;padding:6px 12px;font-size:12px;font-family:inherit;"
+        +(already?"background:var(--s2);border:1px solid var(--bd2);color:var(--mu);cursor:default":"background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.28);color:var(--bl);cursor:pointer");
+      ab.textContent=already?"✓ "+opt+" 已加入":"＋ 加入 "+opt;
+      ab.disabled=already;
+      if(!already)ab.onclick=function(){addQuizOptionWord(opt,ab);};
+      addRow.appendChild(ab);
     });
-    if(newOpts.length){
-      var addRow=mk("div","");addRow.style.cssText="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap";
-      newOpts.forEach(function(opt){
-        var ab=mk("button","");
-        ab.style.cssText="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.28);color:var(--bl);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit";
-        ab.textContent="＋ 新增 "+opt;
-        ab.onclick=function(){addQuizOptionWord(opt,ab);};
-        addRow.appendChild(ab);
-      });
-      fb.appendChild(addRow);
-    }
+    fb.appendChild(addRow);
   }
 
   document.getElementById("qnxt").style.display="block";
@@ -1725,7 +1769,7 @@ function startApp(){
   if(window._lib)LIB=window._lib;
   if(window._st)ST=window._st;
   var ld=document.getElementById("fbld");if(ld)ld.style.display="none";
-  syncUI(false);renderHome();
+  syncUI(false);renderHome();renderQuiz();
   if(window._dataWarning){
     setTimeout(function(){toast("⚠️ "+window._dataWarning,5000);},800);
     window._dataWarning=null;
