@@ -28,6 +28,16 @@ function lsBackup(lib,st){
 function lsRestore(){
   return{lib:lsGet("wl-lib-backup")||[],st:lsGet("wl-st-backup")||{quiz:0,today:0,date:""}};
 }
+function recordTrustedCount(lib){
+  if(Array.isArray(lib)){lsSet("wl-safe-count",lib.length);lsSet("wl-safe-at",Date.now());}
+}
+function suspiciousShrink(incoming){
+  var local=lsRestore().lib||[],lastCount=lsGet("wl-safe-count"),lastAt=lsGet("wl-safe-at")||0;
+  var base=typeof lastCount==="number"?lastCount:local.length;
+  if(base>0&&incoming.length===0)return "同步資料變成空白";
+  if(base>=60&&base-incoming.length>=60&&Date.now()-lastAt<=60000)return "一分鐘內少了 "+(base-incoming.length)+" 個單字";
+  return "";
+}
 
 function wordKey(word){return String(word||"").trim().toLowerCase().replace(/[^a-z0-9]/g,"_");}
 
@@ -99,9 +109,17 @@ async function fbLoad(){
     fbLib.sort(function(a,b){return(a.addedAt||0)-(b.addedAt||0);});
     console.log("Firebase 回傳筆數："+fbLib.length);
 
+    const shrinkReason=suspiciousShrink(fbLib);
+    if(shrinkReason){
+      console.warn("已阻擋可疑單字庫覆蓋："+shrinkReason);
+      window._dataWarning="已保護原有單字庫："+shrinkReason+"，未套用這次同步結果。";
+      return;
+    }
+
     if(fbLib.length>0){
       window._lib=fbLib;window._st=fbSt;
       lsBackup(fbLib,fbSt);
+      recordTrustedCount(fbLib);
       lsSet("wl-lastSaved",fbLastSaved);
       // 更新畫面（已啟動後同步）
       if(window.refreshApp)window.refreshApp();
@@ -154,6 +172,7 @@ async function fbSaveWord(w){
     await setDoc(UREF,{lastSaved:ts},{merge:true});
     lsSet("wl-lastSaved",ts);
     lsBackup(window._lib||[],window._st||{});
+    recordTrustedCount(window._lib||[]);
     syncUI&&syncUI(false);
   }catch(e){console.warn("fbSaveWord",e);}
 }
@@ -167,6 +186,7 @@ async function fbDeleteWord(word){
     await setDoc(UREF,{lastSaved:ts},{merge:true});
     lsSet("wl-lastSaved",ts);
     lsBackup(window._lib||[],window._st||{});
+    recordTrustedCount(window._lib||[]);
   }catch(e){console.warn("fbDeleteWord",e);}
 }
 
@@ -408,8 +428,8 @@ nav button.on{color:var(--al)}
     </div>
   </div>
   <div class="view" id="v-quiz"><div class="qwrap" id="qc"><div style="display: flex; flex-direction: column; gap: 16px; padding: 8px 0px;"><div style="text-align: center;"><div style="font-size: 48px;">✏️</div><div style="font-size: 20px; font-weight: 700; margin-top: 8px;">選擇測驗模式</div></div><div style="background: var(--s1); border: 2px solid var(--abr); border-radius: 16px; padding: 18px; cursor: pointer;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><div style="font-size: 24px;">🧠</div><div style="font-size: 16px; font-weight: 700; color: var(--al);">SRS 智慧複習</div></div><div style="font-size: 13px; color: var(--mu); line-height: 1.6;">依熟悉度自動出題，優先複習待複習單字。
-現在待複習：2167 個
-已完成 313 題；再答 17 題解鎖下一批新單字（待解鎖 591 個）。</div><button class="bp" style="margin-top: 12px;">開始 SRS 測驗</button></div><div style="background: var(--s1); border: 1px solid var(--bd2); border-radius: 16px; padding: 18px;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><div style="font-size: 24px;">📋</div><div style="font-size: 16px; font-weight: 700;">範圍自選</div></div><div style="font-size: 13px; color: var(--mu); margin-bottom: 12px;">指定單字範圍（依新增順序），共 2176 個單字</div><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><input class="inp" type="number" min="1" max="2176" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><span style="font-size: 16px; color: var(--mu); font-weight: 700;">～</span><input class="inp" type="number" min="1" max="2176" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><div style="font-size: 13px; color: var(--mu); flex: 1 1 0%; text-align: right;">2176 個單字</div></div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;"><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">全部</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">最新20</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">21–40</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">41–60</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">61–80</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">81–100</button><button disabled="" style="border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; background: var(--s2); border: 1px solid var(--bd2); color: var(--mu); opacity: 0.5; cursor: not-allowed;">今日新增</button></div><button class="bp" style="width: 100%; background: var(--s2); border: 1px solid var(--bd2); color: var(--tx); border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;">開始範圍測驗</button></div></div></div></div>
+現在待複習：2166 個
+已完成 313 題；再答 17 題解鎖下一批新單字（待解鎖 590 個）。</div><button class="bp" style="margin-top: 12px;">開始 SRS 測驗</button></div><div style="background: var(--s1); border: 1px solid var(--bd2); border-radius: 16px; padding: 18px;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><div style="font-size: 24px;">📋</div><div style="font-size: 16px; font-weight: 700;">範圍自選</div></div><div style="font-size: 13px; color: var(--mu); margin-bottom: 12px;">指定單字範圍（依新增順序），共 2175 個單字</div><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><input class="inp" type="number" min="1" max="2175" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><span style="font-size: 16px; color: var(--mu); font-weight: 700;">～</span><input class="inp" type="number" min="1" max="2175" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><div style="font-size: 13px; color: var(--mu); flex: 1 1 0%; text-align: right;">2175 個單字</div></div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;"><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">全部</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">最新20</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">21–40</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">41–60</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">61–80</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">81–100</button><button disabled="" style="border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; background: var(--s2); border: 1px solid var(--bd2); color: var(--mu); opacity: 0.5; cursor: not-allowed;">今日新增</button></div><button class="bp" style="width: 100%; background: var(--s2); border: 1px solid var(--bd2); color: var(--tx); border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;">開始範圍測驗</button></div></div></div></div>
   <nav>
     <button class="on" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
     <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
@@ -1262,29 +1282,32 @@ function _fillModalBody(mb,w){
 function closeModal(){document.getElementById("modal").style.display="none";}
 function editLibraryWord(word){
   var w=LIB.find(function(x){return x.word===word;});if(!w)return;
-  var oldWord=w.word;
-  var fields=[
-    ["word","英文單字",w.word],["phonetic","音標",w.phonetic||""],["pos","詞性",w.pos||""],
-    ["zh","中文意思",w.zh||""],["en_def","英文定義",w.en_def||""],["level","程度",w.level||""],["source","來源",w.source||""],
-    ["root_tip","字根說明",w.root_tip||""]
-  ];
-  for(var i=0;i<fields.length;i++){var f=fields[i],v=prompt(f[1],f[2]);if(v===null)return;w[f[0]]=v.trim();}
-  if(!w.word){toast("⚠️ 英文單字不能留白");return;}
-  if(w.word.toLowerCase()!==oldWord.toLowerCase()&&LIB.some(function(x){return x!==w&&x.word.toLowerCase()===w.word.toLowerCase();})){toast("⚠️ 這個單字已存在，未儲存");return;}
-  var c=w.conjugation||{};
-  ["present","past","pp","ing"].forEach(function(k){var v=prompt("動詞三態："+k,c[k]||"");if(v!==null)c[k]=v.trim();});
-  w.conjugation=c;
-  var jsonFields=[["examples","例句（JSON）"],["phrases","高頻片語（JSON，最多 2 筆）"],["grammar","文法重點（JSON）"],["collocations","常見搭配詞（JSON，最多 2 筆）"],["roots","字根（JSON）"],["family_words","同族單字（JSON）"]];
-  for(var j=0;j<jsonFields.length;j++){
-    var jf=jsonFields[j],raw=prompt(jf[1],JSON.stringify(w[jf[0]]||[]));
-    if(raw===null)return;
-    try{var parsed=JSON.parse(raw);if(!Array.isArray(parsed))throw new Error();w[jf[0]]=parsed;}catch(e){toast("⚠️ 「"+jf[1]+"」格式錯誤，未儲存");return;}
+  var oldWord=w.word,mb=document.getElementById("mbody");mb.innerHTML="";
+  var scroll=mk("div","mbody-scroll"),title=mk("div","mword","編輯單字資料");title.style.fontSize="25px";scroll.appendChild(title);
+  scroll.appendChild(mk("div","","只要修改需要的欄位，最後按一次儲存。"));
+  var inputs={};
+  function addInput(key,label,value,wide){
+    var box=mk("div","");box.style.cssText="display:flex;flex-direction:column;gap:6px";
+    box.appendChild(mk("div","tlbl",label));
+    var el=document.createElement(wide?"textarea":"input");el.className="inp";el.value=value||"";
+    if(wide){el.rows=wide;el.style.cssText="resize:vertical;line-height:1.45";}
+    box.appendChild(el);scroll.appendChild(box);inputs[key]=el;
   }
-  cleanWordData(w);
-  window._lib=LIB;lsBackup(LIB,ST);
-  if(window.fbSaveWord)window.fbSaveWord(w);
-  if(oldWord!==w.word&&window.fbDeleteWord)window.fbDeleteWord(oldWord);
-  renderHome();renderLib();toast("✅ 已儲存「"+w.word+"」");openModal(w.word);
+  [["word","英文單字"],["phonetic","音標"],["pos","詞性"],["zh","中文意思"],["en_def","英文定義"],["level","程度"],["source","來源"],["root_tip","字根說明"]].forEach(function(f){addInput(f[0],f[1],w[f[0]],f[0]==="root_tip"?3:0);});
+  var c=w.conjugation||{};[["present","原形"],["past","過去式"],["pp","過去分詞"],["ing","現在分詞"]].forEach(function(f){addInput("conj_"+f[0],"動詞三態："+f[1],c[f[0]],0);});
+  [["examples","例句"],["phrases","高頻片語（最多 2 筆）"],["grammar","文法重點"],["collocations","常見搭配詞（最多 2 筆）"],["roots","字根"],["family_words","同族單字"]].forEach(function(f){addInput(f[0],f[1]+"（JSON 格式）",JSON.stringify(w[f[0]]||[],null,2),5);});
+  var save=mk("button","bp","儲存修改");save.style.marginTop="8px";save.onclick=function(){
+    var draft={};Object.keys(inputs).forEach(function(k){draft[k]=inputs[k].value.trim();});
+    if(!draft.word){toast("⚠️ 英文單字不能留白");return;}
+    if(draft.word.toLowerCase()!==oldWord.toLowerCase()&&LIB.some(function(x){return x!==w&&x.word.toLowerCase()===draft.word.toLowerCase();})){toast("⚠️ 這個單字已存在");return;}
+    var arrays=["examples","phrases","grammar","collocations","roots","family_words"];
+    for(var i=0;i<arrays.length;i++){try{draft[arrays[i]]=JSON.parse(draft[arrays[i]]||"[]");if(!Array.isArray(draft[arrays[i]]))throw new Error();}catch(e){toast("⚠️ 「"+arrays[i]+"」格式錯誤，請使用 JSON 陣列");return;}}
+    ["word","phonetic","pos","zh","en_def","level","source","root_tip"].forEach(function(k){w[k]=draft[k];});
+    w.conjugation={present:draft.conj_present,past:draft.conj_past,pp:draft.conj_pp,ing:draft.conj_ing};arrays.forEach(function(k){w[k]=draft[k];});cleanWordData(w);
+    window._lib=LIB;lsBackup(LIB,ST);if(window.fbSaveWord)window.fbSaveWord(w);if(oldWord!==w.word&&window.fbDeleteWord)window.fbDeleteWord(oldWord);
+    renderHome();renderLib();toast("✅ 已儲存「"+w.word+"」");openModal(w.word);
+  };
+  var cancel=mk("button","mclose","取消，不儲存");cancel.onclick=function(){openModal(oldWord);};scroll.appendChild(save);scroll.appendChild(cancel);mb.appendChild(scroll);
 }
 function enrichWord(word,btn){
   btn.disabled=true;btn.textContent="分析中...";
@@ -1841,6 +1864,7 @@ window.refreshApp=function(){
 if(window._fbReady){startApp();}
 else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},15000);}
 </script>
+
 
 
 
