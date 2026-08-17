@@ -21,14 +21,15 @@ const WCOL=collection(db,"users","kumo","words");
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function lsBackup(lib,st){
-  if(lib&&lib.length>0){lsSet("wl-lib-backup",lib);lsSet("wl-lib-count",lib.length);}
+  // 空陣列也必須保存，否則刪掉最後一個單字後會被舊快取還原。
+  if(Array.isArray(lib)){lsSet("wl-lib-backup",lib);lsSet("wl-lib-count",lib.length);}
   if(st)lsSet("wl-st-backup",st);
 }
 function lsRestore(){
   return{lib:lsGet("wl-lib-backup")||[],st:lsGet("wl-st-backup")||{quiz:0,today:0,date:""}};
 }
 
-function wordKey(word){return word.toLowerCase().replace(/[^a-z0-9]/g,"_");}
+function wordKey(word){return String(word||"").trim().toLowerCase().replace(/[^a-z0-9]/g,"_");}
 
 // ── 快速啟動：先用 localStorage，不等 Firebase
 function quickStart(){
@@ -68,7 +69,9 @@ async function fbLoad(){
     const localLastSaved=lsGet("wl-lastSaved")||0;
 
     // 3. 偵測舊結構（library 陣列在主文件）→ 自動遷移
-    if(d.library&&d.library.length>0){
+    // library 是早期的整包儲存格式。完成遷移後必須以 words 子集合為準，
+    // 否則已刪除的單字會被舊陣列在下次開啟時重新載回。
+    if(d.library&&d.library.length>0&&!d.migrated){
       console.log("偵測到舊結構，開始遷移 "+d.library.length+" 筆...");
       window._lib=d.library;window._st=fbSt;
       lsBackup(d.library,fbSt);
@@ -383,12 +386,12 @@ nav button.on{color:var(--al)}
     </div>
     <div class="hdiv"></div>
     <div class="stats">
-      <div class="stat"><div class="stn" id="ht">1969</div><div class="stl">我的單字</div></div>
-      <div class="stat"><div class="stn" id="hd">24</div><div class="stl">今日新增</div></div>
+      <div class="stat"><div class="stn" id="ht">2176</div><div class="stl">我的單字</div></div>
+      <div class="stat"><div class="stn" id="hd">0</div><div class="stl">今日新增</div></div>
       <div class="stat"><div class="stn" id="hq">37</div><div class="stl">測驗次數</div></div>
     </div>
     <div class="sh">最近新增</div>
-    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">nephew</div><div class="riz">外甥；姪子</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">stroke</div><div class="riz">中風；撫摸；筆劃</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">receiver</div><div class="riz">接收器；聽筒</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">dial</div><div class="riz">撥號；刻度盤</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">seize</div><div class="riz">抓住</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">snap at</div><div class="riz">厲聲回應；咬</div></div><span class="rib">手動</span></div></div>
+    <div class="rlist" id="rlist"><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">obstache</div><div class="riz">障礙</div></div><span class="rib">手動</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">call off</div><div class="riz">取消</div></div><span class="rib">多張圖片</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">call for</div><div class="riz">要求，召喚</div></div><span class="rib">多張圖片</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">call on</div><div class="riz">拜訪</div></div><span class="rib">多張圖片</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">ceasefire</div><div class="riz">停火</div></div><span class="rib">多張圖片</span></div><div class="ri"><div style="flex: 1 1 0%;"><div class="riw">carry on</div><div class="riz">繼續</div></div><span class="rib">多張圖片</span></div></div>
   </div>
   <div class="view" id="v-add"><div class="awrap" id="awrap"></div></div>
   <div class="view" id="v-lib">
@@ -405,8 +408,8 @@ nav button.on{color:var(--al)}
     </div>
   </div>
   <div class="view" id="v-quiz"><div class="qwrap" id="qc"><div style="display: flex; flex-direction: column; gap: 16px; padding: 8px 0px;"><div style="text-align: center;"><div style="font-size: 48px;">✏️</div><div style="font-size: 20px; font-weight: 700; margin-top: 8px;">選擇測驗模式</div></div><div style="background: var(--s1); border: 2px solid var(--abr); border-radius: 16px; padding: 18px; cursor: pointer;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><div style="font-size: 24px;">🧠</div><div style="font-size: 16px; font-weight: 700; color: var(--al);">SRS 智慧複習</div></div><div style="font-size: 13px; color: var(--mu); line-height: 1.6;">依熟悉度自動出題，優先複習待複習單字。
-現在待複習：1504 個
-目前沒有待解鎖的新單字。</div><button class="bp" style="margin-top: 12px;">開始 SRS 測驗</button></div><div style="background: var(--s1); border: 1px solid var(--bd2); border-radius: 16px; padding: 18px;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><div style="font-size: 24px;">📋</div><div style="font-size: 16px; font-weight: 700;">範圍自選</div></div><div style="font-size: 13px; color: var(--mu); margin-bottom: 12px;">指定單字範圍（依新增順序），共 1513 個單字</div><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><input class="inp" type="number" min="1" max="1513" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><span style="font-size: 16px; color: var(--mu); font-weight: 700;">～</span><input class="inp" type="number" min="1" max="1513" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><div style="font-size: 13px; color: var(--mu); flex: 1 1 0%; text-align: right;">1513 個單字</div></div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;"><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">全部</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">最新20</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">21–40</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">41–60</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">61–80</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">81–100</button><button disabled="" style="border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; background: var(--s2); border: 1px solid var(--bd2); color: var(--mu); opacity: 0.5; cursor: not-allowed;">今日新增</button></div><button class="bp" style="width: 100%; background: var(--s2); border: 1px solid var(--bd2); color: var(--tx); border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;">開始範圍測驗</button></div></div></div></div>
+現在待複習：1960 個
+已完成 313 題；再答 17 題解鎖下一批新單字（待解鎖 328 個）。</div><button class="bp" style="margin-top: 12px;">開始 SRS 測驗</button></div><div style="background: var(--s1); border: 1px solid var(--bd2); border-radius: 16px; padding: 18px;"><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><div style="font-size: 24px;">📋</div><div style="font-size: 16px; font-weight: 700;">範圍自選</div></div><div style="font-size: 13px; color: var(--mu); margin-bottom: 12px;">指定單字範圍（依新增順序），共 1969 個單字</div><div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;"><input class="inp" type="number" min="1" max="1969" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><span style="font-size: 16px; color: var(--mu); font-weight: 700;">～</span><input class="inp" type="number" min="1" max="1969" style="width: 72px; padding: 10px; font-size: 16px; text-align: center; background: var(--s2); border: 1px solid var(--bd2); border-radius: 10px; outline: none; color: var(--tx);"><div style="font-size: 13px; color: var(--mu); flex: 1 1 0%; text-align: right;">1969 個單字</div></div><div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;"><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">全部</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">最新20</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">21–40</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">41–60</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">61–80</button><button style="background: var(--s2); border: 1px solid var(--bd2); color: var(--m2); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">81–100</button><button disabled="" style="border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; background: var(--s2); border: 1px solid var(--bd2); color: var(--mu); opacity: 0.5; cursor: not-allowed;">今日新增</button></div><button class="bp" style="width: 100%; background: var(--s2); border: 1px solid var(--bd2); color: var(--tx); border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;">開始範圍測驗</button></div></div></div></div>
   <nav>
     <button class="on" id="nb-home" onclick="goTab(&#39;home&#39;)"><span class="ni">🏠</span>首頁</button>
     <button id="nb-add" onclick="goTab(&#39;add&#39;)"><span class="ni">📷</span>新增</button>
@@ -980,6 +983,11 @@ function buildWCard(w,idx){
   var sr=mk("div","srow");sr.id="sr-"+idx;
   if(dup){var mbg=mk("button","bsav","🔄 合併教材內容");mbg.onclick=function(){saveOne(idx);};sr.appendChild(mbg);}
   else{var sb=mk("button","bsav","＋ 加入單字庫");sb.onclick=function(){saveOne(idx);};sr.appendChild(sb);}
+  var discard=mk("button","bdel","✕ 不加入");
+  discard.style.padding="10px 13px";
+  discard.title="從這次辨識結果移除";
+  discard.onclick=function(){discardPendingWord(idx);};
+  sr.appendChild(discard);
   card.appendChild(sr);
   var roots=w.roots||[];var hasFam=(w.family_words||[]).length>0;
   if(roots.length||w.root_tip||hasFam){
@@ -1004,6 +1012,14 @@ function buildWCard(w,idx){
   }
   if(w.memory_tip){var mb=mk("div","tbox");mb.appendChild(mk("div","tlbl","💡 記憶技巧"));mb.appendChild(mk("div","ttxt",w.memory_tip));card.appendChild(mb);}
   return card;
+}
+
+// AI 辨識偶爾會漏資料或誤抓文字；先從待加入清單排除，不會影響已儲存的單字庫。
+function discardPendingWord(idx){
+  var w=PEND[idx];if(!w)return;
+  PEND.splice(idx,1);
+  showRes(PEND,"辨識結果");
+  toast("已移除「"+w.word+"」，不會加入單字庫");
 }
 
 function saveOne(idx){
@@ -1127,7 +1143,13 @@ function filterLib(q){
 function delWord(word){
   if(!word||word==="null"){toast("⚠️ 無效單字，略過");return;}
   if(!confirm("確定刪除「"+word+"」？"))return;
-  LIB=LIB.filter(function(w){return w.word!==word;});
+  // 容許 AI 或舊資料帶有大小寫／空白差異，避免畫面顯示有字但刪不掉。
+  var key=String(word).trim().toLowerCase();
+  var before=LIB.length;
+  LIB=LIB.filter(function(w){return String((w&&w.word)||"").trim().toLowerCase()!==key;});
+  if(LIB.length===before){toast("⚠️ 找不到「"+word+"」，請重新整理單字庫後再試");return;}
+  // LIB 在這裡被重新指派；同步用的快取也要立刻指向刪除後的清單。
+  window._lib=LIB;
   lsBackup(LIB,ST);
   if(window.fbDeleteWord)window.fbDeleteWord(word);
   renderLib();renderHome();toast("🗑 已刪除「"+word+"」");
@@ -1790,6 +1812,7 @@ window.refreshApp=function(){
 if(window._fbReady){startApp();}
 else{window._onFbReady=startApp;setTimeout(function(){if(!window._fbReady){console.warn("Firebase timeout");startApp();}},15000);}
 </script>
+
 
 
 
